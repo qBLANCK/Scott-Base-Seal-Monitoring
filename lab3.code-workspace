@@ -4,7 +4,7 @@
 			"path": "."
 		},
 		{
-			"path": "../../../../../local/antarctica_seals"
+			"path": "/local/antarctica_seals"
 		}
 	],
 	"settings": {}
