@@ -1,0 +1,67 @@
+#!/bin/bash
+#
+# This script builds the upstream tar file for dcraw
+# by downloading sources file by file via http by wget.
+#
+# Run its from outside of repository:
+#
+#   $ bash dcraw/debian/getsource
+#
+# As output, dcraw_X.YY.orig.tar.gz will be created.
+#
+
+PATH=/usr/bin:/bin
+
+set -x
+set -u
+set -e
+
+DCRAWHOME=http://www.cybercom.net/~dcoffin/dcraw/
+WGET=wget
+
+http_proxy=
+export http_proxy
+
+TMPFILE=dcraw.c_new
+
+# Get the new source
+${WGET} -O ${TMPFILE} ${DCRAWHOME}dcraw.c
+
+# grep for the current version
+#NEWVERSION=$(grep -i v[0-9][.][0-9][0-9] ${TMPFILE} | sed -e 's/^.*Raw Photo Decoder.*v\([0-9][.][0-9][0-9]\).*$/\1/')
+NEWVERSION=$(grep -i '^#define DCRAW_VERSION "[0-9][.][0-9][0-9]"$' ${TMPFILE} | sed -e 's/^#define DCRAW_VERSION "\([0-9][.][0-9][0-9]\)"$/\1/')
+
+if [ -z "${NEWVERSION}" ]
+then
+  echo "error: Could not get new version number"
+  exit 1
+fi
+
+
+# Build a working directory
+WORKDIR=dcraw_${NEWVERSION}.orig
+if [ -d ${WORKDIR} ]
+then
+    echo "Working directory for current version already exists. stop"
+    echo "dcraw is in newest version already."
+  exit 0
+fi
+
+mkdir ${WORKDIR}
+mv ${TMPFILE} ${WORKDIR}/dcraw.c
+
+# Get the other bits and pieces
+cd ${WORKDIR}
+${WGET} ${DCRAWHOME}dcraw.1
+#${WGET} ${DCRAWHOME}dcwrap
+${WGET} ${DCRAWHOME}parse.c
+#${WGET} ${DCRAWHOME}fixdates.c
+${WGET} ${DCRAWHOME}fujiturn.c
+${WGET} ${DCRAWHOME}fuji_green.c
+${WGET} ${DCRAWHOME}clean_crw.c
+${WGET} ${DCRAWHOME}.badpixels
+
+cd ..
+
+tar -cvzf ${WORKDIR}.tar.gz ${WORKDIR}
+rm -rf ${WORKDIR}
