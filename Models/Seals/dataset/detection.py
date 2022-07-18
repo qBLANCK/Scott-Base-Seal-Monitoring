@@ -287,9 +287,6 @@ def transform_training(args, encoder=None):
         transforms.adjust_brightness(args.brightness, args.contrast),
         transforms.adjust_colours(args.hue, args.saturation)
     ))
-
-
-
     
 
     encode = encode_with(args, deepcopy(encoder).to('cpu')) 

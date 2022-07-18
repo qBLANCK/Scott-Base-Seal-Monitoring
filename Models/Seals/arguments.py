@@ -4,7 +4,7 @@ import argparse
 from tools.parameters import param, parse_args, choice, parse_choice, group
 from tools import struct
 
-import detection.models as models
+from detection.retina import model as retina
 
 train_parameters = struct (
     optimizer = group('optimizer settings',
@@ -53,7 +53,6 @@ train_parameters = struct (
 
     paused          = param(False, help='start trainer paused'),
     num_workers     = param(4,      help='number of workers used to process dataset'),
-    model           = choice(default='retina', options=models.parameters, help='model type and parameters e.g. "retina --start=4"'),
 
     bn_momentum    = param(0.9, "momentum for batch normalisation modules"),
 
@@ -141,14 +140,11 @@ input_remote = make_input_parameters('json', input_choices._extend(
     remote = struct (host = param("localhost:2160", help = "hostname of remote connection"))
 ))
 
-parameters = detection_parameters._merge(train_parameters)._merge(input_remote)._merge(debug_parameters)
+parameters = detection_parameters._merge(train_parameters)._merge(input_remote)._merge(debug_parameters)._merge(retina.parameters)
 
 
 def get_arguments():
     args = parse_args(parameters, "trainer", "object detection parameters")
-
-
-    args.model = parse_choice("model", parameters.model, args.model)
     args.input = parse_choice("input", parameters.input, args.input)
 
 

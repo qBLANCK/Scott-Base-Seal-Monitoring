@@ -4,7 +4,7 @@ import os
 import copy
 
 from dataset.imports import load_dataset
-from detection import models
+from detection.retina import model as retina
 
 from tools import struct, Struct
 
@@ -72,7 +72,7 @@ def load_model(model_path):
 
     args = loaded.args
 
-    model, encoder = models.create(args.model, args.dataset)
+    model, encoder = retina.create(args.model, args.dataset)
     load_state(model, loaded.best)
 
     return model, encoder, args

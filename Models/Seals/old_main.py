@@ -29,8 +29,6 @@ from tools.parameters import default_parameters, get_choice
 from tools import table, struct, logger, to_structs, Struct, window, tensors_to, shape
 
 from tools.logger import EpochLogger
-
-import connection
 import trainer
 import evaluate
 import math
@@ -524,12 +522,8 @@ def run_main():
 
     choice, input_args = get_choice(args.input)
 
-    if choice == 'remote':
-        print("connecting to: " + input_args.host)
-        p, conn = connection.connect('ws://' + input_args.host)
-    else:
-        config, dataset = load_dataset(args)
-        env = initialise(config, dataset, args)
+    config, dataset = load_dataset(args)
+    env = initialise(config, dataset, args)
 
 
 

@@ -5,7 +5,7 @@ import random
 import torch.optim as optim
 from torch import nn
 from dataset.imports import load_dataset
-from detection import models
+from detection.retina import model as retina
 import checkpoint
 from tools import struct, logger, Struct
 from tools.logger import EpochLogger
@@ -33,7 +33,7 @@ def initialise(config, dataset, args):
     output_path, _ = logger.make_experiment(log_root, args.run_name, load=not args.no_load, dry_run=args.dry_run)
     model_path = os.path.join(output_path, "model.pth")
 
-    model, _ = models.create(model_args.model, model_args.dataset)
+    model, _ = retina.create(args, model_args.dataset)
 
     set_bn_momentum(model, args.bn_momentum)
 
@@ -100,7 +100,6 @@ class Trainer():
             dataset = struct(
                 classes = dataset.classes,
                 input_channels = 3),
-            model   = args.model,
             version = 2
         )
 
@@ -114,7 +113,7 @@ class Trainer():
         output_path, log = logger.make_experiment(log_root, args.run_name, load=not args.no_load, dry_run=args.dry_run)
         model_path = os.path.join(output_path, "model.pth")
 
-        model, encoder = models.create(model_args.model, model_args.dataset)
+        model, encoder = retina.create(args, model_args.dataset)
 
         set_bn_momentum(model, args.bn_momentum)
 
