@@ -19,6 +19,7 @@
             "program": "~/SENG402/Models/Seals/main.py",
             "args": [
                 "--first", "2",
+                "--scale", "1.2",
                 "--input", "json --path /home/fdi19/SENG402/data/annotations/scott_base.json",
                 "--log_dir", "~/SENG402/Models/Seals/log",
                 "--train_size", "512",

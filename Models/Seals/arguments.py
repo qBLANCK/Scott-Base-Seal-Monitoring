@@ -1,8 +1,6 @@
-
-import argparse
-
-from tools.parameters import param, parse_args, choice, parse_choice, group
+from tools.parameters import param, parse_args, choice, parse_choice, group, add_arguments
 from tools import struct
+import argparse
 
 from detection.retina import model as retina
 
@@ -128,24 +126,23 @@ input_choices = struct(
     )
 )
 
-def make_input_parameters(default = None, choices = input_choices):
-    return struct(
+input_parameters = struct(
         keep_classes = param(type="str", help = "further filter the classes, but keep empty images"),
         subset       = param(type="str", help = "use a subset of loaded classes, filter images with no anntations"),
-        input        = choice(default=default, options=choices, help='input method', required=default is None),
+        input        = choice(default="json", options=input_choices, help='input method'),
     )
 
 
-input_remote = make_input_parameters('json', input_choices._extend(
-    remote = struct (host = param("localhost:2160", help = "hostname of remote connection"))
-))
-
-parameters = detection_parameters._merge(train_parameters)._merge(input_remote)._merge(debug_parameters)._merge(retina.parameters)
+parameters = detection_parameters._merge(train_parameters)._merge(input_parameters)._merge(debug_parameters)._merge(retina.parameters)
 
 
 def get_arguments():
     args = parse_args(parameters, "trainer", "object detection parameters")
     args.input = parse_choice("input", parameters.input, args.input)
-
+    
+    parser = argparse.ArgumentParser()
+    add_arguments(parser, retina.parameters)
+    _args = parser.parse_known_args()
+    args.model_params = struct(**_args[0].__dict__)
 
     return args

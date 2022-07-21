@@ -17,39 +17,6 @@ import pprint
 
 pp = pprint.PrettyPrinter(indent=2)
 
-def initialise(config, dataset, args):
-
-    data_root = config.root
-    log_root = args.log_dir or data_root
-
-    model_args = struct (
-        dataset = struct(
-            classes = dataset.classes,
-            input_channels = 3),
-        model   = args.model,
-        version = 2
-    )
-
-    output_path, _ = logger.make_experiment(log_root, args.run_name, load=not args.no_load, dry_run=args.dry_run)
-    model_path = os.path.join(output_path, "model.pth")
-
-    model, _ = retina.create(args, model_args.dataset)
-
-    set_bn_momentum(model, args.bn_momentum)
-
-    _, current, _ = checkpoint.load_checkpoint(model_path, model, model_args, args)
-    model = current.model
-
-    device = torch.cuda.current_device()
-
-    # Allocate more GPU memory
-    fraction = 4 / 4
-    torch.cuda.set_per_process_memory_fraction(fraction, device)
-    torch.cuda.empty_cache()
-
-    return struct(**locals())
-
-
 def log_anneal(range, t):
     begin, end = range
     return math.exp(math.log(begin) * (1 - t) + math.log(end) * t)
@@ -100,7 +67,8 @@ class Trainer():
             dataset = struct(
                 classes = dataset.classes,
                 input_channels = 3),
-            version = 2
+            version = 2,
+            model_params = args.model_params
         )
 
         run = 0
@@ -113,7 +81,7 @@ class Trainer():
         output_path, log = logger.make_experiment(log_root, args.run_name, load=not args.no_load, dry_run=args.dry_run)
         model_path = os.path.join(output_path, "model.pth")
 
-        model, encoder = retina.create(args, model_args.dataset)
+        model, encoder = retina.create(args.model_params, model_args.dataset)
 
         set_bn_momentum(model, args.bn_momentum)
 

@@ -72,7 +72,7 @@ def load_model(model_path):
 
     args = loaded.args
 
-    model, encoder = retina.create(args.model, args.dataset)
+    model, encoder = retina.create(args.model_params, args.dataset)
     load_state(model, loaded.best)
 
     return model, encoder, args
@@ -86,7 +86,6 @@ def load_checkpoint(model_path, model, model_args, args, strict=True):
         current = load_state(model, loaded.best if args.restore_best else loaded.current, strict=strict)
         best = load_state(copy.deepcopy(model), loaded.best, strict=strict)
 
-        print(loaded.args)
 
         if loaded.args == model_args:
             print("loaded model dataset parameters match, resuming")

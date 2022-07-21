@@ -145,23 +145,22 @@ class RetinaNet(nn.Module):
 
 
 parameters = struct(
-   
     anchor_scale = param (4, help = "anchor scale relative to box stride"),
-    shared    = param (False, help = "share weights between network heads at different levels"),
-    square    = param (False, help = "restrict box outputs (and anchors) to square"),
+        shared    = param (False, help = "share weights between network heads at different levels"),
+        square    = param (False, help = "restrict box outputs (and anchors) to square"),
 
-    params = group('parameters',
-        pos_match = param (0.5, help = "lower iou threshold matching positive anchor boxes in training"),
-        neg_match = param (0.4,  help = "upper iou threshold matching negative anchor boxes in training"),
+        params = group('parameters',
+            pos_match = param (0.5, help = "lower iou threshold matching positive anchor boxes in training"),
+            neg_match = param (0.4,  help = "upper iou threshold matching negative anchor boxes in training"),
 
-        crop_boxes      = param(False, help='crop boxes to the edge of the image patch in training'),
-        top_anchors     = param(1,     help='select n top anchors for ground truth regardless of iou overlap (0 disabled)'),
+            crop_boxes      = param(False, help='crop boxes to the edge of the image patch in training'),
+            top_anchors     = param(1,     help='select n top anchors for ground truth regardless of iou overlap (0 disabled)'),
 
-        location_loss =  param ("l1", help = "location loss function (giou | l1)"),
-        balance = param(4., help = "loss = class_loss / balance + location loss")
-    ),
+            location_loss =  param ("l1", help = "location loss function (giou | l1)"),
+            balance = param(4., help = "loss = class_loss / balance + location loss")
+        ),
 
-    pyramid = group('pyramid_parameters', **pyramid_parameters)
+        pyramid = group('pyramid_parameters', **pyramid_parameters)
   )
 
 
