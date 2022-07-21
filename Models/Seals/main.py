@@ -202,7 +202,7 @@ class Trainer():
         self.epoch = self.epoch + 1
 
         if self.best.epoch < self.epoch - self.args.validation_pause:
-            self.wrap_up(f"Validation not improced after {self.args.validation_pause} epochs.")
+            self.wrap_up(f"Validation not improved after {self.args.validation_pause} epochs.")
         else:
             print(f"Best epoch: {self.best.epoch}")
 
