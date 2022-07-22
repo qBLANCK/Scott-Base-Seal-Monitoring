@@ -31,22 +31,30 @@
             "console": "integratedTerminal"
         },
         {
-            "name": "Visualise",
+            "name": "Train Seals Model (2021-22)",
             "type": "python",
             "request": "launch",
-            "justMyCode": false,
-            "program": "~/SENG402/Models/Seals/vis.py",
+            "program": "~/SENG402/Models/Seals/main.py",
             "args": [
-                "--model", "retina --first 2",
-                "--input", "json --path /home/fdi19/SENG402/data/annotations/scott_base.json",
+                "--first", "2",
+                "--input", "coco --path /home/fdi19/SENG402/data/annotations/export_coco-instance_segmentsai1_Seal_2022-22_v1.0.json --image_root /home/fdi19/SENG402/data/images/scott_base/2021-22",
                 "--log_dir", "~/SENG402/Models/Seals/log",
                 "--train_size", "512",
-                "--batch_size", "8",
+                "--batch_size", "4",
                 "--validation_pause", "16",
-                "--run_name", "Seals_3",
-                "--restore_best",
-                "--validate"
+                "--run_name", "Seals_COCO",
+                "--restore_best"
             ],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Segments.AI Upload",
+            "type": "python",
+            "request": "launch",
+            "program": "~/SENG402/Models/Seals/scripts/segments_ai_upload.py",
+            "env": {
+                "SegmentsAI_api_key": "ae49a2f3f2b214880769d3d6a7276c8f747a2376"
+            },
             "console": "integratedTerminal"
         },
     ]
