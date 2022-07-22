@@ -14,24 +14,13 @@ train_parameters = struct (
         lr_step         = param(10, type='float', help='step factor to drop LR'),
 
         lr_min          = param(0.1,    help='minimum learning rate to decay to (factor of initial lr)'),
-      
-        fine_tuning     = param(1.0,    help='fine tuning as proportion of learning rate'),
+        
         momentum        = param(0.5,    help='SGD momentum'),
         weight_decay    = param(1e-4, help='weight decay rate')
     ),
 
-    average_start  = param(2,    help='start weight averaging after epochs'),
-    average_window = param(1,    help='use a window of size for averaging, 1 = no averaging'),
-
     seed            = param(1,      help='random seed'),
     batch_size      = param(8,     help='input batch size for training'),
-
-    reviews      = param(0,     help = 'number of reviews conducted per epoch'),
-    detections   = param(0,     help = 'number of detections conducted per epoch on new images'),
-
-    detect_all   = param(False,     help = 'run detections for all images'),
-    variation_window = param(2,         help = 'size of window to compute frame variation with'),
-
 
     tests = param('', help='comma separated list of test sets to use'),
     
@@ -40,16 +29,10 @@ train_parameters = struct (
 
     incremental       = param(False, help='simulate incremental adding to the dataset during training'),
     max_epochs      = param(None, type='int', help='maximum number of epochs to train'),
-      
-    pause_epochs      = param(128, type='int', help='number of epochs to train before pausing'),
 
     eval_split      = param(False, help='evaluate images split into crops of image_size'),
     overlap         = param(200, type='int', help='margin of overlap when splitting images for evaluation'),
-    
-    box_noise       = param(0.0, help='add gaussian noise to bounding boxes'),
-    box_offset      = param(0, help='add systematic offset to bounding boxes'),
 
-    paused          = param(False, help='start trainer paused'),
     num_workers     = param(4,      help='number of workers used to process dataset'),
 
     bn_momentum    = param(0.9, "momentum for batch normalisation modules"),

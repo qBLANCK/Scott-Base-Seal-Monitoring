@@ -157,7 +157,7 @@ class Trainer():
             raise Exception("Either no environment or training dataset")
 
         if self.args.max_epochs is not None and self.epoch > self.args.max_epochs:
-            self.wrap_up(f"Max epocs ({self.args.max_epochs}) reached.")
+            self.wrap_up(f"Max epochs ({self.args.max_epochs}) reached.")
 
 
         log = EpochLogger(self.log, self.epoch)
@@ -202,12 +202,6 @@ class Trainer():
             self.wrap_up(f"Validation not improved after {self.args.validation_pause} epochs.")
         else:
             print(f"Best epoch: {self.best.epoch}")
-
-        if self.pause_time is not None:
-            self.pause_time = self.pause_time - 1
-
-            if self.pause_time == 0:
-                self.wrap_up("Pause time reached")
 
         log.flush()
     
