@@ -1,13 +1,11 @@
-from scripts.load_figures import *
-from matplotlib.lines import Line2D
+import torch
+from detection.evaluate import mAP_smoothed
+from tools import filter_none, struct, pluck, pluck_struct
+import matplotlib.pyplot as plt
+from os import path
 
-from scripts.history import *
-import scripts.figures
-
-from tools import transpose_structs, struct
-
-from scipy import stats
-import numpy as np
+from scripts.history import empty_detections
+from scripts.load_figures import make_chart, load_all, datasets, base_path, dataset_colors, dataset_labels
 
 
 def image_result(image):
@@ -29,7 +27,7 @@ def running_mAP(dataset, iou=[50], dx=0.1, sigma=5):
 
     image_pairs = filter_none([image_result(image)
                               for image in dataset.history])
-    mAP = evaluate.mAP_smoothed(image_pairs, times)
+    mAP = mAP_smoothed(image_pairs, times)
 
     return eval_times.numpy(), {t: mAP(t/100.0, eval_times, sigma).numpy() for t in iou}
 
