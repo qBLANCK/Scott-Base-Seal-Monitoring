@@ -121,11 +121,7 @@ input_choices = struct(
     coco = struct(
         path          = param(type="str", help = "path to exported json annotation file", required=True),
         image_root    = param(type="str", help = "path to root of training images", required=True),
-        split_ratio   = param(type="str", help = "slash separated list of dataset ratio (train/validate/test) e.g. 70/15/15", default="70/15/15")),
-    voc = struct(
-        path          = param("/home/oliver/storage/voc", help = "path to exported json annotation file"),
-        preset        = param("test2007", help='preset configuration of testing/training set used options test2007|val2012')
-    )
+        split_ratio   = param(type="str", help = "slash separated list of dataset ratio (train/validate/test) e.g. 70/15/15", default="70/15/15"))
 )
 
 input_parameters = struct(
