@@ -106,9 +106,9 @@ class Trainer():
         self.optimizer = optimizer
         self.dataset = dataset
         self.log = log
-        self.model = model
+        self.model = model.to(device)
         self.device = device
-        self.encoder = encoder
+        self.encoder = encoder.to(device)
         self.debug = debug
         self.best = best
         self.tests = tests
@@ -127,7 +127,7 @@ class Trainer():
             modified = lr * param_group['modifier'] if 'modifier' in param_group else lr
             param_group['lr'] = modified
 
-    def test_images(self, images, model, split=False, hook=None):
+    def test_images(self, images, split=False, hook=None):
         eval_params = struct(
             overlap = self.args.overlap,
             split = split,
@@ -138,14 +138,14 @@ class Trainer():
             debug = self.debug
         )
 
-        eval_test = evaluate.eval_test(model.eval(), self.encoder, eval_params)
+        eval_test = evaluate.eval_test(self.model.eval(), self.encoder, eval_params)
         return trainer.test(self.dataset.test_on(images, self.args, self.encoder), eval_test, hook=hook)
 
 
-    def run_testing(self, name, images, model, split=False, hook=None, thresholds=None):
+    def run_testing(self, name, images, split=False, hook=None, thresholds=None):
         if len(images) > 0:
             print("{} {}:".format(name, self.epoch))
-            results = self.test_images(images, model, split=split, hook=hook)
+            results = self.test_images(images, split=split, hook=hook)
 
             return evaluate.summarize_test(name, results, self.dataset.classes, self.epoch, 
                 log=EpochLogger(self.log, self.epoch), thresholds=thresholds)
@@ -161,8 +161,6 @@ class Trainer():
 
 
         log = EpochLogger(self.log, self.epoch)
-        model = self.model.to(self.device)
-        encoder = self.encoder.to(self.device)
 
         log.scalars("dataset", Struct(self.dataset.count_categories()))
 
@@ -173,28 +171,27 @@ class Trainer():
             train_images = train_images[:n]
 
         print("Training {} on {} images:".format(self.epoch, len(train_images)))
-        # TODO Should this line use the ecoder on device??
         train_stats = trainer.train(self.dataset.sample_train_on(train_images, self.args, self.encoder),
-            evaluate.eval_train(model.train(), self.encoder, self.debug, 
+            evaluate.eval_train(self.model.train(), self.encoder, self.debug, 
             device=self.device), self.optimizer, hook=self.adjust_learning_rate)
 
         evaluate.summarize_train("train", train_stats, self.dataset.classes, self.epoch, log=log)
 
-        score, thresholds = self.run_testing('validate', self.dataset.validate_images, model)
+        score, thresholds = self.run_testing('validate', self.dataset.validate_images)
         if self.args.eval_split:           
-            self.run_testing('validate_split', self.dataset.validate_images, model, split=True)            
+            self.run_testing('validate_split', self.dataset.validate_images, split=True)            
 
 
         is_best = score >= self.best.score
         if is_best:
-            self.best = struct(model = copy.deepcopy(model), score = score, thresholds = thresholds, epoch = self.epoch)
+            self.best = struct(model = copy.deepcopy(self.model), score = score, thresholds = thresholds, epoch = self.epoch)
 
 
-        current = struct(state = model.state_dict(), epoch = self.epoch, thresholds = thresholds, score = score)
+        current = struct(state = self.model.state_dict(), epoch = self.epoch, thresholds = thresholds, score = score)
         best = struct(state = self.best.model.state_dict(), epoch = self.best.epoch, thresholds = self.best.thresholds, score = self.best.score)
-        
+
         for test_name in self.tests:
-            self.run_testing(test_name, self.dataset.get_images(test_name), model, thresholds = self.best.thresholds)                
+            self.run_testing(test_name, self.dataset.get_images(test_name), thresholds = self.best.thresholds)                
         
         save_checkpoint = struct(current = current, best = best, args = self.model_args, run = self.run)
         torch.save(save_checkpoint, self.model_path)

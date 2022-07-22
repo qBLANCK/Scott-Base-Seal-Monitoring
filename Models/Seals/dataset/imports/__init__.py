@@ -19,10 +19,6 @@ def import_json(filename):
 
     raise Exception('load_file: file not readable ' + filename)
 
-import_voc = import_voc
-import_coco = import_coco
-
-
 
 def lookup_classes(dataset, classes):
     config = dataset['config']
@@ -38,27 +34,6 @@ def lookup_classes(dataset, classes):
 def filter_annotations(image, class_ids):
     anns = {k:ann for k, ann in image['annotations'].items() if ann['label'] in class_ids}
     return {**image, 'annotations':anns}
-
-
-def subset_dataset(dataset, subset, keep_classes=None):
-    keep_classes = keep_classes or subset
-        
-    subset_ids = lookup_classes(dataset, subset)
-    keep_ids = lookup_classes(dataset, keep_classes)
-
-    assert all(c in subset_ids for c in keep_ids)
-
-    keep_image = contains_any_class(dataset, subset_ids)
-    images = [filter_annotations(image, keep_ids) 
-                for image in dataset['images'] 
-                if keep_image(image)
-             ]
-    
-    class_config = dataset['config']['classes']
-    subset = {k : class_config[k] for k in keep_ids}
-    config = {**dataset['config'], 'classes':subset}
-
-    return {'images': images, 'config': config}
     
 
 def contains_any_class(dataset, class_ids):
@@ -89,16 +64,16 @@ def summarise(images, classes):
     print(categories)
 
 
-def import_dataset(input_args, subset=None):
+def import_dataset(input_args):
     choice, params = get_choice(input_args)
-  
 
     if choice == 'json':
         print("loading json from: " + params.path)
         return import_json(params.path)
     elif choice == 'coco':
         print("loading coco from: " + params.path)
-        return import_coco(params.path, classes=subset)
+        ratio = tuple(map(int, params.split_ratio.split('/')))
+        return import_coco(params.path, params.image_root, split_ratio=ratio)
     elif choice == 'voc':
         print("loading voc from: " + params.path)        
         return import_voc(params.path, preset=params.preset)
@@ -107,17 +82,8 @@ def import_dataset(input_args, subset=None):
 
 
 def load_dataset(args):
-
-    subset = args.subset.split(",") if args.subset else None
-    keep_classes = args.keep_classes.split(",") if args.keep_classes else subset
-
-    dataset = import_dataset(args.input, subset)
-
-    if subset:
-        dataset = subset_dataset(dataset, subset, keep_classes)
-
+    dataset = import_dataset(args.input)
 
     summarise(dataset['images'], dataset['config']['classes'])
   
     return decode_dataset(dataset)
-

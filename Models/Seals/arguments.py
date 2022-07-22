@@ -33,7 +33,7 @@ train_parameters = struct (
     variation_window = param(2,         help = 'size of window to compute frame variation with'),
 
 
-    tests = param('test', help='comma separated list of test sets to use'),
+    tests = param('', help='comma separated list of test sets to use'),
     
     epoch_size          = param(1024, help='epoch size for training'),
     validation_pause    = param(16,    type='int', help='automatically pause training if validation does not improve after epochs'),
@@ -119,7 +119,9 @@ input_choices = struct(
     json = struct(
         path          = param(type="str", help = "path to exported json annotation file", required=True)),
     coco = struct(
-        path          = param("/home/oliver/storage/coco", help = "path to exported json annotation file")),
+        path          = param(type="str", help = "path to exported json annotation file", required=True),
+        image_root    = param(type="str", help = "path to root of training images", required=True),
+        split_ratio   = param(type="str", help = "slash separated list of dataset ratio (train/validate/test) e.g. 70/15/15", default="70/15/15")),
     voc = struct(
         path          = param("/home/oliver/storage/voc", help = "path to exported json annotation file"),
         preset        = param("test2007", help='preset configuration of testing/training set used options test2007|val2012')
@@ -127,8 +129,6 @@ input_choices = struct(
 )
 
 input_parameters = struct(
-        keep_classes = param(type="str", help = "further filter the classes, but keep empty images"),
-        subset       = param(type="str", help = "use a subset of loaded classes, filter images with no anntations"),
         input        = choice(default="json", options=input_choices, help='input method'),
     )
 

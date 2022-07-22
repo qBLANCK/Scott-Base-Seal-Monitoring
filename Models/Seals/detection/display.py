@@ -5,8 +5,9 @@ from tools.image.index_map import default_map
 
 from tools import tensor
 
-def to_rgb(hex):
-    return ((hex >> 16) & 255, (hex >> 8)  & 255, (hex >> 0) & 255)
+def to_rgb(_hex):
+    _hex = int(_hex, 16)
+    return ((_hex >> 16) & 255, (_hex >> 8)  & 255, (_hex >> 0) & 255)
 
 
 def draw_box(image, box, scale=1.0, name=None, confidence=None, thickness=2, color=(255, 0, 0), text_color=None):
