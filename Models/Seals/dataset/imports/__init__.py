@@ -1,5 +1,4 @@
 from .coco import import_coco
-from .voc import import_voc
 
 from tools.parameters import get_choice
 from tools import struct
@@ -74,9 +73,6 @@ def import_dataset(input_args):
         print("loading coco from: " + params.path)
         ratio = tuple(map(int, params.split_ratio.split('/')))
         return import_coco(params.path, params.image_root, split_ratio=ratio)
-    elif choice == 'voc':
-        print("loading voc from: " + params.path)        
-        return import_voc(params.path, preset=params.preset)
     else:
         assert False, "unknown dataset type: " + choice
 
