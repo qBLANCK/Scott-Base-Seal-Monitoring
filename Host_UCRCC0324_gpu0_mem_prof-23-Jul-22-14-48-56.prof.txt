@@ -1,0 +1,72 @@
+__main__ training_cycle:183                       :6549.6 Mb         gpu_profile(frame=sys._getframe(), event='line', arg=None)
++ __main__ training_cycle:183                        (36,)                <class 'torch.Tensor'>
++ __main__ training_cycle:183                        (128, 512, 1, 1)     <class 'torch.Tensor'>
++ __main__ training_cycle:183                        (64, 512, 1, 1)      <class 'torch.nn.parameter.Parameter'>
++ __main__ training_cycle:183                        (18, 64, 1, 1)       <class 'torch.Tensor'>
++ __main__ training_cycle:183                        (256, 128, 1, 1)     <class 'torch.nn.parameter.Parameter'>
++ __main__ training_cycle:183                        (36, 64, 1, 1)       <class 'torch.Tensor'>
++ __main__ training_cycle:183                        (64, 128, 3, 3)      <class 'torch.Tensor'>
++ __main__ training_cycle:183                        (128, 128, 3, 3)     <class 'torch.nn.parameter.Parameter'>
++ __main__ training_cycle:183                        (36, 64, 1, 1)       <class 'torch.nn.parameter.Parameter'>
++ __main__ training_cycle:183                        (128, 128, 3, 3)     <class 'torch.Tensor'>
++ __main__ training_cycle:183                        (64, 512, 1, 1)      <class 'torch.Tensor'>
++ __main__ training_cycle:183                        (64, 256, 1, 1)      <class 'torch.Tensor'>
++ __main__ training_cycle:183                        (256, 128, 1, 1)     <class 'torch.Tensor'>
++ __main__ training_cycle:183                        (64, 256, 1, 1)      <class 'torch.nn.parameter.Parameter'>
++ __main__ training_cycle:183                        (512, 256, 3, 3)     <class 'torch.nn.parameter.Parameter'>
++ __main__ training_cycle:183                        (512, 256, 3, 3)     <class 'torch.Tensor'>
++ __main__ training_cycle:183                        (64,)                <class 'torch.nn.parameter.Parameter'>
++ __main__ training_cycle:183                        (64, 64, 1, 1)       <class 'torch.nn.parameter.Parameter'>
++ __main__ training_cycle:183                        (128, 64, 1, 1)      <class 'torch.nn.parameter.Parameter'>
++ __main__ training_cycle:183                        (256, 128, 3, 3)     <class 'torch.nn.parameter.Parameter'>
++ __main__ training_cycle:183                        ()                   <class 'torch.Tensor'>
++ __main__ training_cycle:183                        (64,)                <class 'torch.Tensor'>
++ __main__ training_cycle:183                        (64, 64, 1, 1)       <class 'torch.Tensor'>
++ __main__ training_cycle:183                        (256,)               <class 'torch.nn.parameter.Parameter'>
++ __main__ training_cycle:183                        (18,)                <class 'torch.nn.parameter.Parameter'>
++ __main__ training_cycle:183                        (128, 64, 1, 1)      <class 'torch.Tensor'>
++ __main__ training_cycle:183                        (128,)               <class 'torch.nn.parameter.Parameter'>
++ __main__ training_cycle:183                        (256, 128, 3, 3)     <class 'torch.Tensor'>
++ __main__ training_cycle:183                        (256, 256, 3, 3)     <class 'torch.nn.parameter.Parameter'>
++ __main__ training_cycle:183                        (64, 64, 3, 3)       <class 'torch.nn.parameter.Parameter'>
++ __main__ training_cycle:183                        (128, 64, 3, 3)      <class 'torch.nn.parameter.Parameter'>
++ __main__ training_cycle:183                        (512, 512, 3, 3)     <class 'torch.nn.parameter.Parameter'>
++ __main__ training_cycle:183                        (36,)                <class 'torch.nn.parameter.Parameter'>
++ __main__ training_cycle:183                        (64, 64, 3, 3)       <class 'torch.Tensor'>
++ __main__ training_cycle:183                        (256,)               <class 'torch.Tensor'>
++ __main__ training_cycle:183                        (18,)                <class 'torch.Tensor'>
++ __main__ training_cycle:183                        (128,)               <class 'torch.Tensor'>
++ __main__ training_cycle:183                        (128, 64, 3, 3)      <class 'torch.Tensor'>
++ __main__ training_cycle:183                        (512, 256, 1, 1)     <class 'torch.nn.parameter.Parameter'>
++ __main__ training_cycle:183                        (512, 512, 3, 3)     <class 'torch.Tensor'>
++ __main__ training_cycle:183                        (18, 64, 1, 1)       <class 'torch.nn.parameter.Parameter'>
++ __main__ training_cycle:183                        (512,)               <class 'torch.nn.parameter.Parameter'>
++ __main__ training_cycle:183                        (64, 128, 1, 1)      <class 'torch.nn.parameter.Parameter'>
++ __main__ training_cycle:183                        (64, 3, 7, 7)        <class 'torch.nn.parameter.Parameter'>
++ __main__ training_cycle:183                        (128, 512, 1, 1)     <class 'torch.nn.parameter.Parameter'>
++ __main__ training_cycle:183                        (256, 256, 3, 3)     <class 'torch.Tensor'>
++ __main__ training_cycle:183                        (512, 256, 1, 1)     <class 'torch.Tensor'>
++ __main__ training_cycle:183                        (64, 128, 1, 1)      <class 'torch.Tensor'>
++ __main__ training_cycle:183                        (64, 3, 7, 7)        <class 'torch.Tensor'>
++ __main__ training_cycle:183                        (196560, 4)          <class 'torch.Tensor'>
++ __main__ training_cycle:183                        (512,)               <class 'torch.Tensor'>
++ __main__ training_cycle:183                        (64, 128, 3, 3)      <class 'torch.nn.parameter.Parameter'>
+__main__ training_cycle:185                       :6549.6 Mb         gpu_profile(frame=sys._getframe(), event='line', arg=None)
+__main__ training_cycle:188                       :6549.6 Mb         gpu_profile(frame=sys._getframe(), event='line', arg=None)
+evaluate evaluate_full:117                        :7547.6 Mb             gpu_profile(frame=sys._getframe(), event='line', arg=None)
++ evaluate evaluate_full:117                         (1, 4416300, 2)      <class 'torch.Tensor'>
++ evaluate evaluate_full:117                         (4416300, 2)         <class 'torch.Tensor'>
++ evaluate evaluate_full:117                         (4416300, 4)         <class 'torch.Tensor'>
++ evaluate evaluate_full:117                         (100,)               <class 'torch.Tensor'>
++ evaluate evaluate_full:117                         (2920,)              <class 'torch.Tensor'>
++ evaluate evaluate_full:117                         (100, 4)             <class 'torch.Tensor'>
++ evaluate evaluate_full:117                         (1, 4416300, 4)      <class 'torch.Tensor'>
++ evaluate evaluate_full:117                         (2920, 4)            <class 'torch.Tensor'>
+evaluate evaluate_full:121                        :7547.6 Mb             gpu_profile(frame=sys._getframe(), event='line', arg=None)
++ evaluate evaluate_full:121                         (1, 4416300, 2)      <class 'torch.Tensor'>
++ evaluate evaluate_full:121                         (1, 4416300, 4)      <class 'torch.Tensor'>
+evaluate evaluate_full:124                        :7547.6 Mb             gpu_profile(frame=sys._getframe(), event='line', arg=None)
++ evaluate evaluate_full:124                         (204,)               <class 'torch.Tensor'>
++ evaluate evaluate_full:124                         (204, 4)             <class 'torch.Tensor'>
+evaluate evaluate_full:126                        :7547.6 Mb             gpu_profile(frame=sys._getframe(), event='line', arg=None)
+evaluate evaluate_full:129                        :7547.6 Mb             gpu_profile(frame=sys._getframe(), event='line', arg=None)

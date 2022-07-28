@@ -9,7 +9,7 @@ from time import sleep
 api_key = environ.get("SegmentsAI_api_key")
 
 dataset_identifier = "segmentsai1/Seal_2022-22"
-name = "v1.0"
+name = "v1.1"
 
 
 client = SegmentsClient(api_key)
@@ -22,7 +22,9 @@ while (status := release['status']) != 'SUCCEEDED':
     sleep(5)
     release = client.get_release(dataset_identifier, name)
 
-dataset = SegmentsDataset(release, labelset='ground-truth', filter_by=['labeled', 'reviewed'])
+dataset = SegmentsDataset(release, labelset='ground-truth',
+                          filter_by=['labeled', 'reviewed'])
 
 # Export to COCO instance format
-export_dataset(dataset, export_format="coco-instance", export_folder="./data/annotations/")
+export_dataset(dataset, export_format="coco-instance",
+               export_folder="./data/annotations/")

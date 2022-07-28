@@ -15,6 +15,9 @@ import math
 import arguments
 import pprint
 
+import sys
+from gpu_profile import gpu_profile
+
 pp = pprint.PrettyPrinter(indent=2)
 
 
@@ -101,9 +104,8 @@ class Trainer():
         tests = args.tests.split(",")
 
         # Allocate more GPU memory
-        fraction = 4 / 4
-        torch.cuda.set_per_process_memory_fraction(fraction, device)
-        torch.cuda.empty_cache()
+        # fraction = 3 / 4
+        # torch.cuda.set_per_process_memory_fraction(fraction, device)
 
         self.args = args
         self.epoch = epoch
@@ -135,7 +137,7 @@ class Trainer():
         eval_params = struct(
             overlap=self.args.overlap,
             split=split,
-            image_size=(self.args.train_size, self.args.train_size),
+            image_size=(self.args.image_size, self.args.image_size),
             batch_size=self.args.batch_size,
             nms_params=get_nms_params(self.args),
             device=self.device,
@@ -178,15 +180,14 @@ class Trainer():
         train_stats = trainer.train(self.dataset.sample_train_on(train_images, self.args, self.encoder),
                                     evaluate.eval_train(self.model.train(), self.encoder, self.debug,
                                                         device=self.device), self.optimizer, hook=self.adjust_learning_rate)
-
+        gpu_profile(frame=sys._getframe(), event='line', arg=None)
+        torch.cuda.empty_cache()
+        gpu_profile(frame=sys._getframe(), event='line', arg=None)
         evaluate.summarize_train("train", train_stats,
                                  self.dataset.classes, self.epoch, log=log)
-
+        gpu_profile(frame=sys._getframe(), event='line', arg=None)
         score, thresholds = self.run_testing(
-            'validate', self.dataset.validate_images)
-        if self.args.eval_split:
-            self.run_testing('validate_split',
-                             self.dataset.validate_images, split=True)
+            'validate', self.dataset.validate_images, split=self.args.eval_split == True)
 
         is_best = score >= self.best.score
         if is_best:

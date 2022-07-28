@@ -5,12 +5,14 @@ from torch import nn
 from tqdm import tqdm
 import gc
 
+import sys
+from gpu_profile import gpu_profile
+
 
 def const(a):
     def f(*args):
         return a
     return f
-
 
 
 def run_progress(loader, hook, eval):
@@ -20,7 +22,8 @@ def run_progress(loader, hook, eval):
         for i, data in enumerate(loader):
             result = eval(data)
 
-            if hook and hook((i + 1) * result.size, len(loader) * result.size): break
+            if hook and hook((i + 1) * result.size, len(loader) * result.size):
+                break
 
             results.append(result)
             bar.update(result.size)
@@ -29,7 +32,8 @@ def run_progress(loader, hook, eval):
 
     return results
 
-def train(loader, eval, optimizer, hook = None):
+
+def train(loader, eval, optimizer, hook=None):
 
     def update(data):
         optimizer.zero_grad()
@@ -39,7 +43,7 @@ def train(loader, eval, optimizer, hook = None):
         optimizer.step()
 
         return result.statistics
-        
+
     return run_progress(loader, hook, update)
 
 
@@ -52,9 +56,7 @@ def update_bn(loader, eval):
             gc.collect()
 
 
-
-def test(loader, eval, hook = None):
+def test(loader, eval, hook=None):
 
     with torch.no_grad():
         return run_progress(loader, hook, eval)
-

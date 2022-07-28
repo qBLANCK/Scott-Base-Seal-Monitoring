@@ -8,6 +8,7 @@ from detection.retina import model as retina
 
 from tools import struct, Struct
 
+
 def show_differences(d1, d2, prefix=""):
     unequal_keys = []
     unequal_keys.extend(set(d1.keys()).symmetric_difference(set(d2.keys())))
@@ -22,7 +23,7 @@ def show_differences(d1, d2, prefix=""):
                 v1 = type(v1)
                 v2 = type(v2)
 
-            print ("{:20s} {:10s}, {:10s}".format(prefix + k, str(v1), str(v2)))
+            print("{:20s} {:10s}, {:10s}".format(prefix + k, str(v1), str(v2)))
 
 
 def copy_partial(dest, src):
@@ -37,6 +38,7 @@ def copy_partial(dest, src):
 
     dest.copy_(src)
 
+
 def load_state_partial(model, src):
     dest = model.state_dict()
 
@@ -47,24 +49,28 @@ def load_state_partial(model, src):
             if source_param.dim() == dest_param.dim():
                 copy_partial(dest_param, source_param)
 
-def load_state(model, info, strict=True):    
+
+def load_state(model, info, strict=True):
     if strict:
         model.load_state_dict(info.state, strict=True)
     else:
         load_state_partial(model, info.state)
 
-    return struct(model = model, 
-        thresholds=info.thresholds if 'thresholds' in info else None, 
-        score = info.score, epoch = info.epoch)
+    return struct(model=model,
+                  thresholds=info.thresholds if 'thresholds' in info else None,
+                  score=info.score, epoch=info.epoch)
+
 
 def new_state(model):
-    return struct (model = model, score = 0.0, epoch = 0, thresholds = None)
+    return struct(model=model, score=0.0, epoch=0, thresholds=None)
+
 
 def try_load(model_path):
     try:
         return torch.load(model_path)
     except (FileNotFoundError, EOFError, RuntimeError):
         pass
+
 
 def load_model(model_path):
     loaded = try_load(model_path)
@@ -83,9 +89,9 @@ def load_checkpoint(model_path, model, model_args, args, strict=True):
 
     if not (args.no_load or not (type(loaded) is Struct)):
 
-        current = load_state(model, loaded.best if args.restore_best else loaded.current, strict=strict)
+        current = load_state(
+            model, loaded.best if args.restore_best else loaded.current, strict=strict)
         best = load_state(copy.deepcopy(model), loaded.best, strict=strict)
-
 
         if loaded.args == model_args:
             print("loaded model dataset parameters match, resuming")
