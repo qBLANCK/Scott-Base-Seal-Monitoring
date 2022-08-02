@@ -9,7 +9,7 @@ from time import sleep
 api_key = environ.get("SegmentsAI_api_key")
 
 dataset_identifier = "segmentsai1/Seal_2022-22"
-name = "v1.1"
+name = "v1.2"
 
 
 client = SegmentsClient(api_key)

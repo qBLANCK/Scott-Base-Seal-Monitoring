@@ -82,7 +82,7 @@ def summarize_train(name, results, classes, epoch, log):
     print('{} epoch: {} {}'.format(name, epoch, summary))
 
 
-def evaluate_image(model, image, encoder, nms_params=detection_table.nms_defaults,  device=torch.cuda.current_device()):
+def evaluate_image(model, image, encoder, nms_params=detection_table.nms_defaults,  device=torch.cuda.current_device(), offset=(0, 0)):
     model.eval()
     with torch.no_grad():
         batch = image.unsqueeze(0) if image.dim() == 3 else image
@@ -91,11 +91,15 @@ def evaluate_image(model, image, encoder, nms_params=detection_table.nms_default
         input_size = (batch.shape[2], batch.shape[1])
 
         norm_data = normalize_batch(batch.to(device)).contiguous()
+
+        offset = torch.Tensor([*offset, *offset]).to(device)
         prediction = map_tensors(model(norm_data), lambda p: p.detach()[0])
+        # Add offset to detections
+        detections = encoder.decode(
+            input_size, prediction, nms_params=nms_params)
+        detections.bbox += offset
 
-        # print(shape(prediction))
-
-        return struct(detections=encoder.decode(input_size, prediction, nms_params=nms_params), prediction=prediction)
+        return struct(detections=detections, prediction=prediction)
 
 
 eval_defaults = struct(
@@ -139,33 +143,11 @@ def split_image(image, eval_size, overlap=0):
     return [sub_image(r) for r in image_splits(size, eval_size, overlap)]
 
 
-# def evaluate_raw(model, image, device):
-#     if image.dim() == 3:
-#         image = image.unsqueeze(0)
-
-#     assert image.dim(
-#     ) == 4, "evaluate: expected image of 4d  [1,H,W,C] or 3d [H,W,C]"
-
-#     def detach(p):
-#         return p.detach()[0]
-
-
-# def evaluate_decode(model, image, encoder, device, offset=(0, 0)):
-#     raw = evaluate_raw(model, image, device=device)
-#     p = encoder.decode(image, raw)
-
-#     offset = torch.Tensor(5[*offset, *offset]).to(device)
-#     return p._extend(bbox=p.bbox + offset), raw
-
-
 def evaluate_split(model, data, encoder, params=eval_defaults):
     model.eval()
     with torch.no_grad():
         splits = split_image(data.image.squeeze(
             0), params.image_size, params.overlap)
-
-        # outputs = [evaluate_decode(
-        #     model, image, encoder, device=params.device, offset=offset) for offset, image in splits]
 
         target = tensors_to(data.target, device=params.device)
         encoding = tensors_to(data.encoding, device=params.device)
@@ -173,22 +155,21 @@ def evaluate_split(model, data, encoder, params=eval_defaults):
         params.detections = params.nms_params.detections // len(splits)
 
         results = []
-        for _, image in splits:
-
+        for offset, image in splits:
             output = evaluate_image(
-                model, image, encoder, device=params.device, nms_params=params.nms_params)
+                model, image, encoder, device=params.device, nms_params=params.nms_params, offset=offset)
             output.prediction = map_tensors(
                 output.prediction, lambda p: p.unsqueeze(0))
             input_size = (image.shape[1], image.shape[0])
             loss = encoder.loss(
                 input_size, [target], encoding, output.prediction)
+
             results.append(
-                struct(loss=loss, prediction=output.prediction, detections=output.detections))
+                struct(loss=loss, detections=output.detections))
 
         classification_loss, location_loss = (
             Tensor.item(sum(i) / len(splits)) for i in zip(*[r.loss.values() for r in results]))
 
-        predictions = zip(*[r.prediction for r in results])
         bbox, confidence, label, index = (torch.cat(thing, dim=0) for thing in zip(
             *[r.detections.values() for r in results]))
         detections = table(bbox=bbox, confidence=confidence,
@@ -200,7 +181,7 @@ def evaluate_split(model, data, encoder, params=eval_defaults):
                             instances=data.lengths.sum().item(),
                             )
 
-        return struct(detections=detections, prediction=predictions, statistics=statistics)
+        return struct(detections=detections, statistics=statistics)
 
 
 def evaluate_full(model, data, encoder, params=eval_defaults):

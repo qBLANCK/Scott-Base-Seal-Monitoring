@@ -8,13 +8,13 @@ from functools import partial
 from tools import Struct, shape
 
 
-
-
 def identity(x, **kwargs):
     return x
 
+
 def reverse(xs):
     return list(reversed(xs))
+
 
 def image_size(inputs):
     if torch.is_tensor(inputs):
@@ -24,12 +24,10 @@ def image_size(inputs):
             return inputs.size(1), inputs.size(0)
         else:
             return inputs.size(2), inputs.size(1)
-        
 
     assert (len(inputs) == 2)
     return inputs
 
-    
 
 def map_modules(m, type, f):
     if isinstance(m, type):
@@ -39,6 +37,7 @@ def map_modules(m, type, f):
         m._modules[k] = map_modules(m._modules[k], type, f)
 
     return m
+
 
 def replace_batchnorms(m, num_groups):
     def convert(b):
@@ -51,22 +50,21 @@ def replace_batchnorms(m, num_groups):
     return map_modules(m, nn.BatchNorm2d, convert)
 
 
-
 # @torch.jit.script
-def trim_2d(t, w : int, h : int):
+def trim_2d(t, w: int, h: int):
     dh = t.shape[2] - h
     dw = t.shape[3] - w
 
-    assert dh >=0 and dw >= 0
+    assert dh >= 0 and dw >= 0
 
-    pad_w = slice(dw // 2, t.shape[3] -(dw - dw // 2))
-    pad_h = slice(dh // 2, t.shape[2] -(dh - dh // 2))
+    pad_w = slice(dw // 2, t.shape[3] - (dw - dw // 2))
+    pad_h = slice(dh // 2, t.shape[2] - (dh - dh // 2))
 
     return t[:, :, pad_h, pad_w]
 
 
 # @torch.jit.script
-def match_size_2d(t, w : int, h : int):
+def match_size_2d(t, w: int, h: int):
     # assert t.dim() == 4 and len(shape) == 4
     dh = h - t.shape[2]
     dw = w - t.shape[3]
@@ -91,7 +89,6 @@ def concat_skip(inputs, skip, scale):
     return torch.cat([inputs, upscaled], 1)
 
 
-
 class Lift(nn.Module):
     def __init__(self, f, **kwargs):
         super().__init__()
@@ -101,6 +98,7 @@ class Lift(nn.Module):
 
     def forward(self, input):
         return self.f(input, **self.kwargs)
+
 
 class Identity(nn.Module):
     def __init__(self):
@@ -119,11 +117,11 @@ def cascade(modules, input):
 
     return outputs
 
+
 class Cascade(nn.Sequential):
     def __init__(self, *args, drop_initial=0):
         super(Cascade, self).__init__(*args)
         self.drop = drop_initial
-
 
     def forward(self, input):
         out = cascade(self._modules.values(), input)
@@ -158,14 +156,14 @@ class Parallel(nn.Module):
     def forward(self, inputs):
         assert len(inputs) == len(self.parallel)
         assert type(inputs) is list, "type of inputs is: " + str(type(inputs))
-        
+
         return [m(i) for m, i in zip(self.parallel, inputs)]
 
 
 class Named(nn.Module):
     def __init__(self, **named):
         super(Named, self).__init__()
-        
+
         for k, v in named.items():
             self.add_module(k, v)
 
@@ -180,7 +178,7 @@ class Shared(nn.Module):
         self.module = module
 
     def forward(self, inputs):
-        return [self.module(input) for  input in inputs]
+        return [self.module(input) for input in inputs]
 
 
 class Residual(nn.Sequential):
@@ -197,7 +195,7 @@ class Residual(nn.Sequential):
 
 class Lookup(nn.Module):
     def __init__(self, k):
-        super().__init__() 
+        super().__init__()
         self.k = k
 
     def forward(self, inputs):
@@ -211,7 +209,8 @@ class Conv(nn.Module):
         padding = kernel//2 if padding is None else padding
 
         self.norm = nn.BatchNorm2d(in_size)
-        self.conv = nn.Conv2d(in_size, out_size, kernel, stride=stride, padding=padding, bias=bias, groups=1)
+        self.conv = nn.Conv2d(in_size, out_size, kernel,
+                              stride=stride, padding=padding, bias=bias, groups=1)
         self.activation = activation
 
     def forward(self, inputs):
@@ -225,7 +224,8 @@ class Deconv(nn.Module):
         padding = kernel//2 if padding is None else padding
 
         self.norm = nn.BatchNorm2d(in_size)
-        self.conv = nn.ConvTranspose2d(in_size, out_size, kernel, stride=stride, padding=padding, bias=bias, groups=1)
+        self.conv = nn.ConvTranspose2d(
+            in_size, out_size, kernel, stride=stride, padding=padding, bias=bias, groups=1)
         self.activation = activation
 
     def forward(self, inputs):
@@ -234,14 +234,13 @@ class Deconv(nn.Module):
 
 class LocalSE(nn.Module):
 
-    def __init__(self, features, kernel = 7):
+    def __init__(self, features, kernel=7):
         super().__init__()
 
         self.conv1 = nn.Conv2d(features, features, 1)
         self.conv2 = nn.Conv2d(features, features, 1)
         self.kernel = kernel
         self.norm = nn.BatchNorm2d(features)
-
 
     def forward(self, inputs):
         x = F.avg_pool2d(inputs, self.kernel, stride=1, padding=self.kernel//2)
@@ -261,9 +260,8 @@ class GlobalSE(nn.Module):
         self.conv1 = Conv(features, features, 1)
         self.conv2 = Conv(features, features, 1)
 
-
     def forward(self, inputs):
-        avg = F.adaptive_avg_pool2d(inputs, (1, 1)) 
+        avg = F.adaptive_avg_pool2d(inputs, (1, 1))
 
         x = self.conv1(avg)
         x = torch.sigmoid(self.conv2(x))
@@ -277,11 +275,11 @@ def dropout(p=0.0):
 
 def basic_block(in_size, out_size):
     return nn.Sequential(
-        Conv(in_size, out_size, activation=identity), 
-        Conv(out_size, out_size), 
+        Conv(in_size, out_size, activation=identity),
+        Conv(out_size, out_size),
         nn.BatchNorm2d(out_size)
     )
-    
+
 
 def se_block(in_size, out_size):
     return nn.Sequential(
@@ -296,7 +294,8 @@ def reduce_features(in_size, out_size, steps=2, kernel=1):
         d = out_size + int((1 - t) * (in_size - out_size))
         return d
 
-    m = nn.Sequential(*[Conv(interp(i), interp(i + 1), kernel) for i in range(0, steps)])
+    m = nn.Sequential(*[Conv(interp(i), interp(i + 1), kernel)
+                      for i in range(0, steps)])
     return m
 
 
@@ -322,7 +321,6 @@ class Bias2d(nn.Module):
             return input + self.bias
 
 
-
 class Upscale(nn.Module):
     def __init__(self, features, scale_factor=2):
         super().__init__()
@@ -331,7 +329,6 @@ class Upscale(nn.Module):
 
     def forward(self, inputs):
         return F.pixel_shuffle(self.conv(inputs), self.scale_factor)
-
 
 
 def make_upscale(features, scale_factor, method):
@@ -343,7 +340,6 @@ def make_upscale(features, scale_factor, method):
         return Deconv(features, features, stride=2, padding=0)
     else:
         assert False, "unknown upscale method: " + method
-
 
 
 class Decode(nn.Module):
@@ -358,11 +354,12 @@ class Decode(nn.Module):
         if not (inputs is None):
             upscaled = self.upscale(inputs)
 
-            #trim = trim_2d(upscaled, skip.shape[3], skip.shape[2])            
-            trim = match_size_2d(upscaled, skip.shape[3], skip.shape[2])                 
+            #trim = trim_2d(upscaled, skip.shape[3], skip.shape[2])
+            trim = match_size_2d(upscaled, skip.shape[3], skip.shape[2])
             return self.module(self.reduce(torch.cat([trim, skip], 1)))
 
         return self.module(skip)
+
 
 def init_weights(module):
     def f(m):
