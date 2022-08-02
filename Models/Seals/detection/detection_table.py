@@ -7,7 +7,7 @@ from tools import table, struct
 
 nms_defaults = struct(
     nms         = 0.5,
-    threshold   = 0.05,
+    threshold   = 0.5,
     detections  = 500
 )
 
