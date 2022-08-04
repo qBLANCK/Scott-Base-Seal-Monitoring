@@ -210,6 +210,14 @@ def random(centre_range, size_range, n):
     return torch.cat([centre - extents, centre + extents], 1)
 
 
+def in_ratio_range(box, ratio):
+    # Check if box is in ratio range
+    w, h = box[:, 2] - box[:, 0], box[:, 3] - box[:, 1]
+    if (w / h).abs().max() > ratio or (h / w).abs().max() > ratio:
+        return False
+    return True
+
+
 if __name__ == "__main__":
 
     boxes1 = random((0, 10), (50, 100), 10)

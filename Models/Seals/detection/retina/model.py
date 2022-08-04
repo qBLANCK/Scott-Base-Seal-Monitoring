@@ -72,9 +72,6 @@ class Encoder:
         bbox = anchor.decode(location, anchor_boxes)
         confidence, label = classification.max(1)
 
-        if self.params.crop_boxes:
-            box.clamp(bbox, (0, 0), inputs)
-
         decoded = table(bbox=bbox, confidence=confidence, label=label)
         return detection_table.nms(decoded, nms_params)
 
