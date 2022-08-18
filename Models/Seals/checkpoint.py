@@ -1,12 +1,8 @@
 import torch
-
-import os
 import copy
+from Models.Seals.detection.retina import model as retina
 
-from dataset.imports import load_dataset
-from detection.retina import model as retina
-
-from tools import struct, Struct
+from libs.tools import struct, Struct
 
 
 def show_differences(d1, d2, prefix=""):

@@ -1,10 +1,11 @@
 from .coco import import_coco
 
-from tools.parameters import get_choice
-from tools import struct
-from dataset.annotate import decode_dataset
+from libs.tools.parameters import get_choice
+from libs.tools import struct
+from Models.Seals.dataset.annotate import decode_dataset
 
 import json
+
 
 def import_json(filename):
     with open(filename, "r") as file:
@@ -12,7 +13,7 @@ def import_json(filename):
 
         # Convert keys of classes to integers (json objects are always string)
         config = dataset['config']
-        config['classes'] = {int(k):v for k, v in config['classes'].items()}
+        config['classes'] = {int(k): v for k, v in config['classes'].items()}
 
         return dataset
 
@@ -21,7 +22,7 @@ def import_json(filename):
 
 def lookup_classes(dataset, classes):
     config = dataset['config']
-    class_map = {v['name'] : int(k) for k, v in config['classes'].items()}
+    class_map = {v['name']: int(k) for k, v in config['classes'].items()}
 
     def lookup_class(name):
         assert name in class_map, "class not found: " + name
@@ -31,9 +32,10 @@ def lookup_classes(dataset, classes):
 
 
 def filter_annotations(image, class_ids):
-    anns = {k:ann for k, ann in image['annotations'].items() if ann['label'] in class_ids}
-    return {**image, 'annotations':anns}
-    
+    anns = {k: ann for k, ann in image['annotations'].items(
+    ) if ann['label'] in class_ids}
+    return {**image, 'annotations': anns}
+
 
 def contains_any_class(dataset, class_ids):
     def f(image):
@@ -44,9 +46,11 @@ def contains_any_class(dataset, class_ids):
         return False
     return f
 
+
 def add_dict(d, k):
     d[k] = d[k] + 1 if k in d else 1
     return d
+
 
 def summarise(images, classes):
     counts = sum([len(image['annotations']) for image in images])
@@ -55,11 +59,12 @@ def summarise(images, classes):
     for image in images:
         add_dict(categories, image['category'])
 
-    annotated = categories.get('train', 0) + categories.get('test', 0) + categories.get('validate', 0)
+    annotated = categories.get(
+        'train', 0) + categories.get('test', 0) + categories.get('validate', 0)
 
     print("using {:d} classes, found {:d} images, {:d} annotated with {:d} instances at {:.2f} per image"
-        .format(len(classes), len(images), annotated, counts, counts / annotated) )
-    
+          .format(len(classes), len(images), annotated, counts, counts / annotated))
+
     print(categories)
 
 
@@ -81,5 +86,5 @@ def load_dataset(args):
     dataset = import_dataset(args.input)
 
     summarise(dataset['images'], dataset['config']['classes'])
-  
+
     return decode_dataset(dataset)

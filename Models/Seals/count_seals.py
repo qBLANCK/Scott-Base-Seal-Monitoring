@@ -1,13 +1,12 @@
 import csv
 from pathlib import Path
 from os import listdir
-from pytz import country_names
 import torch
-import tools.image.cv as cv
+import libs.tools.image.cv as cv
 from tqdm import tqdm
-from checkpoint import load_model
-from evaluate import evaluate_image
-from detection import detection_table
+from Models.Seals.checkpoint import load_model
+from Models.Seals.evaluate import evaluate_image
+from Models.Seals.detection import detection_table
 
 # TODO: Take out dependence on library
 # TODO: Add more confidence levels

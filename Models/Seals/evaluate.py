@@ -1,28 +1,17 @@
-import statistics
 import torch
 from torch import Tensor
 import math
-import gc
-
-import torch.nn.functional as F
-from torch.autograd import Variable
-
-from tools.image import index_map
-import tools.image.cv as cv
-
-import tools.confusion as c
-
-from tools.image.transforms import normalize_batch
-from tools import struct, table, tensor, shape, cat_tables, shape_info, \
+from libs.tools.image.transforms import normalize_batch
+from libs.tools import struct, table, tensor, shape, cat_tables, shape_info, \
     Histogram, ZipList, transpose_structs, transpose_lists, pluck, Struct, filter_none, split_table, tensors_to, map_tensors
 
-from detection import box, evaluate, detection_table
+from Models.Seals.detection import box, evaluate, detection_table
 from functools import reduce
 
 import operator
 
 import sys
-from gpu_profile import gpu_profile
+from Models.Seals.gpu_profile import gpu_profile
 
 
 def mean_results(results):

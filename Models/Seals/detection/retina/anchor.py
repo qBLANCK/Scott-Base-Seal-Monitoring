@@ -1,9 +1,9 @@
 import math
 
 import torch
-from tools import struct, Table, shape
+from libs.tools import struct, Table, shape
 
-from detection import box
+from Models.Seals.detection import box
 
 
 def make_boxes(box_sizes, box_dim, device=torch.device('cpu')):

@@ -8,14 +8,14 @@ from scripts.datasets import load_dataset, annotation_summary
 from matplotlib.collections import PathCollection
 from matplotlib.legend_handler import HandlerPathCollection
 
-import tools.window as window
+import libs.tools.window as window
 
 
 from os import path
 import torch
 import math
 
-from tools import struct, to_structs, filter_none, drop_while, concat_lists, \
+from libs.tools import struct, to_structs, filter_none, drop_while, concat_lists, \
     map_dict, pprint_struct, pluck_struct, count_dict, sum_list, Struct, sum_dicts
 
 import matplotlib.pyplot as plt

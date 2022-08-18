@@ -1,17 +1,9 @@
 import torch
-import os
-from tools.image import cv
-from checkpoint import load_model
-from evaluate import evaluate_image
-from detection import display, detection_table
-from matplotlib import pyplot as plt
-from tools import struct
-import random
+from Models.Seals.checkpoint import load_model
+from libs.tools import struct
 
-import evaluate
-from dataset.imports import load_dataset
-from dataset.detection import collate_batch
-from torch.utils.data.dataloader import DataLoader
+import Models.Seals.evaluate as evaluate
+from Models.Seals.dataset.imports import load_dataset
 
 out_dir = "./Models/Seals/log/Seals"
 model, encoder, args = load_model(f"{out_dir}/model.pth")

@@ -1,8 +1,8 @@
-from tools.parameters import param, parse_args, choice, parse_choice, group, add_arguments
-from tools import struct
+from libs.tools.parameters import param, parse_args, choice, parse_choice, group, add_arguments
+from libs.tools import struct
 import argparse
 
-from detection.retina import model as retina
+from Models.Seals.detection.retina import model as retina
 
 train_parameters = struct(
     optimizer=group('optimizer settings',

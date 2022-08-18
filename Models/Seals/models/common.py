@@ -5,7 +5,7 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 
 from functools import partial
-from tools import Struct, shape
+from libs.tools import Struct, shape
 
 
 def identity(x, **kwargs):

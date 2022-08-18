@@ -3,8 +3,8 @@ import torch
 import torch.nn.functional as F
 from torch.autograd import Variable
 
-from detection import box
-from tools import struct, const, pluck, shape
+from Models.Seals.detection import box
+from libs.tools import struct, const, pluck, shape
 import numpy as np
 
 

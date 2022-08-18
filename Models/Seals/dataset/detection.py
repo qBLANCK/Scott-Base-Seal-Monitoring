@@ -8,17 +8,17 @@ from torch.utils.data.sampler import RandomSampler
 from torch.utils.data.dataloader import DataLoader, default_collate
 
 
-import tools.dataset.direct as direct
+import libs.tools.dataset.direct as direct
 
-from tools.dataset.flat import FlatList
-from tools.dataset.samplers import RepeatSampler
-from tools.image import transforms, cv
+from libs.tools.dataset.flat import FlatList
+from libs.tools.dataset.samplers import RepeatSampler
+from libs.tools.image import transforms, cv
 
-from tools.image.index_map import default_map
-from tools import over_struct, tensor, struct, table, cat_tables, Table, Struct, shape
+from libs.tools.image.index_map import default_map
+from libs.tools import over_struct, tensor, struct, table, cat_tables, Table, Struct, shape
 
 
-from detection import box
+from Models.Seals.detection import box
 import collections
 
 

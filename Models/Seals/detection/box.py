@@ -2,11 +2,8 @@
 # https://github.com/amdegroot/ssd.pytorch.git
 
 
-from tools import struct, Table, shape
+from libs.tools import struct
 import torch
-
-import math
-import torchvision.ops as torchvision
 
 
 def split(boxes):

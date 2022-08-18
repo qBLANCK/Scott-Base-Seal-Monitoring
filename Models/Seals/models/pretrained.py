@@ -11,18 +11,17 @@ from torchvision.models import resnet, densenet, vgg
 import torchvision.models as model_zoo
 
 
-
 # from pretrainedmodels.models import senet
 # import pretrainedmodels
 
-from models.mobilenetv2 import MobileNetV2, InvertedResidual
+from Models.Seals.models.mobilenetv2 import MobileNetV2, InvertedResidual
 
-import models.common as c
+import Models.Seals.models.common as c
 
-from tools import struct
+from libs.tools import struct
 
 
-def make_encoder(name, depth = None):
+def make_encoder(name, depth=None):
     layers = get_layers(name)
     if depth:
         layers = layers[:depth]
@@ -31,7 +30,7 @@ def make_encoder(name, depth = None):
 
 
 def create_mobilenet(filename):
-    def f ():
+    def f():
         model = MobileNetV2()
 
         model_path = path.join('weights', filename)
@@ -47,7 +46,7 @@ def create_mobilenet(filename):
                 layers.append(nn.Sequential(*layer))
                 layer = []
             layer.append(m)
-       
+
         if len(layer) > 0:
             layers.append(nn.Sequential(*layer))
 
@@ -65,6 +64,7 @@ def create_antialiased(name, filter_size):
         else:
             assert false, "unsupported model type " + name
     return f
+
 
 def create_imagenet(name):
     def f():
@@ -85,21 +85,23 @@ def create_imagenet(name):
 
 
 models = {
-    'aa_resnet18':create_antialiased('resnet18', 2),
-    'resnet18':create_imagenet('resnet18'),
-    'resnet34':create_imagenet('resnet34'),
-    'resnet50':create_imagenet('resnet50'),
-    'vgg11':create_imagenet('vgg11_bn'),
-    'vgg13':create_imagenet('vgg13_bn'),
-    'mobilenet_v2':create_mobilenet('mobilenet_v2.pth')
+    'aa_resnet18': create_antialiased('resnet18', 2),
+    'resnet18': create_imagenet('resnet18'),
+    'resnet34': create_imagenet('resnet34'),
+    'resnet50': create_imagenet('resnet50'),
+    'vgg11': create_imagenet('vgg11_bn'),
+    'vgg13': create_imagenet('vgg13_bn'),
+    'mobilenet_v2': create_mobilenet('mobilenet_v2.pth')
 }
 
 
 def make_cascade(layers):
     return c.Cascade(*layers)
 
+
 def layer_sizes(layers):
     return encoder_sizes(make_cascade(layers))
+
 
 def encoder_sizes(encoder):
     encoder.eval()
@@ -114,17 +116,21 @@ def senet_layers(model):
     *layer0_modules, pool0 = model.layer0
 
     layer0 = nn.Sequential(*layer0_modules)
-    layer1 = nn.Sequential(nn.MaxPool2d(kernel_size=3, stride=2, padding=1), model.layer1)
-    layers = [c.Identity(), layer0, layer1, model.layer2, model.layer3, model.layer4]
+    layer1 = nn.Sequential(nn.MaxPool2d(
+        kernel_size=3, stride=2, padding=1), model.layer1)
+    layers = [c.Identity(), layer0, layer1, model.layer2,
+              model.layer3, model.layer4]
 
     return layers
 
 
 def resnet_layers(model):
     layer0 = nn.Sequential(model.conv1, model.bn1, nn.ReLU(inplace=True))
-    layer1 = nn.Sequential(nn.MaxPool2d(kernel_size=3, stride=2, padding=1), model.layer1)
+    layer1 = nn.Sequential(nn.MaxPool2d(
+        kernel_size=3, stride=2, padding=1), model.layer1)
 
-    layers = [c.Identity(), layer0, layer1, model.layer2, model.layer3, model.layer4]
+    layers = [c.Identity(), layer0, layer1, model.layer2,
+              model.layer3, model.layer4]
 
     return layers
 
@@ -143,14 +149,15 @@ def vgg_layers(model):
 
     return layers
 
+
 def densenet_layers(densenet):
     m = densenet.features._modules
 
     return [
-            c.Identity(),
-            nn.Sequential(m['conv0'], m['norm0'], m['relu0']),
-            nn.Sequential(m['pool0'], m['denseblock1']),
-            nn.Sequential(m['transition1'], m['denseblock2']),
-            nn.Sequential(m['transition2'], m['denseblock3']),
-            nn.Sequential(m['transition3'], m['denseblock4'], m['norm5'])
-        ]
+        c.Identity(),
+        nn.Sequential(m['conv0'], m['norm0'], m['relu0']),
+        nn.Sequential(m['pool0'], m['denseblock1']),
+        nn.Sequential(m['transition1'], m['denseblock2']),
+        nn.Sequential(m['transition2'], m['denseblock3']),
+        nn.Sequential(m['transition3'], m['denseblock4'], m['norm5'])
+    ]

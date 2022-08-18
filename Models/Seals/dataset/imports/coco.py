@@ -1,7 +1,7 @@
 from math import floor
 from random import shuffle
 
-from tools import concat_lists
+from libs.tools import concat_lists
 
 
 def tagged(tag, contents):

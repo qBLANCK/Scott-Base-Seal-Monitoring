@@ -3,23 +3,18 @@ import math
 
 import torch
 import torch.nn as nn
-from torch import Tensor
 
-import itertools
-import torchvision.models as m
+from Models.Seals.detection import detection_table
 
-import models.pretrained as pretrained
-from detection import box, detection_table
+from Models.Seals.models.common import Named, Parallel
 
-from models.common import Named, Parallel, image_size
+from Models.Seals.models.feature_pyramid import feature_pyramid, init_weights, init_classifier, join_output, residual_subnet, pyramid_parameters
+from libs.tools import struct, table, shape, sum_list, cat_tables, stack_tables, tensors_to
 
-from models.feature_pyramid import feature_pyramid, init_weights, init_classifier, join_output, residual_subnet, pyramid_parameters
-from tools import struct, table, shape, sum_list, cat_tables, stack_tables, tensors_to
-
-from tools.parameters import param, choice, parse_args, parse_choice, make_parser, group
+from libs.tools.parameters import param, choice, parse_args, parse_choice, make_parser, group
 from collections import OrderedDict
 
-from . import anchor, loss
+from Models.Seals.detection.retina import anchor, loss
 
 
 class Encoder:

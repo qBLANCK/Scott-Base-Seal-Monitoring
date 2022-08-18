@@ -4,19 +4,19 @@ import copy
 import random
 import torch.optim as optim
 from torch import nn
-from dataset.imports import load_dataset
-from detection.retina import model as retina
-import checkpoint
-from tools import struct, logger, Struct
-from tools.logger import EpochLogger
-import trainer
-import evaluate
+from Models.Seals.dataset.imports import load_dataset
+from Models.Seals.detection.retina import model as retina
+import Models.Seals.checkpoint as checkpoint
+from libs.tools import struct, logger, Struct
+from libs.tools.logger import EpochLogger
+import Models.Seals.trainer as trainer
+import Models.Seals.evaluate as evaluate
 import math
-import arguments
+import Models.Seals.arguments as arguments
 import pprint
 
 import sys
-from gpu_profile import gpu_profile
+from Models.Seals.gpu_profile import gpu_profile
 
 pp = pprint.PrettyPrinter(indent=2)
 
