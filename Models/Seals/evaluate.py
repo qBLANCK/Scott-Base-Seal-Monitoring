@@ -12,6 +12,7 @@ import operator
 
 import sys
 from Models.Seals.gpu_profile import gpu_profile
+import numpy as np
 
 
 def mean_results(results):
