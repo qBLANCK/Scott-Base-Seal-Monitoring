@@ -1,3 +1,4 @@
+from gettext import npgettext
 from tqdm import tqdm
 import csv
 # Heatmap
@@ -12,18 +13,25 @@ from Models.Seals.evaluate import evaluate_image
 from Models.Seals.detection import detection_table
 from Models.Seals.checkpoint import load_model
 
+# Del me
+import numpy as np
+CHUNKS = 4
+
 
 MODEL_DIR = "./Models/Seals/log/Seals_2021-22/model.pth"
-VID_LEN_S = 60 * 6  # seconds
-USE_EVERY = 1  # every nth frame
+VID_LEN_S = 60 * 6 / CHUNKS  # seconds
 DETECTION_CREATE_CSV = True
 DETECTION_CSV_NAME = "detection.csv"
 DETECTION_THRESHOLD = 0.4
 TIMELAPSE_INPUT = '/home/fdi19/SENG402/data/images/scott_base/2021-22'
 TIMELAPSE_IMAGES = sorted(os.listdir(TIMELAPSE_INPUT))
-# TIMELAPSE_FPS = (len(TIMELAPSE_IMAGES) / USE_EVERY) / VID_LEN_S
+TIMELAPSE_IMAGES = np.array(TIMELAPSE_IMAGES)
+TIMELAPSE_IMAGES, _, _, _ = [
+    list(x) for x in np.array_split(TIMELAPSE_IMAGES, CHUNKS)]
+TIMELAPSE_USE_EVERY = 1  # every nth frame
+# TIMELAPSE_FPS = (len(TIMELAPSE_IMAGES) / TIMELAPSE_USE_EVERY) / VID_LEN_S
 TIMELAPSE_FPS = 24
-TIMELAPSE_NAME = "timelapse.mp4"
+TIMELAPSE_NAME = "timelapse_1q.mp4"
 HEATMAP_FPS = 24
 HEATMAP_NAME = "heatmap.mp4"
 HEATMAP_BITRATE = "3000k"
@@ -126,7 +134,7 @@ if __name__ == "__main__":
     model, encoder, device = load_CNN_model()
     print("Status: Filtering images")
     image_files = [os.path.join(TIMELAPSE_INPUT, img)
-                   for img in tqdm(TIMELAPSE_IMAGES[::USE_EVERY])
+                   for img in tqdm(TIMELAPSE_IMAGES[::TIMELAPSE_USE_EVERY])
                    if img.endswith(".jpg")]
     if os.path.exists(TIMELAPSE_NAME):
         print("Status: Timelapse already exists, skipping creation")
@@ -140,7 +148,8 @@ if __name__ == "__main__":
         with open(DETECTION_CSV_NAME, newline='') as f:
             reader = csv.reader(f)
             next(reader)  # Skip header
-            points = [(int(x), int(y), int(t)) for x, y, t in list(reader)]
+            points = [(int(x), int(y), int(t))
+                      for x, y, t in tqdm(list(reader))]
     else:
         points = detect_seals(model, encoder, device, image_files)
 
