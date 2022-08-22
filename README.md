@@ -1,6 +1,8 @@
 # Setup Steps
 
-`conda env create -f environment.yaml` might not need the python=3.8 as in yaml
+`./install_conda.sh`
+
+`conda env create -f environment.yaml python=3.8`
 
 `conda activate venv`
 
