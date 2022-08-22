@@ -1,0 +1,3 @@
+[submodule "libs/heatmappy"]
+	path = libs/heatmappy
+	url = https://github.com/LumenResearch/heatmappy.git
