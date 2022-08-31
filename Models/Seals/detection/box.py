@@ -14,11 +14,6 @@ def split4(boxes):
     return boxes[..., 0],  boxes[..., 1], boxes[..., 2], boxes[..., 3]
 
 
-def join(lower, upper):
-    assert lower.shape == upper.shape
-    return torch.cat([lower, upper], lower.dim() - 1)
-
-
 def extents(boxes):
     lower, upper = split(boxes)
     return struct(centre=(lower + upper) * 0.5, size=upper - lower)
@@ -61,13 +56,6 @@ def flip_vertical(boxes, height):
     return torch.stack([x1, height - y2, x2, height - y1], boxes.dim() - 1)
 
 
-def filter_invalid(target):
-    boxes = target.bbox
-
-    valid = (boxes[:, 2] - boxes[:, 0] > 0) & (boxes[:, 3] - boxes[:, 1] > 0)
-    return target[valid.nonzero(as_tuple=False).squeeze(1)]
-
-
 def filter_hidden(target, lower, upper, min_visible=0.0):
     bounds = torch.Tensor([[*lower, *upper]])
     overlaps = (intersect_matrix(bounds, target.bbox) /
@@ -78,16 +66,6 @@ def filter_hidden(target, lower, upper, min_visible=0.0):
 def area(boxes):
     x1, y1, x2, y2 = boxes[:, 0], boxes[:, 1], boxes[:, 2], boxes[:, 3]
     return (x2-x1) * (y2-y1)
-
-
-def clamp(boxes, lower, upper):
-
-    boxes[:, 0].clamp_(min=lower[0])
-    boxes[:, 1].clamp_(min=lower[1])
-    boxes[:, 2].clamp_(max=upper[0])
-    boxes[:, 3].clamp_(max=upper[1])
-
-    return boxes
 
 
 def intersect_matrix(box_a, box_b):
@@ -166,13 +144,6 @@ def union(box_a, box_b):
     return inter, unions
 
 
-def iou(box_a, box_b):
-    assert box_a.shape == box_b.shape
-
-    inter, unions = union(box_a, box_b)
-    return conditional_div(inter, unions)
-
-
 def merge(box_a, box_b):
     l1, u1 = split(box_a)
     l2, u2 = split(box_b)
@@ -193,31 +164,3 @@ def giou(box_a, box_b):
     giou = conditional_div(hull - unions, hull)
 
     return iou - giou
-
-
-def random_points(r, n):
-    lower, upper = r
-    return torch.FloatTensor(n, 2).uniform_(*r)
-
-
-def random(centre_range, size_range, n):
-    centre = random_points(centre_range, n)
-    extents = random_points(size_range, n) * 0.5
-
-    return torch.cat([centre - extents, centre + extents], 1)
-
-
-def in_ratio_range(box, ratio):
-    # Check if box is in ratio range
-    w, h = box[:, 2] - box[:, 0], box[:, 3] - box[:, 1]
-    if (w / h).abs().max() > ratio or (h / w).abs().max() > ratio:
-        return False
-    return True
-
-
-if __name__ == "__main__":
-
-    boxes1 = random((0, 10), (50, 100), 10)
-    boxes2 = random((0, 10), (50, 100), 10)
-
-    print(iou(boxes1, boxes2), giou(boxes1, boxes2))

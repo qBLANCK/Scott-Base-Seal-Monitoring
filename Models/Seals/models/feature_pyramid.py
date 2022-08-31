@@ -2,21 +2,16 @@ import sys
 import math
 
 import torch
-from torch import Tensor
 import torch.nn as nn
-
-import itertools
-import torchvision.models as m
 
 import Models.Seals.models.pretrained as pretrained
 
-from Models.Seals.models.common import Conv, Cascade, UpCascade, Residual, Parallel, Shared, Lookup,  \
-    Decode,  basic_block, se_block, reduce_features, replace_batchnorms, identity, GlobalSE
+from Models.Seals.models.common import Conv, Cascade, UpCascade, Residual, Parallel, Decode,  basic_block
 
 import torch.nn.init as init
-from libs.tools import struct, table, shape, sum_list, cat_tables, Struct
+from libs.tools import struct
 
-from libs.tools.parameters import param, choice, parse_args, parse_choice, make_parser
+from libs.tools.parameters import param
 from collections import OrderedDict
 
 
@@ -149,20 +144,3 @@ def feature_pyramid(backbone_name, first=3, depth=8, features=64, decode_blocks=
 
     return FeaturePyramid(backbone_layers, first=first, features=features,
                           make_decoder=residual_decoder(decode_blocks, upscale))
-
-
-def feature_map(backbone_name, **options):
-    pyramid = feature_pyramid(backbone_name, **options)
-    return nn.Sequential(pyramid, Lookup(0))
-
-
-if __name__ == '__main__':
-
-    _, *cmd_args = sys.argv
-
-    model = feature_pyramid('resnet18')
-
-    x = torch.FloatTensor(4, 3, 500, 500)
-    out = model.cuda()(x.cuda())
-
-    print(shape(out))

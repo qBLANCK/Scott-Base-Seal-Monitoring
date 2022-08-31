@@ -1,7 +1,8 @@
 import math
 
 import torch
-from libs.tools import struct, Table, shape
+from libs.tools import struct
+from libs.tools.image.transforms import clamp
 
 from Models.Seals.detection import box
 
@@ -66,8 +67,6 @@ def encode(target, anchor_boxes, params):
     if params.location_loss == "l1":
         location = encode_boxes(location, anchor_boxes)
 
-    # torch.cuda.empty_cache()
-
     return struct(location=location, classification=class_target)
 
 
@@ -118,10 +117,3 @@ def decode(prediction, anchor_boxes):
     sizes = loc_size.exp() * anchor_size
 
     return box.point_form(torch.cat([pos, sizes], pos.dim() - 1))
-
-
-def decode_nms(loc_preds, class_preds, anchor_boxes, nms_params):
-    assert loc_preds.dim() == 2 and class_preds.dim() == 2
-
-    prediction = decode(loc_preds, class_preds, anchor_boxes)
-    return nms(prediction, nms_params).type_as(prediction.label)

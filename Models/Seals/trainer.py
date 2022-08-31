@@ -1,13 +1,5 @@
 import torch
-
 from tqdm import tqdm
-import gc
-
-
-def const(a):
-    def f(*args):
-        return a
-    return f
 
 
 def run_progress(loader, hook, eval):
@@ -40,15 +32,6 @@ def train(loader, eval, optimizer, hook=None):
         return result.statistics
 
     return run_progress(loader, hook, update)
-
-
-def update_bn(loader, eval):
-
-    with torch.no_grad():
-        for i, data in enumerate(tqdm(loader)):
-
-            eval(data)
-            gc.collect()
 
 
 def test(loader, eval, hook=None):

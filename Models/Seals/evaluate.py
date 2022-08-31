@@ -2,22 +2,13 @@ import torch
 from torch import Tensor
 import math
 from libs.tools.image.transforms import normalize_batch
-from libs.tools import struct, table, tensor, shape, cat_tables, shape_info, \
-    Histogram, ZipList, transpose_structs, transpose_lists, pluck, Struct, filter_none, split_table, tensors_to, map_tensors
+from libs.tools import struct, table, transpose_structs, transpose_lists, pluck, Struct, filter_none, split_table, tensors_to, map_tensors
 
-from Models.Seals.detection import box, evaluate, detection_table
+from Models.Seals.detection import evaluate, detection_table
 from functools import reduce
 
 import operator
 
-import sys
-from Models.Seals.gpu_profile import gpu_profile
-import numpy as np
-
-
-def mean_results(results):
-    total = reduce(operator.add, results)
-    return total / total.size, total
 
 
 def sum_results(results):
@@ -213,11 +204,6 @@ def eval_test(model, encoder, params=eval_defaults):
     return f
 
 
-def percentiles(t, n=100):
-    assert t.dim() == 1
-    return torch.from_numpy(np.percentile(t.numpy(), np.arange(0, n)))
-
-
 def mean(xs):
     return sum(xs) / len(xs)
 
@@ -248,7 +234,6 @@ def condense_pr(pr, n=400):
 
 
 def compute_thresholds(pr):
-
     f1 = 2 * (pr.precision * pr.recall) / (pr.precision + pr.recall)
 
     def find_threshold(t):

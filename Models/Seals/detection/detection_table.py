@@ -1,7 +1,6 @@
 
-import torch
 import torchvision.ops as torchvision
-from libs.tools import table, struct
+from libs.tools import struct
 
 
 nms_defaults = struct(
@@ -22,9 +21,3 @@ def nms(prediction, params):
     except RuntimeError:
         pass
     return prediction._index_select(inds)._take(params.detections)
-
-
-empty_detections = table(
-    bbox=torch.FloatTensor(0, 4),
-    label=torch.LongTensor(0),
-    confidence=torch.FloatTensor(0))

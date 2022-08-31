@@ -16,7 +16,6 @@ import Models.Seals.arguments as arguments
 import pprint
 
 import sys
-from Models.Seals.gpu_profile import gpu_profile
 
 pp = pprint.PrettyPrinter(indent=2)
 
@@ -180,12 +179,9 @@ class Trainer():
         train_stats = trainer.train(self.dataset.sample_train_on(train_images, self.args, self.encoder),
                                     evaluate.eval_train(self.model.train(), self.encoder, self.debug,
                                                         device=self.device), self.optimizer, hook=self.adjust_learning_rate)
-        gpu_profile(frame=sys._getframe(), event='line', arg=None)
         torch.cuda.empty_cache()
-        gpu_profile(frame=sys._getframe(), event='line', arg=None)
         evaluate.summarize_train("train", train_stats,
                                  self.dataset.classes, self.epoch, log=log)
-        gpu_profile(frame=sys._getframe(), event='line', arg=None)
         score, thresholds = self.run_testing(
             'validate', self.dataset.validate_images, split=self.args.eval_split == True)
 

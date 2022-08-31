@@ -1,4 +1,3 @@
-from os import path
 import random
 import math
 from copy import deepcopy
@@ -14,8 +13,7 @@ from libs.tools.dataset.flat import FlatList
 from libs.tools.dataset.samplers import RepeatSampler
 from libs.tools.image import transforms, cv
 
-from libs.tools.image.index_map import default_map
-from libs.tools import over_struct, tensor, struct, table, cat_tables, Table, Struct, shape
+from libs.tools import over_struct, struct, table, cat_tables, Table, Struct
 
 
 from Models.Seals.detection import box
@@ -37,24 +35,11 @@ def collate_batch(batch):
         return batch
     elif elem is None:
         return batch
-
-    elif isinstance(elem, collections.abc.Mapping):
-        return {key: collate([d[key] for d in batch]) for key in elem}
     elif isinstance(elem, collections.abc.Sequence):
         transposed = zip(*batch)
         return [collate_batch(samples) for samples in transposed]
     else:
         return default_collate(batch)
-
-    raise TypeError(
-        "batch must contain Table, numbers, dicts or lists; found {}".format(elem_type))
-
-
-# Use this to get around pickling problems using multi-processing
-def callable(name, f):
-    return type(name, (object,), {'__call__': lambda self, batch: f(batch)})
-
-# collate_batch = callable('collate_batch', _collate_batch)()
 
 
 empty_target = table(
@@ -65,10 +50,6 @@ empty_target = table(
 def load_image(image):
     img = cv.imread_color(image.file)
     return image._extend(image=img, image_size=torch.LongTensor([img.size(1), img.size(0)]))
-
-
-def random_mean(mean, magnitude):
-    return mean + random.uniform(-magnitude, magnitude)
 
 
 def scale(scale):
@@ -130,47 +111,6 @@ def resize_to(dest_size):
 
     return apply
 
-
-def transformed(d, image, bbox):
-    return d._extend(
-        image=image,
-        target=d.target._extend(bbox=bbox))
-
-# def transform(d, translate = (0, 0), scale = (1, 1)):
-
-#     t = transforms.translation(dx, dy)
-
-#     return transformed(d,
-#         image =
-#         bbox = box.transform(d.target.bbox, translate = translate, scale = scale)
-#     )
-
-
-def centre_on(image_size):
-    width, height = image_size
-
-    def apply(d):
-        dx = (width - d.image.size(1)) / 2
-        # Use this to get around pickling problems using multi-processing
-        dy = (height - d.image.size(0)) / 2
-
-
-def callable(name, f):
-    cls = type(name, (object,), {'__call__': f})
-
-#callable('collate_batch', _collate_batch)
-
-
-# def fit_to(image_size):
-#     def apply(d):
-#         h, w, _ = d.image.size()
-
-#         s = image_size / max(h, w)
-#         bbox = box.transform(d.target.bbox, scale = (s, s))
-
-#       return d._extend(
-#                 image   = transforms.warp_affine(d.image, transforms.translation(dx, dy), (image_size, image_size)),
-#                 target = d.target._extend(bbox = bbox))
 
 def as_tuple(bbox):
     b = bbox.tolist()
@@ -271,6 +211,12 @@ def identity(x):
     return x
 
 
+def multiple(n, transform):
+    def f(data):
+        return [transform(data) for _ in range(n)]
+    return f
+
+
 def encode_with(args, encoder=None):
     return identity if encoder is None else encode_target(encoder)
 
@@ -305,12 +251,6 @@ def transform_training(args, encoder=None):
     return multiple(args.image_samples, transforms.compose(crop, adjust_light, filter, flip, encode))
 
 
-def multiple(n, transform):
-    def f(data):
-        return [transform(data) for _ in range(n)]
-    return f
-
-
 def flatten(collate_fn):
     def f(lists):
         return collate_fn([x for y in lists for x in y])
@@ -327,8 +267,6 @@ def transform_testing(args, encoder=None):
             else scale(args.scale) if (args.scale != 1) \
             else identity
 
-        # return transforms.compose(scaling, centre_on(dest_size))
-
     elif args.augment == "resize":
         s = args.scale
 
@@ -337,19 +275,6 @@ def transform_testing(args, encoder=None):
 
     encode = encode_with(args, encoder)
     return transforms.compose(transform, encode)
-
-
-def least_recently_evaluated(images, n=None):
-    random.shuffle(images)
-
-    def key(image): return tuple(image.evaluated or (0, 0))
-    images = sorted(images, key=key)
-
-    if n is not None:
-        return images[:n]
-    else:
-        return images
-
 
 class DetectionDataset:
 

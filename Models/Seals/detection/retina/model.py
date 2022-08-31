@@ -1,4 +1,3 @@
-import sys
 import math
 
 import torch
@@ -9,9 +8,9 @@ from Models.Seals.detection import detection_table
 from Models.Seals.models.common import Named, Parallel
 
 from Models.Seals.models.feature_pyramid import feature_pyramid, init_weights, init_classifier, join_output, residual_subnet, pyramid_parameters
-from libs.tools import struct, table, shape, sum_list, cat_tables, stack_tables, tensors_to
+from libs.tools import struct, table, stack_tables
 
-from libs.tools.parameters import param, choice, parse_args, parse_choice, make_parser, group
+from libs.tools.parameters import param, group
 from collections import OrderedDict
 
 from Models.Seals.detection.retina import anchor, loss
@@ -76,7 +75,6 @@ class Encoder:
         anchor_boxes = self.anchors(input_size)
         encoding = stack_tables(
             [anchor.encode(t, anchor_boxes, self.params) for t in target])
-        # target = tensors_to(encoding, device=prediction.location.device)
 
         class_loss = loss.class_loss(
             encoding.classification, classification,  class_weights=self.class_weights)
@@ -95,14 +93,9 @@ class Encoder:
         return struct(classification=class_loss / self.params.balance, location=loc_loss)
 
 
-def check_equal(*elems):
-    first, *rest = elems
-    return all(first == elem for elem in rest)
-
-
 def output(features, n, layers, init=init_weights):
     modules = [(str(i), residual_subnet(features, n)) for i in layers]
-    for k, module in modules:
+    for _, module in modules:
         module.apply(init)
 
     return Parallel(OrderedDict(modules))
@@ -211,23 +204,3 @@ def create(args, dataset_args):
 
 
 model = struct(create=create, parameters=parameters)
-
-if __name__ == '__main__':
-
-    _, *cmd_args = sys.argv
-
-    parser = make_parser('object detection', model.parameters)
-    model_args = struct(**parser.parse_args().__dict__)
-
-    classes = [
-        struct(weighting=0.25),
-        struct(weighting=0.25)
-    ]
-
-    model, encoder = model.create(
-        model_args, struct(classes=classes, input_channels=3))
-
-    x = torch.FloatTensor(4, 3, 370, 500)
-    out = model.cuda()(x.cuda())
-
-    print(shape(out))

@@ -2,21 +2,14 @@ import torch.nn.functional as F
 from Models.Seals.detection import box
 
 # makes a one_hot vector from class labels
-
-
 def one_hot(label, num_classes):
     t = label.new(label.size(0), num_classes).zero_()
     return t.scatter_(1, label.unsqueeze(1), 1)
 
+
 # makes a one_hot vector from class labels with an 'ignored' case as 0 (which is trimmed)
-
-
 def one_hot_with_ignored(label, num_classes):
     return one_hot(label, num_classes + 1)[:, 1:]
-
-
-def all_eq(xs):
-    return all(map(lambda x: x == xs[0], xs))
 
 
 def focal_loss_label(target_labels, pred, class_weights, gamma=2, eps=1e-6):
@@ -57,16 +50,8 @@ def giou(target, prediction, class_target):
     return 0.05 * (1 - giou).masked_fill_(neg_mask, 0).sum()
 
 
-def iou(target, prediction, class_target):
-
-    iou = box.iou(prediction.view(-1, 4), target.view(-1, 4))
-    neg_mask = (class_target == 0).view_as(iou)
-
-    return 0.05 * (1 - iou).masked_fill_(neg_mask, 0).sum()
-
-
 def class_loss(target, prediction, class_weights,  gamma=2, eps=1e-6):
-    batch, _, num_classes = prediction.shape
+    _, _, num_classes = prediction.shape
 
     class_weights = prediction.new([0.0, *class_weights])
     invalid_mask = (target < 0).unsqueeze(2).expand_as(prediction)

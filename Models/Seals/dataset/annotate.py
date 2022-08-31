@@ -1,28 +1,15 @@
 
 from os import path
-import json
 
 import torch
 from Models.Seals.dataset.detection import DetectionDataset
 from libs.tools import struct, to_structs
 
-from libs.tools import filter_map, pluck, filter_none, struct, table, pprint_struct
-
-
-def load_dataset(filename):
-    with open(filename, "r") as file:
-        str = file.read()
-        raw = json.loads(str)
-        return decode_dataset(raw)
-    raise Exception('load_file: file not readable ' + filename)
+from libs.tools import pluck, struct, table
 
 
 def split_tagged(tagged):
     return tagged.tag, tagged.contents if 'contents' in tagged else None
-
-
-def tagged(name, contents=None):
-    return struct(tag=name, contents=contents)
 
 
 def decode_obj(obj):
@@ -43,15 +30,6 @@ def decode_obj(obj):
         return None
 
 
-def decode_detection(det):
-
-    obj = decode_obj(det)
-    if obj is not None:
-        obj = obj._extend(confidence=det.confidence)
-
-    return obj
-
-
 def lookup(mapping):
     def f(i):
         assert i in mapping, "missing key in mapping" + \
@@ -59,27 +37,6 @@ def lookup(mapping):
         return mapping[i]
     return f
 
-
-def decode_detections(detections, class_mapping):
-    objs = filter_map(decode_detection, detections)
-
-    boxes = pluck('box', objs)
-    labels = list(map(lookup(class_mapping), pluck('label', objs)))
-
-    return table(bbox=torch.FloatTensor(boxes) if len(boxes) else torch.FloatTensor(0, 4),
-                 label=torch.LongTensor(labels),
-                 confidence=torch.FloatTensor(pluck('confidence', objs))
-                 )
-
-
-# def decode_objects(data, class_mapping):
-#     objs = filter_map(decode_obj, data.annotations)
-
-#     boxes = pluck('box', objs)
-#     labels = list(map(lookup(class_mapping), pluck('label', objs)))
-
-#     return table (bbox = torch.FloatTensor(boxes) if len(boxes) else torch.FloatTensor(0, 4),
-#                   label = torch.LongTensor(labels))
 
 def decode_object_map(annotations, config):
     mapping = class_mapping(config)
@@ -109,14 +66,8 @@ def decode_image(data, config):
         id=data.image_file,
         file=path.join(config.root, data.image_file),
         target=target,
-        category=data.category,
-        #evaluated = data.evaluated,
-        #key = data.key
+        category=data.category
     )
-
-
-def filterDict(d):
-    return {k: v for k, v in d.items() if v is not None}
 
 
 def decode_dataset(data):
@@ -126,9 +77,3 @@ def decode_dataset(data):
 
     images = {i.image_file: decode_image(i, config) for i in data.images}
     return config, DetectionDataset(classes=classes, images=images)
-
-
-def init_dataset(config):
-    classes = [struct(id=int(k), **v) for k, v in config.classes.items()]
-
-    return config, DetectionDataset(classes=classes)
