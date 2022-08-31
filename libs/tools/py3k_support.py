@@ -5,7 +5,7 @@
 
 import sys
 
-PY3K = (sys.version_info >= (3, ))
+PY3K = (sys.version_info >= (3,))
 
 # Backward compatibility for xrange function, basestring datatype
 # unicode function/type, unichr function and raw_input function

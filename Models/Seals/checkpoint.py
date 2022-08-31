@@ -1,7 +1,8 @@
-import torch
 import copy
-from Models.Seals.detection.retina import model as retina
 
+import torch
+
+from Models.Seals.detection.retina import model as retina
 from libs.tools import struct, Struct
 
 
@@ -94,7 +95,7 @@ def load_checkpoint(model_path, model, model_args, args, strict=True):
 
         else:
             print("loaded model dataset parameters differ, loading partial")
-            show_differences(model_args.__dict__,  loaded.args.__dict__)
+            show_differences(model_args.__dict__, loaded.args.__dict__)
 
             best.score = 0.0
             best.epoch = current.epoch

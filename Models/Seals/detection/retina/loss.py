@@ -1,5 +1,7 @@
 import torch.nn.functional as F
+
 from Models.Seals.detection import box
+
 
 # makes a one_hot vector from class labels
 def one_hot(label, num_classes):
@@ -26,14 +28,13 @@ def focal_loss_bce(target, pred, alpha, gamma=2, eps=1e-6):
     p_t = target * pred + target_inv * (1 - pred)
     a_t = target * alpha + target_inv * (1 - alpha)
 
-    p_t = p_t.clamp(min=eps, max=1-eps)
+    p_t = p_t.clamp(min=eps, max=1 - eps)
 
     errs = -a_t * (1 - p_t).pow(gamma) * p_t.log()
     return errs
 
 
 def l1(target, prediction, class_target):
-
     loss = F.smooth_l1_loss(prediction.view(-1, 4),
                             target.view(-1, 4), reduction='none')
 
@@ -42,7 +43,6 @@ def l1(target, prediction, class_target):
 
 
 def giou(target, prediction, class_target):
-
     giou = box.giou(prediction.view(-1, 4), target.view(-1, 4))
     neg_mask = (class_target == 0).view_as(giou)
 
@@ -50,13 +50,13 @@ def giou(target, prediction, class_target):
     return 0.05 * (1 - giou).masked_fill_(neg_mask, 0).sum()
 
 
-def class_loss(target, prediction, class_weights,  gamma=2, eps=1e-6):
+def class_loss(target, prediction, class_weights, gamma=2, eps=1e-6):
     _, _, num_classes = prediction.shape
 
     class_weights = prediction.new([0.0, *class_weights])
     invalid_mask = (target < 0).unsqueeze(2).expand_as(prediction)
 
     loss = focal_loss_label(target.clamp(min=0).view(-1),
-                            prediction.view(-1, num_classes), class_weights=class_weights, gamma=gamma)\
-
-    return loss.masked_fill_(invalid_mask.view_as(loss), 0).sum()
+                            prediction.view(-1, num_classes), class_weights=class_weights, gamma=gamma) \
+ \
+            return loss.masked_fill_(invalid_mask.view_as(loss), 0).sum()

@@ -1,5 +1,5 @@
-import time
 import logging
+import time
 from random import randint
 
 from libs.tools.py3k_support import *

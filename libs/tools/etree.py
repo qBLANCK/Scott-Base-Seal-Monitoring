@@ -3,10 +3,9 @@ Functions to process content of lxml nodes.
 """
 import re
 
-from libs.tools.text import normalize_space as normalize_space_func, find_number
-from libs.tools.encoding import smart_str, smart_unicode
-
+from libs.tools.encoding import smart_str
 from libs.tools.py3k_support import *
+from libs.tools.text import normalize_space as normalize_space_func, find_number
 
 RE_TAG_START = re.compile(r'<[a-z]')
 

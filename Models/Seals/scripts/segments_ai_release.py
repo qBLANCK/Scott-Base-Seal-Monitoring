@@ -2,15 +2,15 @@
 # Note: Only labeled/reviewed images are included in the release
 
 from os import environ
+from time import sleep
+
 from segments import SegmentsClient, SegmentsDataset
 from segments.utils import export_dataset
-from time import sleep
 
 api_key = environ.get("SegmentsAI_api_key")
 
 dataset_identifier = "segmentsai1/Seal_2022-22"
 name = "v1.2"
-
 
 client = SegmentsClient(api_key)
 # Create release

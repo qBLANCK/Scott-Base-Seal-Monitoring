@@ -26,28 +26,27 @@ def default_logging(grab_log='/tmp/grab.log', level=logging.DEBUG, mode='a',
         grab_logger.addHandler(hdl)
         grab_logger.setLevel(level)
 
+# LOGGING_BUFFER = defaultdict(list)
+# GLOBAL = {'key': None}
 
-#LOGGING_BUFFER = defaultdict(list)
-#GLOBAL = {'key': None}
-
-#class MemoryHandler(logging.Handler):
-    #def emit(self, record):
-        #LOGGING_BUFFER[GLOBAL['key']].append(self.format(record))
-
-
-#logger = logging.getLogger('calculate')
-#logger.addHandler(MemoryHandler())
+# class MemoryHandler(logging.Handler):
+# def emit(self, record):
+# LOGGING_BUFFER[GLOBAL['key']].append(self.format(record))
 
 
-#def save_logging(func):
-    #def inner(*args, **kwargs):
-        #key = str(time.time()) + str(id({}))
-        #GLOBAL['key'] = key 
-        #try:
-            #result = func(*args, **kwargs)
-            #result['logs'] = copy(LOGGING_BUFFER[key])
-        #finally:
-            #if key in LOGGING_BUFFER:
-                #del LOGGING_BUFFER[key]
-        #return result
-    #return inner
+# logger = logging.getLogger('calculate')
+# logger.addHandler(MemoryHandler())
+
+
+# def save_logging(func):
+# def inner(*args, **kwargs):
+# key = str(time.time()) + str(id({}))
+# GLOBAL['key'] = key
+# try:
+# result = func(*args, **kwargs)
+# result['logs'] = copy(LOGGING_BUFFER[key])
+# finally:
+# if key in LOGGING_BUFFER:
+# del LOGGING_BUFFER[key]
+# return result
+# return inner

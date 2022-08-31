@@ -1,13 +1,8 @@
-
-from libs.tools import struct
-
-import sys
 import cv2
+import numpy as np
 import torch
 
-import numpy as np
 from libs.tools import struct
-
 
 line_type = struct(
     filled=cv2.FILLED,
@@ -34,13 +29,13 @@ image_read = struct(
 
 
 def _rgb_bgr(cv_image):
-    if(len(cv_image.shape) == 3 and cv_image.shape[2] == 3):
+    if (len(cv_image.shape) == 3 and cv_image.shape[2] == 3):
         cv_image = cv2.cvtColor(cv_image, cv2.COLOR_BGR2RGB)
     return cv_image
 
 
 def _bgr_rgb(cv_image):
-    if(len(cv_image.shape) == 3 and cv_image.shape[2] == 3):
+    if (len(cv_image.shape) == 3 and cv_image.shape[2] == 3):
         cv_image = cv2.cvtColor(cv_image, cv2.COLOR_RGB2BGR)
     return cv_image
 
@@ -49,7 +44,7 @@ def convert_loaded(cv_image):
     cv_image = _bgr_rgb(cv_image)
     image = torch.from_numpy(cv_image)
 
-    if(image.dim() == 2):
+    if (image.dim() == 2):
         image = image.view(*image.size(), 1)
     return image
 
@@ -60,7 +55,7 @@ def video_capture(path):
     def frames(start=0):
         cap.set(cv2.CAP_PROP_POS_FRAMES, start)
 
-        while(cap.isOpened()):
+        while (cap.isOpened()):
             ret, frame = cap.read()
             if ret:
                 yield convert_loaded(frame)
@@ -90,7 +85,7 @@ def imread_depth(path):
             str(cv_image.dtype), path)
 
     image = torch.from_numpy(cv_image)
-    if(image.dim() == 2):
+    if (image.dim() == 2):
         image = image.view(*image.size(), 1)
 
     return image
@@ -120,12 +115,12 @@ def write(image, extension, path):
 
 
 def imencode(extension, image):
-    assert(image.dim() == 3 and image.size(2) <= 4)
+    assert (image.dim() == 3 and image.size(2) <= 4)
     return cv2.imencode(extension, _bgr_rgb(image.numpy()))
 
 
 def imwrite(path, image):
-    assert(image.dim() == 3 and image.size(2) <= 4)
+    assert (image.dim() == 3 and image.size(2) <= 4)
     return cv2.imwrite(path, _bgr_rgb(image.numpy()))
 
 

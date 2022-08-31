@@ -1,10 +1,10 @@
-from grab import Grab
 import logging
-import os
 
+from grab import Grab
 from grab.tools import html
-from grab.tools.pwork import make_work
 from grab.tools.encoding import smart_str
+from grab.tools.pwork import make_work
+
 from libs.tools.py3k_support import *
 
 PING_XML = """<?xml version="1.0"?>

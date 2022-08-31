@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+
 from libs.tools import Struct
 
 
@@ -19,7 +20,6 @@ def match_size_2d(t, w: int, h: int):
 
     pad = (dw // 2, dw - dw // 2, dh // 2, dh - dh // 2)
     return F.pad(t, pad)
-
 
 
 class Identity(nn.Module):
@@ -57,7 +57,6 @@ class UpCascade(nn.Module):
         self.decoders = nn.Sequential(*decoders)
 
     def forward(self, inputs):
-
         assert len(inputs) == len(self.decoders)
 
         input = None
@@ -114,10 +113,11 @@ class Lookup(nn.Module):
 
 
 class Conv(nn.Module):
-    def __init__(self, in_size, out_size, kernel=3, stride=1, padding=None, bias=False, activation=nn.ReLU(inplace=True), groups=1):
+    def __init__(self, in_size, out_size, kernel=3, stride=1, padding=None, bias=False,
+                 activation=nn.ReLU(inplace=True), groups=1):
         super().__init__()
 
-        padding = kernel//2 if padding is None else padding
+        padding = kernel // 2 if padding is None else padding
 
         self.norm = nn.BatchNorm2d(in_size)
         self.conv = nn.Conv2d(in_size, out_size, kernel,
@@ -129,10 +129,11 @@ class Conv(nn.Module):
 
 
 class Deconv(nn.Module):
-    def __init__(self, in_size, out_size, kernel=3, stride=1, padding=None, bias=False, activation=nn.ReLU(inplace=True), groups=1):
+    def __init__(self, in_size, out_size, kernel=3, stride=1, padding=None, bias=False,
+                 activation=nn.ReLU(inplace=True), groups=1):
         super().__init__()
 
-        padding = kernel//2 if padding is None else padding
+        padding = kernel // 2 if padding is None else padding
 
         self.norm = nn.BatchNorm2d(in_size)
         self.conv = nn.ConvTranspose2d(
@@ -151,12 +152,10 @@ def basic_block(in_size, out_size):
     )
 
 
-
-
 class Upscale(nn.Module):
     def __init__(self, features, scale_factor=2):
         super().__init__()
-        self.conv = Conv(features, features * scale_factor**2)
+        self.conv = Conv(features, features * scale_factor ** 2)
         self.scale_factor = scale_factor
 
     def forward(self, inputs):
@@ -189,4 +188,3 @@ class Decode(nn.Module):
             return self.module(self.reduce(torch.cat([trim, skip], 1)))
 
         return self.module(skip)
-

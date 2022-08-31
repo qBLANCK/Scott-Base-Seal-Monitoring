@@ -1,4 +1,5 @@
 import torch
+
 import libs.tools.tensor as tensor
 
 
@@ -10,7 +11,8 @@ def confusion_matrix(pred, target, num_classes):
     mask = (target < num_classes).long()
     n = num_classes * num_classes
 
-    return tensor.count_elements(pred + (target * mask * num_classes) + mask, n + 1).narrow(0, 1, n).view(num_classes, num_classes)
+    return tensor.count_elements(pred + (target * mask * num_classes) + mask, n + 1).narrow(0, 1, n).view(num_classes,
+                                                                                                          num_classes)
 
 
 def confusion_zero(n):

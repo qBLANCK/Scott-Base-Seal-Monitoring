@@ -1,14 +1,10 @@
 # import numpy as np
+import json
+import os
+import os.path as path
 from datetime import datetime
 
-import os.path as path
-import os
-
-from . import Histogram, struct, to_dicts, to_structs
-
-import torch
-import json
-import numpy as np
+from . import Histogram, struct, to_dicts
 
 
 def create_dir(dir):
@@ -28,7 +24,7 @@ def backup_experiment(log_path, name):
         backup_name = enumerate_name(name, os.listdir(backup_path))
         dest_path = os.path.join(backup_path, backup_name)
 
-        print("backing up: {} -> {}".format(output_path,  dest_path))
+        print("backing up: {} -> {}".format(output_path, dest_path))
         os.rename(output_path, dest_path)
 
 

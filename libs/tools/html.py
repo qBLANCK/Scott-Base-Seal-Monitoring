@@ -3,15 +3,16 @@
 # Author: Grigoriy Petukhov (http://lorien.name)
 # License: BSD
 import re
+
 try:
     from htmlentitydefs import name2codepoint
 except ImportError:
     from html.entities import name2codepoint
-import logging
 
 from libs.tools.text import normalize_space as normalize_space_func
 import six
-#from libs.tools.py3k_support import *
+
+# from libs.tools.py3k_support import *
 
 RE_TAG = re.compile(r'<[^>]+>')
 RE_REFRESH_TAG = re.compile(
@@ -125,8 +126,8 @@ def escape(html):
     Returns the given HTML with ampersands, quotes and angle brackets encoded.
     """
 
-    return html.replace('&', '&amp;')\
-               .replace('<', '&lt;')\
-               .replace('>', '&gt;')\
-               .replace('"', '&quot;')\
-               .replace("'", '&#39;')
+    return html.replace('&', '&amp;') \
+        .replace('<', '&lt;') \
+        .replace('>', '&gt;') \
+        .replace('"', '&quot;') \
+        .replace("'", '&#39;')

@@ -4,7 +4,8 @@ Text parsing and processing utilities.
 import re
 
 from libs.tools.error import RuntimeConfigError, DataNotFound
-#from libs.tools.py3k_support import *
+
+# from libs.tools.py3k_support import *
 
 RE_NUMBER = re.compile(r'\d+')
 RE_NUMBER_WITH_SPACES = re.compile(r'\d[\s\d]*', re.U)
@@ -71,8 +72,7 @@ def remove_bom(text):
     else:
         return text
 
-
 # def strip_space(text):
-    #"""Strip all spaces at begin or end of the text"""
+# """Strip all spaces at begin or end of the text"""
 
-    # return RE_STRIP_SPACE.sub('', text)
+# return RE_STRIP_SPACE.sub('', text)

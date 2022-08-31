@@ -1,4 +1,5 @@
 import torch
+
 from libs.tools.image import index_map, cv
 
 
@@ -7,9 +8,9 @@ def split(t, dim=0):
 
 
 def tile_batch(t, cols=int(6)):
-    assert(t.dim() == 4)
+    assert (t.dim() == 4)
 
-    if(t.size(0)) == 1:
+    if (t.size(0)) == 1:
         return t[0]
 
     h = t.size(1)
@@ -46,7 +47,6 @@ def insert_size(s, dim, n):
 
 
 def one_hot(label, classes, dim=1):
-
     expanded = label.view(insert_size(label.size(), dim, 1))
     target = label.new(insert_size(label.size(), dim, classes))
 
@@ -77,7 +77,7 @@ def show_batch_t(data, cols=int(6), scale=1):
 def show_batch(t, cols=int(6), scale=1):
     tiled = tile_batch(t, cols)
     tiled = cv.resize(tiled, (tiled.size(0) * scale, tiled.size(1)
-                      * scale), interpolation=cv.INTER_NEAREST)
+                              * scale), interpolation=cv.INTER_NEAREST)
 
     return cv.display(tiled)
 
@@ -93,18 +93,18 @@ def show_indexed_batch(t, cols=int(6)):
 def centre_crop(t, size):
     d = t.dim()
 
-    dw = t.size(d-1) - size[3]
-    dh = t.size(d-2) - size[2]
+    dw = t.size(d - 1) - size[3]
+    dh = t.size(d - 2) - size[2]
 
     if not (dw >= 0 and dh >= 0):
         print(t.size(), size)
 
-    return t.narrow(d-1, dw//2, size[3]).narrow(d-2, dh//2, size[2]).contiguous()
+    return t.narrow(d - 1, dw // 2, size[3]).narrow(d - 2, dh // 2, size[2]).contiguous()
 
 
 def pluck(t, indices, dim1=0, dim2=1):
     n = indices.size(0)
-    #print(indices.dim(), indices.size(), t.size(), dim1, dim2)
+    # print(indices.dim(), indices.size(), t.size(), dim1, dim2)
     assert indices.dim() == 1 and t.size(dim1) == n
     t = t.contiguous()
     indices = indices.long()

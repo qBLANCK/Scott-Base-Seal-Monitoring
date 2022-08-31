@@ -1,9 +1,8 @@
 import torch
 import torch.nn as nn
-from torch.autograd import Variable
-
-from torchvision.models import resnet, densenet, vgg
 import torchvision.models as model_zoo
+from torch.autograd import Variable
+from torchvision.models import resnet, densenet, vgg
 
 import Models.Seals.models.common as c
 
@@ -16,6 +15,7 @@ def create_antialiased(name, filter_size):
             return resnet_layers(model)
         else:
             assert false, "unsupported model type " + name
+
     return f
 
 
@@ -32,6 +32,7 @@ def create_imagenet(name):
             return vgg_layers(model)
         else:
             assert false, "unsupported model type " + name
+
     return f
 
 

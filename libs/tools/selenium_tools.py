@@ -2,15 +2,16 @@
 Documentation:
 * http://selenium.googlecode.com/svn/trunk/docs/api/py/webdriver/selenium.webdriver.common.action_chains.html
 """
-import os
 import logging
-import time
+import os
 import shutil
-from selenium.webdriver.firefox.firefox_profile import FirefoxProfile
+import time
+from random import randint
+
+from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
-from selenium.common.exceptions import WebDriverException
-from random import randint
+from selenium.webdriver.firefox.firefox_profile import FirefoxProfile
 
 from libs.tools.py3k_support import *
 
@@ -30,30 +31,30 @@ def delete_dir(path):
 
 
 # def delete_selenium_profile(path):
-    # """
-    # Delete temporary selenium profile directory.
-    # """
+# """
+# Delete temporary selenium profile directory.
+# """
 
-    # if os.path.exists(path):
-    # if path.rstrip('/').endswith('webdriver-py-profilecopy'):
-    #path = os.path.dirname(path)
-    # delete_dir(path)
+# if os.path.exists(path):
+# if path.rstrip('/').endswith('webdriver-py-profilecopy'):
+# path = os.path.dirname(path)
+# delete_dir(path)
 
 
 # def remove_old_profiles(tmp_dir, timeout):
-    # """
-    # Delete any directory in given `tmp_dir` which looks like
-    # firefox profile and which age is more than `timeout`.
-    # """
+# """
+# Delete any directory in given `tmp_dir` which looks like
+# firefox profile and which age is more than `timeout`.
+# """
 
-    # for fname in os.listdir(tmp_dir):
-    #path = os.path.join(tmp_dir, fname)
-    #age = time.time() - int(os.path.getctime(path))
-    # if age > timeout:
-    # if firefox profile
-    # if (os.path.exists(os.path.join(path, 'webdriver-py-profilecopy'))
-    # or os.path.exists(os.path.join(path, 'prefs.js'))):
-    # delete_dir(path)
+# for fname in os.listdir(tmp_dir):
+# path = os.path.join(tmp_dir, fname)
+# age = time.time() - int(os.path.getctime(path))
+# if age > timeout:
+# if firefox profile
+# if (os.path.exists(os.path.join(path, 'webdriver-py-profilecopy'))
+# or os.path.exists(os.path.join(path, 'prefs.js'))):
+# delete_dir(path)
 
 
 def create_profile(path=None, user_agent=None, accept_language=None,
@@ -71,9 +72,9 @@ def create_profile(path=None, user_agent=None, accept_language=None,
 
     # Memory and cpu optimization
     profile.set_preference('browser.sessionhistory.max_total_viewers', 0)
-    #profile.set_preference('browser.cache.memory.enable', False)
-    #profile.set_preference('browser.cache.offline.enable', False)
-    #profile.set_preference('browser.cache.disk.enable', False)
+    # profile.set_preference('browser.cache.memory.enable', False)
+    # profile.set_preference('browser.cache.offline.enable', False)
+    # profile.set_preference('browser.cache.disk.enable', False)
     profile.set_preference('browser.safebrowsing.enabled', False)
     profile.set_preference('browser.shell.checkDefaultBrowser', False)
     profile.set_preference('browser.startup.page', 0)

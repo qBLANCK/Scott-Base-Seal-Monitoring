@@ -1,16 +1,7 @@
-import os
-import torch
-
 import torch.nn as nn
-
-import argparse
-
-from libs.tools import struct
-from libs.tools.parameters import add_arguments, default_parameters
 
 
 def create(models, model_args, dataset_args):
-
     assert model_args.choice in models, "model not found " + model_args.choice
     model = models[model_args.choice]
 
@@ -25,6 +16,5 @@ def model_stats(model):
 
     parameters = sum([p.nelement() for p in model.parameters()])
     print("Model of {} parameters, {} convolutions".format(parameters, convs))
-
 
 # def merge_state_dict(model, loaded):

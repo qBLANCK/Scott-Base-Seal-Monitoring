@@ -1,10 +1,10 @@
 import math
 
 import torch
-from libs.tools import struct
-from libs.tools.image.transforms import clamp
 
 from Models.Seals.detection import box
+from libs.tools import struct
+from libs.tools.image.transforms import clamp
 
 
 def make_boxes(box_sizes, box_dim, device=torch.device('cpu')):
@@ -71,7 +71,6 @@ def encode(target, anchor_boxes, params):
 
 
 def encode_classes(label, max_ious, max_ids, match_thresholds=(0.4, 0.5)):
-
     match_neg, match_pos = match_thresholds
     assert match_pos >= match_neg
 
@@ -79,7 +78,7 @@ def encode_classes(label, max_ious, max_ids, match_thresholds=(0.4, 0.5)):
     class_target[max_ious <= match_neg] = 0  # negative label is 0
 
     ignore = (max_ious > match_neg) & (
-        max_ious <= match_pos)  # ignore ious between [0.4,0.5]
+            max_ious <= match_pos)  # ignore ious between [0.4,0.5]
     class_target[ignore] = -1  # mark ignored to -1
 
     return class_target
@@ -95,7 +94,7 @@ def encode_boxes(boxes, anchor_boxes):
     anchor_pos, anchor_size = box.split(anchor_boxes)
 
     loc_pos = (boxes_pos - anchor_pos) / anchor_size
-    loc_size = torch.log(boxes_size/anchor_size)
+    loc_size = torch.log(boxes_size / anchor_size)
     return torch.cat([loc_pos, loc_size], 1)
 
 

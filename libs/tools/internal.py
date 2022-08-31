@@ -1,7 +1,8 @@
-import warnings
-from functools import wraps
 import logging
-#from libs.tools.error import RuntimeConfigError
+from functools import wraps
+
+
+# from libs.tools.error import RuntimeConfigError
 
 
 # from https://github.com/scrapy/scrapy/blob/master/scrapy/utils/decorator.py
@@ -16,8 +17,10 @@ def deprecated(use_instead=None):
             message = "Call to deprecated function %s." % func.__name__
             if use_instead:
                 message += " Use %s instead." % use_instead
-            #warnings.warn(message, category=RuntimeConfigError, stacklevel=2)
+            # warnings.warn(message, category=RuntimeConfigError, stacklevel=2)
             logging.error(message)
             return func(*args, **kwargs)
+
         return new_func
+
     return wrapped

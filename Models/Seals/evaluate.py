@@ -1,24 +1,24 @@
-import torch
-from torch import Tensor
 import math
-from libs.tools.image.transforms import normalize_batch
-from libs.tools import struct, table, transpose_structs, transpose_lists, pluck, Struct, filter_none, split_table, tensors_to, map_tensors
-
-from Models.Seals.detection import evaluate, detection_table
+import operator
 from functools import reduce
 
-import operator
+import torch
+from torch import Tensor
 
+from Models.Seals.detection import evaluate, detection_table
+from libs.tools import struct, table, transpose_structs, transpose_lists, pluck, Struct, filter_none, split_table, \
+    tensors_to, map_tensors
+from libs.tools.image.transforms import normalize_batch
 
 
 def sum_results(results):
     return reduce(operator.add, results)
 
+
 # TODO: move this entirely to the individual object detector
 
 
 def make_statistics(data, loss):
-
     stats = struct(error=sum(loss.values()),
                    loss=loss._map(Tensor.item),
                    size=data.image.size(0),
@@ -44,6 +44,7 @@ def eval_train(model, encoder, debug=struct(), device=torch.cuda.current_device(
 
         statistics = make_statistics(data, loss)
         return struct(error=sum(loss.values()) / image.data.size(0), statistics=statistics, size=data.image.size(0))
+
     return f
 
 
@@ -54,7 +55,7 @@ def summarize_train_stats(name, results, classes, log):
     log.scalars(name + "/loss", avg.loss._extend(total=avg.error))
 
     loss_str = " + ".join(["{} : {:.3f}".format(k, v)
-                          for k, v in sorted(avg.loss.items())])
+                           for k, v in sorted(avg.loss.items())])
     return ('n: {}, instances : {:.2f}, loss: {} = {:.3f}'.format(totals.size, avg.instances, loss_str, avg.error))
 
 
@@ -63,7 +64,8 @@ def summarize_train(name, results, classes, epoch, log):
     print('{} epoch: {} {}'.format(name, epoch, summary))
 
 
-def evaluate_image(model, image, encoder, nms_params=detection_table.nms_defaults,  device=torch.cuda.current_device(), offset=(0, 0)):
+def evaluate_image(model, image, encoder, nms_params=detection_table.nms_defaults, device=torch.cuda.current_device(),
+                   offset=(0, 0)):
     model.eval()
     with torch.no_grad():
         batch = image.unsqueeze(0) if image.dim() == 3 else image
@@ -201,6 +203,7 @@ def eval_test(model, encoder, params=eval_defaults):
 
             size=data.image.size(0),
         )
+
     return f
 
 
@@ -267,7 +270,6 @@ def count_target_classes(image_pairs, class_ids):
 
 
 def compute_AP(results, classes, conf_thresholds=None):
-
     class_ids = pluck('id', classes)
     iou_thresholds = list(range(30, 100, 5))
 
@@ -308,7 +310,6 @@ def compute_AP(results, classes, conf_thresholds=None):
 
 
 def summarize_test(name, results, classes, epoch, log, thresholds=None):
-
     class_names = {c.id: c.name for c in classes}
 
     summary = compute_AP(results, classes, thresholds)
@@ -326,7 +327,7 @@ def summarize_test(name, results, classes, epoch, log, thresholds=None):
         epoch, total.AP * 100, mAP_strs, train_summary))
 
     log.scalars(name, struct(AP=total.AP * 100.0,
-                mAP30=total.mAP[30] * 100.0, mAP50=total.mAP[50] * 100.0, mAP75=total.mAP[75] * 100.0))
+                             mAP30=total.mAP[30] * 100.0, mAP50=total.mAP[50] * 100.0, mAP75=total.mAP[75] * 100.0))
 
     for k, ap in class_aps.items():
         if ap.class_counts is not None:

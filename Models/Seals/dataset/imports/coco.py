@@ -1,6 +1,8 @@
 from math import floor
 from random import shuffle
+
 from pycocotools.coco import COCO
+
 from libs.tools import concat_lists
 
 
@@ -9,7 +11,6 @@ def tagged(tag, contents):
 
 
 def import_coco(annotations_dir, image_root, split_ratio):
-
     coco = COCO(annotations_dir)
 
     cat_ids = coco.getCatIds()

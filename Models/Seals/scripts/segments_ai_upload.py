@@ -1,9 +1,9 @@
 # Segments.ai upload 'Scott Base 2021-22' dataset
 
-from os import environ, listdir, devnull
+from os import environ, listdir
+
 from segments import SegmentsClient
 from tqdm import tqdm
-from sys import stdout
 
 api_key = environ.get("SegmentsAI_api_key")
 dataset = "segmentsai1/Seal_2022-22"

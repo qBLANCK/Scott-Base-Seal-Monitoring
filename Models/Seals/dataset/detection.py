@@ -1,23 +1,18 @@
-import random
+import collections
 import math
+import random
 from copy import deepcopy
 
 import torch
-from torch.utils.data.sampler import RandomSampler
 from torch.utils.data.dataloader import DataLoader, default_collate
-
+from torch.utils.data.sampler import RandomSampler
 
 import libs.tools.dataset.direct as direct
-
+from Models.Seals.detection import box
+from libs.tools import over_struct, struct, table, cat_tables, Table, Struct
 from libs.tools.dataset.flat import FlatList
 from libs.tools.dataset.samplers import RepeatSampler
 from libs.tools.image import transforms, cv
-
-from libs.tools import over_struct, struct, table, cat_tables, Table, Struct
-
-
-from Models.Seals.detection import box
-import collections
 
 
 def collate_batch(batch):
@@ -58,6 +53,7 @@ def scale(scale):
         return d._extend(
             image=transforms.resize_scale(d.image, scale),
             target=d.target._extend(bbox=bbox))
+
     return apply
 
 
@@ -70,6 +66,7 @@ def resize(size):
         return d._extend(
             image=transforms.resize_scale(d.image, scale),
             target=d.target._extend(bbox=bbox))
+
     return apply
 
 
@@ -121,7 +118,6 @@ def random_crop_padded(dest_size, scale_range=(1, 1), aspect_range=(1, 1), borde
     cw, ch = dest_size
 
     def apply(d):
-
         scale = random_log(*scale_range)
         aspect = random_log(*aspect_range)
 
@@ -150,6 +146,7 @@ def random_crop_padded(dest_size, scale_range=(1, 1), aspect_range=(1, 1), borde
             target=d.target._extend(bbox=box.transform(
                 d.target.bbox, (-x, -y), (sx, sy)))
         )
+
     return apply
 
 
@@ -180,7 +177,7 @@ def sample_training(args, images, loader, transform, collate_fn=collate_batch):
 
     dataset = direct.Loader(loader, transform)
     sampler = direct.RandomSampler(images, (args.epoch_size // args.image_samples)) if (
-        args.epoch_size is not None) else direct.ListSampler(images)
+            args.epoch_size is not None) else direct.ListSampler(images)
 
     return DataLoader(dataset,
                       num_workers=args.num_workers,
@@ -204,6 +201,7 @@ def encode_target(encoder):
             lengths=len(d.target.label),
             id=d.id
         )
+
     return f
 
 
@@ -214,6 +212,7 @@ def identity(x):
 def multiple(n, transform):
     def f(data):
         return [transform(data) for _ in range(n)]
+
     return f
 
 
@@ -228,10 +227,11 @@ def transform_training(args, encoder=None):
     crop = identity
 
     if args.augment == "crop":
-        min_scale = args.min_scale or (1/args.max_scale)
+        min_scale = args.min_scale or (1 / args.max_scale)
 
         crop = random_crop_padded(dest_size, scale_range=(s * min_scale, s * args.max_scale),
-                                  aspect_range=(1/args.max_aspect, args.max_aspect), border_bias=args.border_bias, select_instance=args.select_instance)
+                                  aspect_range=(1 / args.max_aspect, args.max_aspect), border_bias=args.border_bias,
+                                  select_instance=args.select_instance)
     elif args.augment == "resize":
         crop = resize_to(dest_size)
     else:
@@ -254,6 +254,7 @@ def transform_training(args, encoder=None):
 def flatten(collate_fn):
     def f(lists):
         return collate_fn([x for y in lists for x in y])
+
     return f
 
 
@@ -275,6 +276,7 @@ def transform_testing(args, encoder=None):
 
     encode = encode_with(args, encoder)
     return transforms.compose(transform, encode)
+
 
 class DetectionDataset:
 
@@ -376,7 +378,7 @@ class DetectionDataset:
 
             if image.category == 'train':
                 totals += struct(iou=box.iou_matrix_matched(noisy,
-                                 image.target.bbox).sum(), n=n)
+                                                            image.target.bbox).sum(), n=n)
 
             return image._extend(target=image.target._extend(bbox=noisy))
 

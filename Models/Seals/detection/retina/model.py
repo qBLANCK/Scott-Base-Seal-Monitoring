@@ -1,19 +1,16 @@
 import math
+from collections import OrderedDict
 
 import torch
 import torch.nn as nn
 
 from Models.Seals.detection import detection_table
-
-from Models.Seals.models.common import Named, Parallel
-
-from Models.Seals.models.feature_pyramid import feature_pyramid, init_weights, init_classifier, join_output, residual_subnet, pyramid_parameters
-from libs.tools import struct, table, stack_tables
-
-from libs.tools.parameters import param, group
-from collections import OrderedDict
-
 from Models.Seals.detection.retina import anchor, loss
+from Models.Seals.models.common import Named, Parallel
+from Models.Seals.models.feature_pyramid import feature_pyramid, init_weights, init_classifier, join_output, \
+    residual_subnet, pyramid_parameters
+from libs.tools import struct, table, stack_tables
+from libs.tools.parameters import param, group
 
 
 class Encoder:
@@ -77,7 +74,7 @@ class Encoder:
             [anchor.encode(t, anchor_boxes, self.params) for t in target])
 
         class_loss = loss.class_loss(
-            encoding.classification, classification,  class_weights=self.class_weights)
+            encoding.classification, classification, class_weights=self.class_weights)
         loc_loss = 0
 
         if self.params.location_loss == "l1":
@@ -143,12 +140,12 @@ parameters = struct(
                  pos_match=param(
                      0.5, help="lower iou threshold matching positive anchor boxes in training"),
                  neg_match=param(
-                     0.4,  help="upper iou threshold matching negative anchor boxes in training"),
+                     0.4, help="upper iou threshold matching negative anchor boxes in training"),
 
                  crop_boxes=param(
                      False, help='crop boxes to the edge of the image patch in training'),
                  top_anchors=param(
-                     1,     help='select n top anchors for ground truth regardless of iou overlap (0 disabled)'),
+                     1, help='select n top anchors for ground truth regardless of iou overlap (0 disabled)'),
 
                  location_loss=param(
                      "l1", help="location loss function (giou | l1)"),
@@ -161,18 +158,17 @@ parameters = struct(
 
 
 def anchor_sizes(start, depth, anchor_scale=4, square=False, tall=False):
-
-    aspects = [1/2, 1, 2]
+    aspects = [1 / 2, 1, 2]
     if square:
         aspects = [1]
     elif tall:
-        aspects = [1/8, 1/4, 1/2]
+        aspects = [1 / 8, 1 / 4, 1 / 2]
 
-    scales = [1, pow(2, 1/3), pow(2, 2/3)]
+    scales = [1, pow(2, 1 / 3), pow(2, 2 / 3)]
 
     return len(aspects) * len(scales), \
-        [anchor.anchor_sizes(anchor_scale * (2 ** i), aspects, scales)
-         for i in range(start, depth)]
+           [anchor.anchor_sizes(anchor_scale * (2 ** i), aspects, scales)
+            for i in range(start, depth)]
 
 
 def create(args, dataset_args):

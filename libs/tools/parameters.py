@@ -1,7 +1,7 @@
-from libs.tools import struct, Struct
 import argparse
-
 import shlex
+
+from libs.tools import struct, Struct
 
 
 def describe_parameters(parameters):
@@ -57,7 +57,7 @@ def parse_choice(name, choice, args):
 
     choices = list(choice.options.keys())
     assert option in choice.options, "option '" + option + \
-        "' missing, expected one of " + str(choices)
+                                     "' missing, expected one of " + str(choices)
     args = parse_args(choice.options[option],
                       name + "." + option, choice.help, cmdArgs)
     return struct(choice=option, parameters=args)
@@ -69,7 +69,7 @@ def param_type(value):
 
 def param(default=None, help='', type=None, required=False):
     assert default is not None or type is not None, "type parameter required if default is not provided"
-    return struct(default=default, required=required,  help=help, type=type or param_type(default))
+    return struct(default=default, required=required, help=help, type=type or param_type(default))
 
 
 def required(type, help=''):
@@ -108,7 +108,7 @@ def add_arguments(parser, parameters):
             if parameter.default is not None:
                 help = parameter.help + ", default(" + str(default) + ")"
 
-            if(parameter.type == 'bool' and default is False):
+            if (parameter.type == 'bool' and default is False):
                 parser.add_argument('--' + name, required=parameter.required,
                                     default=default, help=help, action='store_true')
             else:

@@ -6,12 +6,10 @@ try:
     from urlparse import urlsplit, urlunsplit
 except ImportError:
     from urllib.parse import urlsplit, urlunsplit
-import re
 import logging
+import re
 
-from libs.tools.error import RuntimeConfigError
-from libs.tools.encoding import smart_str, smart_unicode, decode_pairs
-
+from libs.tools.encoding import smart_str, smart_unicode
 from libs.tools.py3k_support import *
 
 # I do not know, what the hell is going on, but sometimes
@@ -26,7 +24,6 @@ from libs.tools.py3k_support import *
 # My idea is that some mystical shit does some thing that breaks python
 # environment,, breaks sys.path So, when special case occurs and some new module
 # is need to be imported then that can't be done due to the unknown magical influence
-import encodings.punycode
 
 logger = logging.getLogger('grab.tools.http')
 RE_NON_ASCII = re.compile(r'[^-.a-zA-Z0-9]')
@@ -68,8 +65,8 @@ def encode_cookies(items, join=True, charset='utf-8'):
         In cookie value only ",", " ", "\t" and ";" should be encoded
         """
 
-        return val.replace(b' ', b'%20').replace(b'\t', b'%09')\
-                  .replace(b';', b'%3B').replace(b',', b'%2C')
+        return val.replace(b' ', b'%20').replace(b'\t', b'%09') \
+            .replace(b';', b'%3B').replace(b',', b'%2C')
 
     if isinstance(items, dict):
         items = items.items()
@@ -124,7 +121,7 @@ def normalize_http_values(items, charset='utf-8', ignore_classes=None):
         return key, value
 
     items = list(map(process, items))
-    #items = sorted(items, key=lambda x: x[0])
+    # items = sorted(items, key=lambda x: x[0])
     return items
 
 
@@ -140,7 +137,7 @@ def normalize_unicode(value, charset='utf-8'):
     if not isinstance(value, unicode):
         return value
     else:
-        #raise RuntimeConfigError('normalize_unicode function accepts only unicode values')
+        # raise RuntimeConfigError('normalize_unicode function accepts only unicode values')
         return value.encode(charset, 'ignore')
 
 

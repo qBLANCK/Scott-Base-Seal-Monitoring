@@ -21,7 +21,6 @@ def run_progress(loader, hook, eval):
 
 
 def train(loader, eval, optimizer, hook=None):
-
     def update(data):
         optimizer.zero_grad()
 
@@ -35,6 +34,5 @@ def train(loader, eval, optimizer, hook=None):
 
 
 def test(loader, eval, hook=None):
-
     with torch.no_grad():
         return run_progress(loader, hook, eval)

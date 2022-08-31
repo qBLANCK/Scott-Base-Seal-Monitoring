@@ -1,10 +1,10 @@
-from collections import defaultdict
 import os
 import random
+from collections import defaultdict
 
-from moviepy.editor import *
 import numpy as np
 from PIL import Image
+from moviepy.editor import *
 
 from libs.heatmappy.heatmappy import Heatmapper
 
@@ -86,8 +86,8 @@ class VideoHeatmapper:
         for x, y, t in pts:
             start = (t // interval) * interval
             pt_last_interval = int(
-                start + heat_decay_s*1000) if heat_decay_s else last_interval
-            for frame_time in range(start, pt_last_interval+1, interval):
+                start + heat_decay_s * 1000) if heat_decay_s else last_interval
+            for frame_time in range(start, pt_last_interval + 1, interval):
                 frames[frame_time].append((x, y))
 
         return frames
@@ -102,8 +102,8 @@ class VideoHeatmapper:
         interval = 1000 // fps
         for frame_start, heat in heatmap_frames:
             yield (ImageClip(heat)
-                   .set_start(frame_start/1000)
-                   .set_duration(interval/1000))
+                   .set_start(frame_start / 1000)
+                   .set_duration(interval / 1000))
 
 
 def _example_random_points():

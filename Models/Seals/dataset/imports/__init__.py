@@ -1,9 +1,8 @@
-from .coco import import_coco
-
-from libs.tools.parameters import get_choice
-from Models.Seals.dataset.annotate import decode_dataset
-
 import json
+
+from Models.Seals.dataset.annotate import decode_dataset
+from libs.tools.parameters import get_choice
+from .coco import import_coco
 
 
 def import_json(filename):

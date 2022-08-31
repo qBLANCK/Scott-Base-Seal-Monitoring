@@ -2,20 +2,20 @@ Snowstorm Classification Using ResNet-18 CNN for Seal Monitoring Application
 ============================================================================
 
 ***Abstrast—The reconstruction of Antarctica New Zealand's research centre, namely
-  Scott Base, is set place to start construction at the end of 2022.
-  Previous research has been conducted to measure the surrounding
-  Weddell Seal activity to ensure the population is not disturbed once
-  Scott Base's construction is underway. This research paper proposes a
-  finetuned ResNet-18 Convolutional Neural Network to classify
-  snowstorms in the Seal images taken in the 2019-2020 Summer. The value
-  of a reliable and accurate model is in the ability to distinguish
-  between true and false low counts of the population (where false
-  counts arise from snowstorm induced low-visibility). Evaluation of the
-  proposed model shows encouraging results. The model achieves an
-  accuracy of 97.8%, precision of 99.6%, recall of 95.5% and a
-  F<sub>1</sub> Score of 97.5%. These results outperform alternate non-CNN
-  weather classification approaches (86%) and match that of other
-  ResNet-18 weather classifiers (98.22%).***
+Scott Base, is set place to start construction at the end of 2022.
+Previous research has been conducted to measure the surrounding
+Weddell Seal activity to ensure the population is not disturbed once
+Scott Base's construction is underway. This research paper proposes a
+finetuned ResNet-18 Convolutional Neural Network to classify
+snowstorms in the Seal images taken in the 2019-2020 Summer. The value
+of a reliable and accurate model is in the ability to distinguish
+between true and false low counts of the population (where false
+counts arise from snowstorm induced low-visibility). Evaluation of the
+proposed model shows encouraging results. The model achieves an
+accuracy of 97.8%, precision of 99.6%, recall of 95.5% and a
+F<sub>1</sub> Score of 97.5%. These results outperform alternate non-CNN
+weather classification approaches (86%) and match that of other
+ResNet-18 weather classifiers (98.22%).***
 
 **Keywords: ResNet-18, Convolutional Neural Network, Snowstorm, Antarctica, Image
 Classification**
@@ -116,7 +116,7 @@ MWDIC holds 1125 images partitioned into four classes: Sunrise, Shine,
 Rain and Cloudy. Researchers split the MWDIC into training and testing
 subsets with a 75% and 25% allocation respectively. Sample images of the
 four classes in the MWDIC are seen in
-Fig. [1](#fig1).
+Fig.[1](#fig1).
 
 ![Sample images of Cloudy, Rain, Shine & Dawn
 [@Haija]](images/sample.png)
@@ -126,7 +126,7 @@ shows an improvement over the previous approach which refrained from
 using CNN's. Another improvement from the previous research paper is in
 the form of model evaluation. Additional metrics used are the precision
 and sensitivity of the classification. The papers also utilised a
-Confusion Matrix (Fig. [2](#fig2)) to describe the performance of the multi-class
+Confusion Matrix (Fig.[2](#fig2)) to describe the performance of the multi-class
 classification model in terms of the number of False Negatives, False
 Positives, True Negatives and True Positives.
 
@@ -142,15 +142,15 @@ neural networks. Its architecture adds connections between layers to
 skip or add shortcuts, namely skip-connections. The two main reasons for
 this added complexity are:
 
-1.  Avoids the vanishing gradient problem.
+1. Avoids the vanishing gradient problem.
 
-2.  Reduces the severity of Degradation. Due to additional layers
-    increasing training error [@He].
+2. Reduces the severity of Degradation. Due to additional layers
+   increasing training error [@He].
 
 Residual Blocks (RB) exist in the ResNet architecture for this purpose.
 An RB is a stack of layers organised using the output of an earlier
 layer as an input to a deeper layer in the RB. Therefore, creating a
-skip-connection by design, shown in Fig. [3](#fig3).
+skip-connection by design, shown in Fig.[3](#fig3).
 
 ![An example of a skip-connection in the ResNet-18 architecture
 [@He]](images/skip.png)
@@ -159,7 +159,7 @@ The ResNet-18 architecture can be broken down into four modules each
 with four convolutional layers. Additionally, there is a convolutional
 layer accepting the input and a fully-connected layer making a total of
 eighteen layers. A softmax layer is added to perform classification
-tasks. Fig. [4](#fig4) shows the
+tasks. Fig.[4](#fig4) shows the
 ResNet-18 architecture along with the skip-connections.
 
 ![ResNet-18 Architecture [@Farheen]](images/resnet.png)
@@ -167,7 +167,7 @@ ResNet-18 architecture along with the skip-connections.
 The proposed storm classification pipeline can be abstracted into three
 components: Preprocessing component, the ResNet-18 finetuning component
 and the Classification component. The architecture of the proposed model
-is shown in Fig. [5](#fig5). The
+is shown in Fig.[5](#fig5). The
 pipeline starts by processing images taken from the Antarctic Dataset
 Subset (ADS). The preprocessing stage performs five operations to
 augment, label, shuffle and partition the images. This stage is
@@ -187,7 +187,7 @@ seal counts. A time-series sequence of images was taken over the
 2018-2019 Summer showing the Weddell seals surrounding Scott Base,
 Antarctica. Three DSLR cameras were set up with their viewpoints. The
 10-minute interval images were cropped to *5000 x 700* pixels to focus
-on the colony [@Batchelor]. Fig. [\[fig6\]](#fig6){reference-type="ref"
+on the colony [@Batchelor]. Fig.[\[fig6\]](#fig6){reference-type="ref"
 reference="fig6"} shows example images of the three viewpoints
 surrounding Scott Base.
 
@@ -232,7 +232,7 @@ cropped at five random locations in the image. Because a storm's
 decrease in visibility is observed in every location of an image, a
 random crop would suffice. Having five crops per image also
 synthetically increased the ADS size by fivefold from 894 to 4470
-images. Fig. [9](#fig7) shows an
+images. Fig.[9](#fig7) shows an
 example of five square crops using Camera A.
 
 ![Image from Camera A with five red squares each representing a *500 x
@@ -262,10 +262,10 @@ Finetuning an existing pre-trained model on a specific dataset can save
 a developer time and can result in better-performing models [@Lalor].
 The finetuning component in the proposed pipeline starts with a model
 with ResNet-18 weights learnt from the ImageNet dataset.
-Fig. [10](#fig8) exhibits
+Fig.[10](#fig8) exhibits
 finetuning by learning the parameters for a generalised CNN and then
 applying the learnt weights to a specialised CNN (snowstorm
-classification. Fig. [10](#fig8)
+classification. Fig.[10](#fig8)
 also illustrates the modification in the output layer, decreasing the
 number of classes to two.
 
@@ -277,10 +277,10 @@ snowstorms. During training, the loss (calculated by the Cross-Entropy
 Loss Function) decreases as the optimisation function modifies the
 weights and their bias. As mentioned, the Cross-Entropy Loss Function is
 used to evaluate the model after each epoch. The Cross-Entropy Loss
-Function is defined as: 
+Function is defined as:
 $$
-    L = -\frac{1}{N}\left [ \sum_{j=1}^{N} \left [ t_{j}log(p_{j})+(1-t_{j})log(1-p_{j}) \right ] \right ]
-    $$
+L = -\frac{1}{N}\left [ \sum_{j=1}^{N} \left [ t_{j}log(p_{j})+(1-t_{j})log(1-p_{j}) \right ] \right ]
+$$
 
 Where $N$ is the number of classes, $t_{i}$ is the truth value (either $1$ or
 $0$) and $p_{i}$ is the Softmax probability for the $i$th class.
@@ -291,14 +291,14 @@ convergence time. Momentum works by remembering the previous change in
 weight and using its magnitude to accelerate towards convergence. The
 formula for SGD with momentum is defined as:
 $$
-    \begin{split}
-        \Delta w_{t+1} &:=  \mu \Delta w_{t} - \alpha g_{t+1}L \\
-        w_{t+1} &:= w_{t}+\Delta w_{t+1}
-    \end{split}$$
+\begin{split}
+\Delta w_{t+1} &:= \mu \Delta w_{t} - \alpha g_{t+1}L \\
+w_{t+1} &:= w_{t}+\Delta w_{t+1}
+\end{split}$$
 Where $w$ is the weight, $\mu$ is the momentum
 (between $0$ and $1$), $\alpha$ is the learning rate, $g$ is the
 gradient and $L$ is the loss function given by
-eq. ([\[loss\]](#loss)). In this
+eq.([\[loss\]](#loss)). In this
 paper, $\alpha = 0.001$ and $\mu = 0.9$.
 
 ## Classification
@@ -310,7 +310,7 @@ a binary classification task, the Softmax function effectively
 calculates the probability of the image being a snowstorm. The Softmax
 function is defined as:
 $$
-    \sigma(z_i) = \frac{e^{z_{i}}}{\sum_{j=1}^N e^{z_{j}}} \ \ \ for\ i=1,2,\dots,N
+\sigma(z_i) = \frac{e^{z_{i}}}{\sum_{j=1}^N e^{z_{j}}} \ \ \ for\ i=1,2,\dots,N
 $$
 Where $N$ is the number of classes.
 
@@ -324,36 +324,36 @@ the original image, using and ensemble of methods provides a better
 performing classifier [@Polikar]. Akin to the preprocessing stage, the
 image is cropped five times in random locations. The model classifies
 each of the five images and combined accuracy is calculated.
-eq. ([\[acc\]](#acc)) defines the
+eq.([\[acc\]](#acc)) defines the
 method for combining the accuracies of the classifications.
 $$
-    \begin{split}
-        a_{j} &:= 
-        \begin{cases}
-            a_{j},& \text{if Storm}\\
-            -a_{j},& \text{if Clear}
-        \end{cases}\\
-        a_{combined} &:= \frac{\sum_{j=1}^{E}a_{j}}{E}
-    \end{split}
+\begin{split}
+a_{j} &:=
+\begin{cases}
+a_{j},& \text{if Storm}\\
+-a_{j},& \text{if Clear}
+\end{cases}\\
+a_{combined} &:= \frac{\sum_{j=1}^{E}a_{j}}{E}
+\end{split}
 $$
 Where $a$ is accuracy and $E$ is the number of crops
-(five in this case). eq. ([\[class\]](#class)) shows how the final classification is chosen where $C$ is the predicted class. Accuracies can be both positive (Storm) and
+(five in this case). eq.([\[class\]](#class)) shows how the final classification is chosen where $C$ is the predicted
+class. Accuracies can be both positive (Storm) and
 negative (Clear).
 
 $$
-    C :=
-    \begin{cases}
-        Storm,& \text{if $a_{j} \geq$ 0}\\
-        Clear,& \text{if $a_{j} <$ 0}
-    \end{cases}
-    $$
+C :=
+\begin{cases}
+Storm,& \text{if $a_{j} \geq$ 0}\\
+Clear,& \text{if $a_{j} <$ 0}
+\end{cases}
+$$
 
 # Results
 
-Tab. [1](#tab:details)
+Tab.[1](#tab:details)
 illustrates a summary of the development environment itself and its
 configurations when training the ResNet-18 model.
-
 
 | **Item**      | **Description**               |
 |---------------|-------------------------------|
@@ -371,9 +371,6 @@ configurations when training the ResNet-18 model.
 | Learning Rate | 0.001                         |
 | Momentum      | 0.9                           |
 
-
-
-
 To quantify the model's performance, four well-known metrics have been
 used. Namely, accuracy, precision, recall and F1-score. Each metric is
 briefly described below with True Positive, True Negative, False
@@ -383,55 +380,54 @@ FN:
 **Accuracy:** The ratio of the number of correct classifications to the
 total number of classifications.
 $$
-    accuracy = \frac{TP + TN}{FP + FN}
+accuracy = \frac{TP + TN}{FP + FN}
 $$
 **Precision:** The number of correct snowstorm classifications to the total number of snowstorms
 seen.
 $$
-    precision = \frac{TP}{TP + FP}
+precision = \frac{TP}{TP + FP}
 $$
 **Recall:** The number of correct
 snowstorm classifications to the total number of snowstorms classified.
 
 $$
-   recall = \frac{TP}{TP + FN}
+recall = \frac{TP}{TP + FN}
 $$
 **F1-Score:** A measure of the
 classification's accuracy when accounting for the models precision and
-recall. 
+recall.
 $$
-    F_{1}Score = 2 \times \frac{recall \times precision}{recall + precision}$$
-
+F_{1}Score = 2 \times \frac{recall \times precision}{recall + precision}$$
 
 To measure the model's performance during training, the loss and the
 F1-score were calculated. The loss function --- defined by
-eq. [\[loss\]](#loss) --- showed
+eq.[\[loss\]](#loss) --- showed
 improvement in the model as the pre-trained model has a loss of $0.3004$
 and the final fine-tuned model has a loss of $0.0774$. A history of the
-best F~1~-Score --- defined by eq. [\[f1\]](#f1){reference-type="ref"
+best F~1~-Score --- defined by eq.[\[f1\]](#f1){reference-type="ref"
 reference="f1"} --- was also tracked during the 15 epochs.
-Fig. [11](#fig9) shows the
+Fig.[11](#fig9) shows the
 progression of the model starting at $F_{1} = 0.926$ and finishing at
-$F_{1} =  0.9692$.
+$F_{1} = 0.9692$.
 
 ![Best $F_{1}Score$ over 15 epochs](images/f1.png)
 
 The performance of the proposed model can be illustrated by a confusion
 matrix. This shows the distribution of the True Positive, True Negative,
 False Positive and False Negatives.
-Fig. [12](#fig10) illustrates
+Fig.[12](#fig10) illustrates
 the final snowstorm classifiers confusion matrix.
 
 ![Confusion Matrix or proposed ResNet-18 model](images/conf2.png)
 
-Digesting Fig. [12](#fig10), the
+Digesting Fig.[12](#fig10), the
 proposed model performs excellent with $< 2.5\%$ of images being
 incorrectly classified. The proposed model is quantifiably evaluated
 below using the aforementioned metrics.
 
 $$\begin{aligned}
-\boldsymbol{accuracy}&\boldsymbol{=97.8\%}  &  \boldsymbol{precision} &\boldsymbol{=99.6\%}  \\
-\boldsymbol{recall}&\boldsymbol{=95.5\%}  &  \boldsymbol{F_{1}Score} &\boldsymbol{=97.5\%} \end{aligned}$$
+\boldsymbol{accuracy}&\boldsymbol{=97.8\%} & \boldsymbol{precision} &\boldsymbol{=99.6\%} \\
+\boldsymbol{recall}&\boldsymbol{=95.5\%} & \boldsymbol{F_{1}Score} &\boldsymbol{=97.5\%} \end{aligned}$$
 
 The proposed model offers a reliable snowstorm classifier with high
 accuracy in the trained environment. Other metrics --- namely the

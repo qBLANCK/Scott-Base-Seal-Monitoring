@@ -1,9 +1,9 @@
 import re
 
 from libs.tools.error import DataNotFound
-from libs.tools.text import normalize_space
 from libs.tools.html import decode_entities
 from libs.tools.py3k_support import *
+from libs.tools.text import normalize_space
 
 REGEXP_CACHE = {}
 NULL = object()
@@ -23,7 +23,7 @@ def cache_regexp(rex, flags=0):
         return REGEXP_CACHE[key]
     except KeyError:
         obj = re.compile(rex, flags)
-        #obj.source = rex
+        # obj.source = rex
         REGEXP_CACHE[key] = obj
         return obj
 

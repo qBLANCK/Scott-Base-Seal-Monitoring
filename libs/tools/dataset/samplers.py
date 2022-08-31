@@ -1,6 +1,6 @@
-
 import torch
 from torch.utils.data.sampler import Sampler
+
 
 class RepeatSampler(Sampler):
     """Samples elements randomly, repeating as necessary.
@@ -11,7 +11,6 @@ class RepeatSampler(Sampler):
     """
 
     def __init__(self, num_samples, data_size):
-
         self.num_samples = num_samples
         self.data_size = data_size
 

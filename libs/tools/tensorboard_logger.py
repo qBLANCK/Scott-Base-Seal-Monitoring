@@ -1,5 +1,6 @@
-import tensorflow as tf
 from os import path
+
+import tensorflow as tf
 import torch
 
 

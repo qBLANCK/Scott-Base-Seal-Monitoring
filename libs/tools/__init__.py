@@ -1,19 +1,15 @@
-from typing import List
-from collections import Counter
+import itertools
+import math
+import operator
+import pprint
 from collections.abc import Mapping
+from functools import reduce
+from numbers import Number
+from typing import List
+
+import numpy as np
 import torch
 from torch import Tensor
-import numpy as np
-
-from numbers import Number
-import math
-
-import operator
-import itertools
-
-import pprint
-
-from functools import reduce
 
 
 def to_dicts(s, truncate=None):
@@ -100,7 +96,7 @@ class Struct(Mapping):
 
     def __repr__(self):
         commaSep = ", ".join(["{}={}".format(str(k), repr(v))
-                             for k, v in self.items()])
+                              for k, v in self.items()])
         return "{" + commaSep + "}"
 
     def __str__(self):
@@ -244,7 +240,7 @@ class Table(Struct):
 
         for (k, v) in d.items():
             assert type(v) == torch.Tensor, "expected tensor, got " + \
-                type(t).__name__
+                                            type(t).__name__
             assert v.size(0) == t.size(
                 0), "mismatched column sizes: " + str(shape(d))
 
@@ -272,7 +268,7 @@ class Table(Struct):
         elif type(index) is int:
             return Struct({k: v[index] for k, v in self.items()})
         assert False, "Table.index_select: unsupported index type" + \
-            type(index).__name__
+                      type(index).__name__
 
     def _index(self, index: int) -> torch.Tensor:
         return self._index_select(torch.tensor([index], dtype=int))
@@ -402,7 +398,6 @@ class Histogram:
 
 
 def shape_info(x):
-
     if type(x) == torch.Tensor:
         return tuple([*x.size(), x.dtype, x.device])
     if isinstance(x, np.ndarray):
@@ -490,6 +485,7 @@ def over_struct(key, f):
     def modify(d):
         value = f(d[key])
         return Struct(replace(d, key, value))
+
     return modify
 
 
@@ -497,6 +493,7 @@ def over(key, f):
     def modify(d):
         value = f(d[key])
         return replace(d, key, value)
+
     return modify
 
 
@@ -545,7 +542,7 @@ def cat_tables(tables, dim=0):
 
 
 def drop_while(f, xs):
-    while(len(xs) > 0 and f(xs[0])):
+    while (len(xs) > 0 and f(xs[0])):
         _, *xs = xs
 
     return xs
@@ -570,6 +567,7 @@ def pluck_struct(k, xs, default=None):
 def const(x):
     def f(*y):
         return x
+
     return f
 
 
@@ -578,7 +576,7 @@ def concat_lists(xs):
 
 
 def map_dict(f, d):
-    return {k:  f(v) for k, v in d.items()}
+    return {k: f(v) for k, v in d.items()}
 
 
 def pprint_struct(s, indent=2, width=160):

@@ -2,16 +2,15 @@
 # Author: Grigoriy Petukhov (http://lorien.name)
 # License: BSD
 import logging
+from datetime import datetime
 from hashlib import sha1
 from time import mktime
-from datetime import datetime
-import feedparser
-from lxml.html.clean import clean_html
 
-from grab.tools.lxml_tools import truncate_html
+import feedparser
 from grab.tools.html import strip_tags
+from grab.tools.lxml_tools import truncate_html
 from grab.tools.text import remove_bom
-from libs.tools.error import DataNotFound, RuntimeConfigError
+from lxml.html.clean import clean_html
 
 log = logging.getLogger('grab.tools.feed')
 
@@ -43,7 +42,6 @@ def parse_entry_tags(entry):
 
 
 def parse_entry_content(entry):
-
     body = ''
     if hasattr(entry, 'content'):
         mapping = dict((x.type, x.value) for x in entry.content)

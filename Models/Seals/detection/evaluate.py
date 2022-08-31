@@ -1,13 +1,14 @@
+import numpy as np
 import torch
 
 from Models.Seals.detection import box
 from libs.tools import struct, const
-import numpy as np
 
 
 def bookend(*xs, dim=0):
     def to_tensor(xs):
         return xs if torch.is_tensor(xs) else torch.FloatTensor([xs])
+
     return torch.cat([to_tensor(x) for x in xs], dim)
 
 
@@ -23,13 +24,12 @@ def area_under_curve(xs, ys):
 
 
 def compute_mAP(matches, confidence, num_target, weight=1, eps=1e-7):
-
     false_positives = ((1 - matches) * weight).cumsum(0)
     true_positives = (matches * weight).cumsum(0)
 
     recall = true_positives / (num_target if num_target > 0 else 1)
     precision = true_positives / \
-        (true_positives + false_positives).clamp(min=eps)
+                (true_positives + false_positives).clamp(min=eps)
 
     recall = bookend(0.0, recall, 1.0)
     precision = rev_cummax(bookend(1.0, precision, 0.0))
@@ -97,7 +97,6 @@ def mAP_classes(image_pairs, num_classes):
     num_targets = torch.bincount(target_label, minlength=num_classes)
 
     def f(threshold):
-
         matches = torch.cat([match(threshold) for match in matchers])[order]
 
         def compute_class(i):

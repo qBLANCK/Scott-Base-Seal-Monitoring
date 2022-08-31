@@ -1,12 +1,12 @@
-import torch
-import torch.nn as nn
 import math
 import numbers
-
-from libs.tools.image import cv
-from libs.tools import struct
-
 import random
+
+import torch
+import torch.nn as nn
+
+from libs.tools import struct
+from libs.tools.image import cv
 
 default_statistics = struct(
     mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
@@ -24,7 +24,7 @@ class Normalize(nn.Module):
 
 
 def normalize_batch(batch, mean=default_statistics.mean, std=default_statistics.std, dtype=torch.float):
-    assert(batch.size(3) == 3)
+    assert (batch.size(3) == 3)
     batch = batch.to(dtype=dtype).div_(255.)
 
     mean = torch.tensor(mean).type_as(batch)
@@ -34,7 +34,7 @@ def normalize_batch(batch, mean=default_statistics.mean, std=default_statistics.
 
 
 def un_normalize_batch(batch, mean=default_statistics.mean, std=default_statistics.std):
-    assert(batch.size(1) == 3)
+    assert (batch.size(1) == 3)
     batch = batch.clone()
 
     for i in range(0, 3):
@@ -45,7 +45,7 @@ def un_normalize_batch(batch, mean=default_statistics.mean, std=default_statisti
 
 
 def random_gamma(image, gamma_range=0.1):
-    gamma = random.uniform(1-gamma_range, 1+gamma_range)
+    gamma = random.uniform(1 - gamma_range, 1 + gamma_range)
     return cv.adjust_gamma(image, gamma)
 
 
@@ -60,22 +60,22 @@ def adjust_gamma(adjustment=0.1, per_channel=0):
             image = random_gamma(image, adjustment)
 
         return image
+
     return f
 
 
 def adjust_brightness(brightness=0, contrast=0):
     def f(image):
-
         b = random.uniform(-brightness, brightness) * 255
         c = random.uniform(1 - contrast, 1 + contrast)
 
         return cv.multiply_add(image, c, b)
+
     return f
 
 
 def adjust_colours(hue=0.0, saturation=0.0):
     def f(image):
-
         h = random.uniform(-hue, hue) * 180
         s = random.uniform(-saturation, saturation) * 255
 
@@ -87,6 +87,7 @@ def adjust_colours(hue=0.0, saturation=0.0):
         image.select(2, 1).copy_(saturations)
 
         return cv.hsv_to_rgb(image)
+
     return f
 
 
@@ -103,8 +104,8 @@ def rotation(a):
 
     return torch.DoubleTensor([
         [ca, -sa, 0],
-        [sa,  ca, 0],
-        [0,   0, 1]])
+        [sa, ca, 0],
+        [0, 0, 1]])
 
 
 def translation(tx, ty):
@@ -154,7 +155,6 @@ def random_crop_target(image_size, crop_size, target_box):
 
 
 def random_crop_padded(image_size, crop_size, border_bias=0):
-
     def random_offset(i):
         lower = 0
         upper = image_size[i]
@@ -177,6 +177,7 @@ def clamp(lower, upper, *xs):
 
 def randoms(*ranges):
     def pair(r): return (r, -r) if isinstance(r, numbers.Number) else r
+
     return [random.uniform(*pair(r)) for r in ranges]
 
 
@@ -185,13 +186,15 @@ def compose(*functions):
         for f in functions:
             image = f(image)
         return image
+
     return composed
 
 
 border = cv.border
 
 
-def warp_affine(image, t, dest_size, border_mode=border.constant, border_fill=default_statistics.mean, flags=cv.inter.area):
+def warp_affine(image, t, dest_size, border_mode=border.constant, border_fill=default_statistics.mean,
+                flags=cv.inter.area):
     border_fill = [255 * x for x in border_fill]
     return cv.warpAffine(image, t, dest_size, flags=flags, borderMode=border_mode, borderValue=border_fill)
 
@@ -215,19 +218,23 @@ def warp_perspective(image, t, dest_size, border_mode=border.constant, border_fi
     return cv.warpPerspective(image, t, dest_size, flags=cv.inter.area, borderMode=border_mode, borderValue=border_fill)
 
 
-def affine_crop(input_crop, dest_size, scale_range=(1, 1), rotation_size=0, border_mode=border.constant, border_fill=default_statistics.mean):
+def affine_crop(input_crop, dest_size, scale_range=(1, 1), rotation_size=0, border_mode=border.constant,
+                border_fill=default_statistics.mean):
     def f(image):
         t = make_affine_crop(image.size(), input_crop,
                              dest_size, scale_range, rotation_size)
         return warp_affine(image, t, dest_size, border_fill)
+
     return f
 
 
-def affine_crop(input_crop, dest_size, scale_range=(1, 1), rotation_size=0, border_mode=border.constant, border_fill=default_statistics.mean):
+def affine_crop(input_crop, dest_size, scale_range=(1, 1), rotation_size=0, border_mode=border.constant,
+                border_fill=default_statistics.mean):
     def f(image):
         t = make_affine_crop(image.size(), input_crop,
                              dest_size, scale_range, rotation_size)
         return warp_affine(image, t, dest_size, border_mode=border_mode, border_fill=border_fill)
+
     return f
 
 
@@ -238,7 +245,8 @@ def centre_on(image, dest_size, border_mode=border.constant, border_fill=(0, 0, 
     return warp_affine(image, t, dest_size, border_mode=border_mode, border_fill=border_fill)
 
 
-def image_augmentation(dest_size, affine_jitter=0, perspective_jitter=0, translation=0, scale_range=(1, 1), rotation_size=0, flip=True, border_mode=border.constant, border_fill=default_statistics.mean):
+def image_augmentation(dest_size, affine_jitter=0, perspective_jitter=0, translation=0, scale_range=(1, 1),
+                       rotation_size=0, flip=True, border_mode=border.constant, border_fill=default_statistics.mean):
     def f(image):
         t = random_affine(image.size(), dest_size, translation=translation,
                           flip=flip, scale_range=scale_range, rotation_size=rotation_size)
@@ -250,6 +258,7 @@ def image_augmentation(dest_size, affine_jitter=0, perspective_jitter=0, transla
             t = random_perspective_jitter(dest_size, perspective_jitter).mm(t)
 
         return warp_perspective(image, t, dest_size, border_mode=border_mode, border_fill=border_fill)
+
     return f
 
 
@@ -278,6 +287,7 @@ def perspective_jitter(pixels=1, border_mode=border.constant, border_fill=defaul
         size = (image.size(1), image.size(0))
         t = make_perspective_jitter(size, pixels=pixels)
         return warp_perspective(image, t, size, border_mode=border_mode, border_fill=border_fill)
+
     return f
 
 
@@ -314,7 +324,7 @@ def fit_transform(input_size, t, pad=0):
     (w, h) = input_size
 
     input_corners = torch.FloatTensor(
-        [(-pad, -pad, 1), (-pad, h+pad, 1), (w+pad, h+pad, 1), (w+pad, -pad, 1)])
+        [(-pad, -pad, 1), (-pad, h + pad, 1), (w + pad, h + pad, 1), (w + pad, -pad, 1)])
     corners = perspective_transform(t, input_corners)
 
     (l, _), (u, _) = corners.min(0), corners.max(0)

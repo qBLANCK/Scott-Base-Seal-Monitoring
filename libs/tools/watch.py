@@ -1,7 +1,7 @@
+import logging
 import os
 import signal
 import sys
-import logging
 import time
 
 
@@ -20,7 +20,7 @@ class Watcher(object):
     I have only tested this on Linux.  I would expect it to
     work on the Macintosh and not work on Windows.
     """
-    
+
     def __init__(self):
         """ Creates a child thread, which returns.  The parent
             thread waits for a KeyboardInterrupt and then kills

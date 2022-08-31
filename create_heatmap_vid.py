@@ -1,21 +1,22 @@
-from tqdm import tqdm
 import csv
+import os
+
+import moviepy.video.io.ImageSequenceClip
+# Del me
+import numpy as np
+# CNN
+import torch
+from tqdm import tqdm
+
+from Models.Seals.checkpoint import load_model
+from Models.Seals.detection import detection_table
+from Models.Seals.evaluate import evaluate_image
 # Heatmap
 from libs.heatmappy.heatmappy.heatmap import Heatmapper
 from libs.heatmappy.heatmappy.video import VideoHeatmapper
-import os
-import moviepy.video.io.ImageSequenceClip
-# CNN
-import torch
 from libs.tools.image import cv
-from Models.Seals.evaluate import evaluate_image
-from Models.Seals.detection import detection_table
-from Models.Seals.checkpoint import load_model
 
-# Del me
-import numpy as np
 CHUNKS = 4
-
 
 MODEL_DIR = "./Models/Seals/log/Seals_2021-22/model.pth"
 VID_LEN_S = 60 * 6 / CHUNKS  # seconds
@@ -86,8 +87,9 @@ def detect_seals(model, encoder, device, image_files):
         frame = cv.imread_color(img)
         results = evaluate_image(model, frame, encoder,
                                  nms_params=nms_params, device=device)
-        img_points = [((x1+x2)/2, (y1+y2)/2, round(1000*(i*(1/TIMELAPSE_FPS)))) for x1, y1, x2,
-                      y2 in results.detections.bbox if is_responsible_bbox([x1, y1, x2, y2], frame)]
+        img_points = [((x1 + x2) / 2, (y1 + y2) / 2, round(1000 * (i * (1 / TIMELAPSE_FPS)))) for x1, y1, x2,
+                                                                                                  y2 in
+                      results.detections.bbox if is_responsible_bbox([x1, y1, x2, y2], frame)]
         points += img_points
     return points
 
@@ -107,7 +109,8 @@ def detect_seals_with_CSV(model, encoder, device, image_files):
             frame = cv.imread_color(img)
             results = evaluate_image(model, frame, encoder,
                                      nms_params=nms_params, device=device)
-            img_points = [(int((x1+x2)/2), int((y1+y2)/2), round(1000*(i*(1/TIMELAPSE_FPS)))) for x1, y1, x2,
+            img_points = [(int((x1 + x2) / 2), int((y1 + y2) / 2), round(1000 * (i * (1 / TIMELAPSE_FPS)))) for
+                          x1, y1, x2,
                           y2 in results.detections.bbox if is_responsible_bbox([x1, y1, x2, y2], frame)]
             points += img_points
             writer.writerows(img_points)

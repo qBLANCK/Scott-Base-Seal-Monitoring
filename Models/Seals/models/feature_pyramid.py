@@ -1,18 +1,14 @@
-import sys
 import math
+from collections import OrderedDict
 
 import torch
 import torch.nn as nn
+import torch.nn.init as init
 
 import Models.Seals.models.pretrained as pretrained
-
-from Models.Seals.models.common import Conv, Cascade, UpCascade, Residual, Parallel, Decode,  basic_block
-
-import torch.nn.init as init
+from Models.Seals.models.common import Conv, Cascade, UpCascade, Residual, Parallel, Decode, basic_block
 from libs.tools import struct
-
 from libs.tools.parameters import param
-from collections import OrderedDict
 
 
 def init_weights(m):
@@ -24,7 +20,7 @@ def init_classifier(m, prior=0.001):
     if isinstance(m, nn.Conv2d):
         init.normal_(m.weight, std=0.01)
         if hasattr(m, 'bias') and m.bias is not None:
-            b = -math.log((1 - prior)/prior)
+            b = -math.log((1 - prior) / prior)
             init.constant_(m.bias, b)
 
 
@@ -33,6 +29,7 @@ def residual_decoder(num_blocks=2, upscale='nearest'):
         blocks = [Residual(basic_block(features, features))
                   for i in range(num_blocks)]
         return Decode(features, module=nn.Sequential(*blocks), upscale=upscale)
+
     return create
 
 
@@ -133,14 +130,13 @@ def label_layers(layers):
 
 
 def feature_pyramid(backbone_name, first=3, depth=8, features=64, decode_blocks=2, upscale='nearest'):
-
     assert first < depth
     assert backbone_name in pretrained.models, "base model not found: " + \
-        backbone_name + ", options: " + base_options
+                                               backbone_name + ", options: " + base_options
 
     base_layers = pretrained.models[backbone_name]()
     backbone_layers = label_layers(extend_layers(
-        base_layers, depth, features=features*2))
+        base_layers, depth, features=features * 2))
 
     return FeaturePyramid(backbone_layers, first=first, features=features,
                           make_decoder=residual_decoder(decode_blocks, upscale))

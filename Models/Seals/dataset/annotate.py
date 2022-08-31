@@ -1,11 +1,10 @@
-
 from os import path
 
 import torch
-from Models.Seals.dataset.detection import DetectionDataset
-from libs.tools import struct, to_structs
 
+from Models.Seals.dataset.detection import DetectionDataset
 from libs.tools import pluck, struct, table
+from libs.tools import to_structs
 
 
 def split_tagged(tagged):
@@ -33,8 +32,9 @@ def decode_obj(obj):
 def lookup(mapping):
     def f(i):
         assert i in mapping, "missing key in mapping" + \
-            str(list(mapping.keys())) + ": " + str(i)
+                             str(list(mapping.keys())) + ": " + str(i)
         return mapping[i]
+
     return f
 
 

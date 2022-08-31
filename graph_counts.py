@@ -1,7 +1,8 @@
-import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
-import datetime as dt
 import csv
+import datetime as dt
+
+import matplotlib.dates as mdates
+import matplotlib.pyplot as plt
 
 datetimes = []
 counts = []

@@ -1,10 +1,9 @@
-from threading import Thread, currentThread
-import time
+from threading import Thread
+
 try:
     from Queue import Queue, Empty
 except ImportError:
     from queue import Queue, Empty
-import logging
 
 from libs.tools.py3k_support import *
 
@@ -106,10 +105,12 @@ if __name__ == '__main__':
     from random import random
     import time
 
+
     def worker(arg):
         logging.debug('Processing %s' % arg)
         time.sleep(random())
         return currentThread().name, arg
+
 
     def tasks():
         for x in xrange(10):
@@ -117,10 +118,12 @@ if __name__ == '__main__':
             time.sleep(random())
             yield (x,)
 
+
     def main():
         for res in make_work(worker, tasks(), 3):
             logging.debug('Result %s received from thread %s' %
                           (res[1], res[0]))
+
 
     if __name__ == '__main__':
         logging.basicConfig(level=logging.DEBUG,

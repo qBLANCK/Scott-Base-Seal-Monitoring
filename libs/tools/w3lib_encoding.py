@@ -3,13 +3,13 @@ Functions for handling encoding of web pages
 
 Original code is https://github.com/scrapy/w3lib/blob/master/w3lib/encoding.py
 """
-import re
 import codecs
 import encodings
+import re
 
 # Python decoder doesn't follow unicode standard when handling
 # bad utf-8 encoded strings. see http://bugs.python.org/issue8271
-codecs.register_error('w3lib_replace', lambda exc: (u'\ufffd', exc.start+1))
+codecs.register_error('w3lib_replace', lambda exc: (u'\ufffd', exc.start + 1))
 
 _HEADER_ENCODING_RE = re.compile(r'charset=([\w-]+)', re.I)
 
@@ -23,7 +23,7 @@ _XML_ENCODING_RE = _TEMPLATE % ('encoding', r'(?P<xmlcharset>[\w-]+)')
 # check for meta tags, or xml decl. and stop search if a body tag is encountered
 _BODY_ENCODING_RE = re.compile(
     r'<\s*(?:meta(?:(?:\s+%s|\s+%s){2}|\s+%s)|\?xml\s[^>]+%s|body)' % \
-        (_HTTPEQUIV_RE, _CONTENT_RE, _CONTENT2_RE, _XML_ENCODING_RE), re.I)
+    (_HTTPEQUIV_RE, _CONTENT_RE, _CONTENT2_RE, _XML_ENCODING_RE), re.I)
 
 # Default encoding translation
 # this maps cannonicalized encodings to target encodings
@@ -77,7 +77,7 @@ def html_body_declared_encoding(html_body_str):
     match = _BODY_ENCODING_RE.search(chunk)
     if match:
         encoding = match.group('charset') or match.group('charset2') \
-                or match.group('xmlcharset')
+                   or match.group('xmlcharset')
         if encoding:
             return resolve_encoding(encoding)
 
@@ -127,8 +127,8 @@ def to_unicode(data_str, encoding):
     return data_str.decode(encoding, 'w3lib_replace')
 
 
-def html_to_unicode(content_type_header, html_body_str, 
-        default_encoding='utf8', auto_detect_fun=None):
+def html_to_unicode(content_type_header, html_body_str,
+                    default_encoding='utf8', auto_detect_fun=None):
     """Convert raw html bytes to unicode
     
     This attempts to make a reasonable guess at the content encoding of the
@@ -176,22 +176,22 @@ def html_to_unicode(content_type_header, html_body_str,
         # remove BOM if it agrees with the encoding
         if enc == bom_enc:
             detected_bom = bom
-            #html_body_str = html_body_str[len(bom):]
+            # html_body_str = html_body_str[len(bom):]
         elif enc == 'utf-16' or enc == 'utf-32':
             # read endianness from BOM, or default to big endian 
             # tools.ietf.org/html/rfc2781 section 4.3
             if bom_enc is not None and bom_enc.startswith(enc):
                 enc = bom_enc
                 detected_bom = bom
-                #html_body_str = html_body_str[len(bom):]
+                # html_body_str = html_body_str[len(bom):]
             else:
                 enc += '-be'
         detected_enc = enc
-        #return enc, to_unicode(html_body_str, enc)
+        # return enc, to_unicode(html_body_str, enc)
     else:
         if bom_enc is not None:
             detected_enc = bom_enc
-            #return bom_enc, to_unicode(html_body_str[len(bom):], bom_enc)
+            # return bom_enc, to_unicode(html_body_str[len(bom):], bom_enc)
         else:
             enc = html_body_declared_encoding(html_body_str)
             if enc is None and (auto_detect_fun is not None):
@@ -199,5 +199,5 @@ def html_to_unicode(content_type_header, html_body_str,
             if enc is None:
                 enc = default_encoding
             detected_enc = enc
-            #return enc, to_unicode(html_body_str, enc)
+            # return enc, to_unicode(html_body_str, enc)
     return detected_enc, bom_found

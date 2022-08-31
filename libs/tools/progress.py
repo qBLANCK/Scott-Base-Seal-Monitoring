@@ -1,5 +1,5 @@
-import sys 
 import logging
+import sys
 
 logger = logging.getLogger('grab.tools.progress')
 
@@ -9,11 +9,11 @@ class Progress(object):
         if total is None and step is None:
             raise Exception('Both step and total arguments are None')
         if total and not step:
-            step = int(total / 20) 
+            step = int(total / 20)
         if step == 0:
             step = total
         self.step = step
-        self.count = 0 
+        self.count = 0
         self.total = total
         self.stop = stop
         self.name = name

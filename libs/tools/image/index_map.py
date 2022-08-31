@@ -1,13 +1,11 @@
+import itertools
+import math
+import random
 
 import torch
-import colorsys
-import random
-import math
 
-from libs.tools import tensor
 import libs.tools.image.cv as cv
-import itertools
-
+from libs.tools import tensor
 
 default_colors = [
     0x00000000, 0xFFFF00FF, 0x1CE6FFFF, 0xFF34FFFF, 0xFF4A46FF, 0x008941FF, 0x006FA6FF, 0xA30059FF,
@@ -56,7 +54,7 @@ default_map = torch.ByteTensor(list(map(hex_rgba, default_colors)))
 def combinations(total, components):
     cs = []
     for i in range(0, components):
-        step = math.ceil(pow(total, 1/(components - i)))
+        step = math.ceil(pow(total, 1 / (components - i)))
         cs.append(step)
         total /= step
 
@@ -90,7 +88,7 @@ def make_color_map(n):
     return torch.cat([rgb, a], 1)
 
 
-#default_map = make_color_map(256)
+# default_map = make_color_map(256)
 #
 # for i in range(0, 256):
 #    colors = default_map[i]
@@ -98,7 +96,7 @@ def make_color_map(n):
 
 
 def colorize(image, color_map):
-    assert(image.dim() == 3 and image.size(2) == 1)
+    assert (image.dim() == 3 and image.size(2) == 1)
 
     flat_indices = image.view(-1).long()
     rgb = color_map[flat_indices]
@@ -107,30 +105,29 @@ def colorize(image, color_map):
 
 
 def colorize_t(image, color_map):
-    assert(image.dim() == 3 and image.size(0) == 1)
+    assert (image.dim() == 3 and image.size(0) == 1)
     return colorize(image.permute(1, 2, 0), color_map).permute(2, 0, 1)
 
 
 def colorizer(n=255):
-
     color_map = make_color_map(n)
     return lambda image: colorize(image, color_map)
 
 
 def overlay_label(image, label, color_map=default_map, alpha=0.4):
-    assert(image.dim() == 3 and image.size(2) == 3)
+    assert (image.dim() == 3 and image.size(2) == 3)
 
-    if(label.dim() == 2):
+    if (label.dim() == 2):
         label = label.view(*label.size(), 1)
 
-    assert(label.dim() == 3 and label.size(2) == 1)
+    assert (label.dim() == 3 and label.size(2) == 1)
     dim = (image.size(1), image.size(0))
     label = cv.resize(label, dim, interpolation=cv.inter.nearest)
 
     label_color = colorize(label, color_map).float()
     mask = torch.FloatTensor(image.size()).fill_(alpha)
 
-    if(label_color.size(2) == 4):
+    if (label_color.size(2) == 4):
         mask = alpha * (label_color.narrow(2, 3, 1) / 255)
         label_color = label_color.narrow(2, 0, 3)
 
@@ -148,7 +145,7 @@ def overlay_batches(images, target, cols=6, color_map=default_map, alpha=0.4):
 
 def counts(target, class_names=None):
     count = tensor.count_elements_sparse(target)
-    if(class_names):
+    if (class_names):
         return {class_names[k] if k < len(class_names) else "invalid": n for k, n in count.items()}
     else:
         return count

@@ -3,7 +3,6 @@ KB = 1024
 MB = 1024 * KB
 GB = MB * 1024
 
-
 metric_labels = {
     u'mb': MB,
     u'мб': MB,
@@ -11,7 +10,7 @@ metric_labels = {
     u'кб': KB,
     u'gb': GB,
     u'гб': GB,
-} 
+}
 
 
 def in_unit(num, unit):

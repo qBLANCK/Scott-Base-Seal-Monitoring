@@ -2,16 +2,17 @@
 # https://github.com/amdegroot/ssd.pytorch.git
 
 
-from libs.tools import struct
 import torch
+
+from libs.tools import struct
 
 
 def split(boxes):
-    return boxes[..., :2],  boxes[..., 2:]
+    return boxes[..., :2], boxes[..., 2:]
 
 
 def split4(boxes):
-    return boxes[..., 0],  boxes[..., 1], boxes[..., 2], boxes[..., 3]
+    return boxes[..., 0], boxes[..., 1], boxes[..., 2], boxes[..., 3]
 
 
 def extents(boxes):
@@ -65,7 +66,7 @@ def filter_hidden(target, lower, upper, min_visible=0.0):
 
 def area(boxes):
     x1, y1, x2, y2 = boxes[:, 0], boxes[:, 1], boxes[:, 2], boxes[:, 3]
-    return (x2-x1) * (y2-y1)
+    return (x2 - x1) * (y2 - y1)
 
 
 def intersect_matrix(box_a, box_b):
@@ -107,13 +108,13 @@ def union_matrix(box_a, box_b):
     """
     inter = intersect_matrix(box_a, box_b)
     unions = -inter
-    area_a = ((box_a[:, 2]-box_a[:, 0]) *
-              (box_a[:, 3]-box_a[:, 1])).unsqueeze(1).expand_as(inter)  # [n,m]
+    area_a = ((box_a[:, 2] - box_a[:, 0]) *
+              (box_a[:, 3] - box_a[:, 1])).unsqueeze(1).expand_as(inter)  # [n,m]
     unions += area_a
     del area_a
     torch.cuda.empty_cache()
-    area_b = ((box_b[:, 2]-box_b[:, 0]) *
-              (box_b[:, 3]-box_b[:, 1])).unsqueeze(0).expand_as(inter)  # [n,m]
+    area_b = ((box_b[:, 2] - box_b[:, 0]) *
+              (box_b[:, 3] - box_b[:, 1])).unsqueeze(0).expand_as(inter)  # [n,m]
     unions += area_b
     del area_b
     torch.cuda.empty_cache()
@@ -136,10 +137,10 @@ def union(box_a, box_b):
 
     inter = intersect(box_a, box_b)
 
-    area_a = ((box_a[:, 2]-box_a[:, 0]) *
-              (box_a[:, 3]-box_a[:, 1]))
-    area_b = ((box_b[:, 2]-box_b[:, 0]) *
-              (box_b[:, 3]-box_b[:, 1]))
+    area_a = ((box_a[:, 2] - box_a[:, 0]) *
+              (box_a[:, 3] - box_a[:, 1]))
+    area_b = ((box_b[:, 2] - box_b[:, 0]) *
+              (box_b[:, 3] - box_b[:, 1]))
     unions = area_a + area_b - inter
     return inter, unions
 

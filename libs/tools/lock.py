@@ -2,10 +2,10 @@
 Provide functions for check if file is locked.
 """
 
-import os.path
-import sys
 import logging
 import os
+import os.path
+import sys
 
 logger = logging.getLogger('grab.tools.lock')
 fh = None
@@ -17,24 +17,24 @@ def set_lock(fname):
     
     Return the status of operation.
     """
-    
+
     global fh
     fh = open(fname, 'w')
 
     if os.name == 'nt':
         # Code for NT systems got from: http://code.activestate.com/recipes/65203/
-        
+
         import win32con
         import win32file
         import pywintypes
-        
+
         LOCK_EX = win32con.LOCKFILE_EXCLUSIVE_LOCK
-        LOCK_SH = 0 # the default
+        LOCK_SH = 0  # the default
         LOCK_NB = win32con.LOCKFILE_FAIL_IMMEDIATELY
-        
+
         # is there any reason not to reuse the following structure?
         __overlapped = pywintypes.OVERLAPPED()
-        
+
         hfile = win32file._get_osfhandle(fh.fileno())
         try:
             win32file.LockFileEx(hfile, LOCK_EX | LOCK_NB, 0, -0x10000, __overlapped)
@@ -50,7 +50,7 @@ def set_lock(fname):
             flock(fh.fileno(), LOCK_EX | LOCK_NB)
         except Exception as ex:
             return False
-    
+
     fh.write(str(os.getpid()))
     fh.flush()
     return True

@@ -1,7 +1,8 @@
+import subprocess
 from os import listdir, makedirs
 from os.path import join, isfile, isdir, basename
 from pathlib import Path
-import subprocess
+
 from tqdm import tqdm
 
 '''
@@ -21,7 +22,8 @@ out_dir = cur_pth / 'out'
 def convert_image(file_path, dir):
     img_name = basename(file_path).split('.')[0]
     process_1 = subprocess.Popen([dcraw, '-w', '-c', in_dir / file_path], cwd=dir, stdout=subprocess.PIPE)
-    process_2 = subprocess.Popen(['convert', '-', f'{img_name}.{out_file_ext}'], cwd=dir, stdin=process_1.stdout, stdout=subprocess.PIPE)
+    process_2 = subprocess.Popen(['convert', '-', f'{img_name}.{out_file_ext}'], cwd=dir, stdin=process_1.stdout,
+                                 stdout=subprocess.PIPE)
 
     out, error = process_2.communicate()
     return out, error
@@ -42,5 +44,5 @@ def recursion(path=Path('./')):
             makedirs(out_dir / path / item, exist_ok=True)  # Won't overwrite existing dir or children
             recursion(path / item)
 
-recursion()
 
+recursion()

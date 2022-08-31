@@ -1,4 +1,4 @@
-from .heatmappy.heatmap import Heatmapper,\
-    GreyHeatMapper,\
-    PILGreyHeatmapper,\
+from .heatmappy.heatmap import Heatmapper, \
+    GreyHeatMapper, \
+    PILGreyHeatmapper, \
     PySideGreyHeatmapper

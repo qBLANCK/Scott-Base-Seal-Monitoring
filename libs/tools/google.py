@@ -29,13 +29,10 @@ try:
 except ImportError:
     from urllib.parse import quote, unquote_plus
 import logging
-import re
-import base64
 
-from grab.tools.html import decode_entities
-from grab.tools.lxml_tools import get_node_text, drop_node, render_html
-from grab.tools.http import urlencode
 from grab.tools.encoding import smart_str
+from grab.tools.http import urlencode
+from grab.tools.lxml_tools import get_node_text, drop_node
 from grab.tools.text import find_number
 
 
@@ -97,7 +94,6 @@ def build_search_url(query, page=None, per_page=None, lang=None,
         if not filter:
             kwargs['filter'] = '0'
 
-
     url = 'http://google.com/search?q=%s' % quote(smart_str(query))
     if kwargs:
         url += '&' + urlencode(kwargs)
@@ -132,41 +128,41 @@ def parse_index_size(grab):
         return int(number)
 
 
-#def search(query, grab=None, limit=None, per_page=None):
+# def search(query, grab=None, limit=None, per_page=None):
 
-    #if not grab:
-        #grab = Grab()
-    #stop = False
-    #count = 0
+# if not grab:
+# grab = Grab()
+# stop = False
+# count = 0
 
-    #grab.clear_cookies()
-    #if grab.proxylist:
-        #grab.change_proxy()
+# grab.clear_cookies()
+# if grab.proxylist:
+# grab.change_proxy()
 
-    #for page in xrange(1, 9999):
-        #if stop:
-            #break
-        #url = build_search_url(query, page, per_page=per_page)
-        #index_size = None
-        #grab = google_request(url, grab=grab)
+# for page in xrange(1, 9999):
+# if stop:
+# break
+# url = build_search_url(query, page, per_page=per_page)
+# index_size = None
+# grab = google_request(url, grab=grab)
 
-        #count = 0
-        #for item in parse_search_results(grab):
-            #yield item # {url, title, index_size}
-            #count += 1
+# count = 0
+# for item in parse_search_results(grab):
+# yield item # {url, title, index_size}
+# count += 1
 
-        #if not count:
-            #stop = True
+# if not count:
+# stop = True
 
-        #if is_last_page(grab):
-            #logging.debug('Last page found')
-            #stop = True
+# if is_last_page(grab):
+# logging.debug('Last page found')
+# stop = True
 
-        #if limit is not None and count >= limit:
-            #logging.debug('Limit %d reached' % limit)
-            #stop = True
+# if limit is not None and count >= limit:
+# logging.debug('Limit %d reached' % limit)
+# stop = True
 
-        #grab.sleep(3, 5)
+# grab.sleep(3, 5)
 
 
 def is_last_page(grab):
@@ -177,17 +173,16 @@ def is_last_page(grab):
     # <td class="b" style="text-align:left"><a href="/search?q=punbb&amp;num=100&amp;hl=ru&amp;prmd=ivns&amp;ei=67DBTs3TJMfpOfrhkcsB&amp;start=100&amp;sa=N" style="text-align:left"><span class="csb ch" style="background-position:-96px 0;width:71px"></span><span style="display:block;margin-left:53px">{NEXT MESSAGE}</span></a></td>
 
     try:
-        #next_link_text = grab.xpath_list('//span[contains(@class, "csb ") and '\
-                                         #'contains(@class, " ch")]/..')[-1]\
-                             #.text_content().strip()
+        # next_link_text = grab.xpath_list('//span[contains(@class, "csb ") and '\
+        # 'contains(@class, " ch")]/..')[-1]\
+        # .text_content().strip()
         next_link = grab.xpath_one('//a[@id="pnnext"]')
     except IndexError:
         logging.debug('No results found')
         return True
     else:
         return False
-        #return not len(next_link_text)
-
+        # return not len(next_link_text)
 
 
 def parse_search_results(grab, parse_index_size=False, strict_query=False):
@@ -195,7 +190,7 @@ def parse_search_results(grab, parse_index_size=False, strict_query=False):
     Parse google search results page content.
     """
 
-    #elif grab.search(u'please type the characters below'):
+    # elif grab.search(u'please type the characters below'):
     if grab.response.code == 403:
         raise AccessDenied('Access denied (HTTP 403)')
     elif grab.search(u'src="/sorry/image'):
@@ -256,12 +251,12 @@ def parse_search_results(grab, parse_index_size=False, strict_query=False):
 
                     # filetype
                     try:
-                        filetype = elem.xpath('.//span[contains(@class, "xsm")]'\
+                        filetype = elem.xpath('.//span[contains(@class, "xsm")]' \
                                               '/text()')[0].lower().strip('[]')
                     except IndexError:
                         filetype = None
 
-                    #if 'File Format':
+                    # if 'File Format':
                     if url:
                         results.append({
                             'url': url,
@@ -274,7 +269,7 @@ def parse_search_results(grab, parse_index_size=False, strict_query=False):
                 return results
             else:
                 pass
-                #return []
+                # return []
     elif grab.css_exists('#res'):
         # Could be search results here?
         # or just message "nothing was found"?

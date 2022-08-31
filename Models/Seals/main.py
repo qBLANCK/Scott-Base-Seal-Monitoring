@@ -1,21 +1,21 @@
-import torch
-import os
 import copy
+import math
+import os
+import pprint
 import random
+
+import torch
 import torch.optim as optim
 from torch import nn
+
+import Models.Seals.arguments as arguments
+import Models.Seals.checkpoint as checkpoint
+import Models.Seals.evaluate as evaluate
+import Models.Seals.trainer as trainer
 from Models.Seals.dataset.imports import load_dataset
 from Models.Seals.detection.retina import model as retina
-import Models.Seals.checkpoint as checkpoint
 from libs.tools import struct, logger, Struct
 from libs.tools.logger import EpochLogger
-import Models.Seals.trainer as trainer
-import Models.Seals.evaluate as evaluate
-import math
-import Models.Seals.arguments as arguments
-import pprint
-
-import sys
 
 pp = pprint.PrettyPrinter(indent=2)
 
@@ -126,10 +126,10 @@ class Trainer():
         exit()
 
     def adjust_learning_rate(self, n, total):
-        lr = schedule_lr(n/total, self.epoch, self.args)
+        lr = schedule_lr(n / total, self.epoch, self.args)
         for param_group in self.optimizer.param_groups:
             modified = lr * \
-                param_group['modifier'] if 'modifier' in param_group else lr
+                       param_group['modifier'] if 'modifier' in param_group else lr
             param_group['lr'] = modified
 
     def test_images(self, images, split=False, hook=None):
@@ -178,7 +178,8 @@ class Trainer():
             self.epoch, len(train_images)))
         train_stats = trainer.train(self.dataset.sample_train_on(train_images, self.args, self.encoder),
                                     evaluate.eval_train(self.model.train(), self.encoder, self.debug,
-                                                        device=self.device), self.optimizer, hook=self.adjust_learning_rate)
+                                                        device=self.device), self.optimizer,
+                                    hook=self.adjust_learning_rate)
         torch.cuda.empty_cache()
         evaluate.summarize_train("train", train_stats,
                                  self.dataset.classes, self.epoch, log=log)
@@ -217,7 +218,7 @@ class Trainer():
 def run_main():
     trainer = Trainer()
     try:
-        while(True):
+        while (True):
             trainer.training_cycle()
     except RuntimeError as error:
         print(torch.cuda.memory_summary())

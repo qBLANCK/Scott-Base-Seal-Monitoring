@@ -1,5 +1,7 @@
 import csv
+
 import six
+
 from libs.tools.encoding import make_str, make_unicode
 
 

@@ -1,28 +1,27 @@
-from abc import ABCMeta, abstractmethod
-from functools import partial
 import io
 import os
 import random
+from abc import ABCMeta, abstractmethod
+from functools import partial
 
-from matplotlib.colors import LinearSegmentedColormap
 import numpy
 from PIL import Image
+from matplotlib.colors import LinearSegmentedColormap
 
 try:
     from PySide import QtCore, QtGui
 except ImportError:
     pass
 
-
 _asset_file = partial(os.path.join, os.path.dirname(__file__), 'assets')
 
 
 def _img_to_opacity(img, opacity):
-        img = img.copy()
-        alpha = img.split()[3]
-        alpha = alpha.point(lambda p: int(p * opacity))
-        img.putalpha(alpha)
-        return img
+    img = img.copy()
+    alpha = img.split()[3]
+    alpha = alpha.point(lambda p: int(p * opacity))
+    img.putalpha(alpha)
+    return img
 
 
 class Heatmapper:
@@ -104,7 +103,6 @@ class Heatmapper:
         else:
             return heatmap
 
-
     def heatmap_on_img_path(self, points, base_path):
         width, height = Image.open(base_path).size
         return self.heatmap(width, height, points, base_path=base_path)
@@ -124,7 +122,7 @@ class Heatmapper:
         img = Image.open(img_path)
         img = img.resize((256, img.height))
         colours = (img.getpixel((x, 0)) for x in range(256))
-        colours = [(r/255, g/255, b/255, a/255) for (r, g, b, a) in colours]
+        colours = [(r / 255, g / 255, b / 255, a / 255) for (r, g, b, a) in colours]
         return LinearSegmentedColormap.from_list('from_image', colours)
 
 
@@ -169,14 +167,14 @@ class PySideGreyHeatmapper(GreyHeatMapper):
         painter.end()
 
     def _paint_point(self, painter, x, y):
-        grad = QtGui.QRadialGradient(x, y, self.point_diameter/2)
+        grad = QtGui.QRadialGradient(x, y, self.point_diameter / 2)
         grad.setColorAt(0, QtGui.QColor(0, 0, 0, max(self.point_strength, 0)))
         grad.setColorAt(1, QtGui.QColor(0, 0, 0, 0))
         brush = QtGui.QBrush(grad)
         painter.setBrush(brush)
         painter.drawEllipse(
-            x - self.point_diameter/2,
-            y - self.point_diameter/2,
+            x - self.point_diameter / 2,
+            y - self.point_diameter / 2,
             self.point_diameter,
             self.point_diameter
         )
@@ -202,11 +200,11 @@ class PILGreyHeatmapper(GreyHeatMapper):
         heat = Image.new('L', (width, height), color=255)
 
         dot = (Image.open(_asset_file('450pxdot.png')).copy()
-                    .resize((self.point_diameter, self.point_diameter), resample=Image.ANTIALIAS))
+               .resize((self.point_diameter, self.point_diameter), resample=Image.ANTIALIAS))
         dot = _img_to_opacity(dot, self.point_strength)
 
         for x, y in points:
-            x, y = int(x - self.point_diameter/2), int(y - self.point_diameter/2)
+            x, y = int(x - self.point_diameter / 2), int(y - self.point_diameter / 2)
             heat.paste(dot, (x, y), dot)
 
         return heat

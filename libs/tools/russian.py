@@ -1,6 +1,7 @@
 # coding: utf-8
-from pytils.translit import translify
 import re
+
+from pytils.translit import translify
 
 from libs.tools.encoding import smart_unicode
 
@@ -15,7 +16,8 @@ RE_NOT_ENRUCHAR = re.compile(u'[^-a-zA-Zа-яА-ЯёЁ0-9]', re.U)
 RE_NOT_ENCHAR_DOT = re.compile(u'[^-.a-zA-Z0-9]', re.U)
 RE_NOT_ENRUCHAR_DOT = re.compile(u'[^-.a-zA-Zа-яА-ЯёЁ0-9]', re.U)
 
-#RE_DASH = re.compile(r'-+')
+
+# RE_DASH = re.compile(r'-+')
 
 
 def slugify(value, limit=None, default='', lower=True, dot_allowed=False,
@@ -45,7 +47,7 @@ def slugify(value, limit=None, default='', lower=True, dot_allowed=False,
         value = value.lower()
 
     # Replace sequences of dashes
-    #value = RE_DASH.sub(delimiter, value)
+    # value = RE_DASH.sub(delimiter, value)
     value = value.replace(delimiter * 5, delimiter)
     value = value.replace(delimiter * 4, delimiter)
     value = value.replace(delimiter * 3, delimiter)

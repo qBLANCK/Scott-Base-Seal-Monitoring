@@ -1,7 +1,6 @@
-
 import torchvision.ops as torchvision
-from libs.tools import struct
 
+from libs.tools import struct
 
 nms_defaults = struct(
     nms=0.5,
