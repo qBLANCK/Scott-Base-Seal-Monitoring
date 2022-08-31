@@ -1,4 +1,3 @@
-from gettext import npgettext
 from tqdm import tqdm
 import csv
 # Heatmap
@@ -26,20 +25,21 @@ DETECTION_THRESHOLD = 0.4
 TIMELAPSE_INPUT = '/home/fdi19/SENG402/data/images/scott_base/2021-22'
 TIMELAPSE_IMAGES = sorted(os.listdir(TIMELAPSE_INPUT))
 TIMELAPSE_IMAGES = np.array(TIMELAPSE_IMAGES)
-TIMELAPSE_IMAGES, _, _, _ = [
+_, _, _, TIMELAPSE_IMAGES = [
     list(x) for x in np.array_split(TIMELAPSE_IMAGES, CHUNKS)]
+print(len(TIMELAPSE_IMAGES))
 TIMELAPSE_USE_EVERY = 1  # every nth frame
 # TIMELAPSE_FPS = (len(TIMELAPSE_IMAGES) / TIMELAPSE_USE_EVERY) / VID_LEN_S
 TIMELAPSE_FPS = 24
-TIMELAPSE_NAME = "timelapse_1q.mp4"
+TIMELAPSE_NAME = "timelapse_q4.mp4"
 HEATMAP_FPS = 24
-HEATMAP_NAME = "heatmap.mp4"
+HEATMAP_NAME = "heatmap_q4.mp4"
 HEATMAP_BITRATE = "3000k"
 HEATMAP_KEEP_HEAT = True
 HEATMAP_HEAT_DECAY = 1  # Seconds
 HEATMAP_POINT_DIAM = 40
-HEATMAP_POINT_STRENGTH = 0.1
-HEATMAP_POINT_OPACITY = 0.5
+HEATMAP_POINT_STRENGTH = 0.2
+HEATMAP_POINT_OPACITY = 0.35
 
 
 def is_responsible_bbox(bbox, frame):
@@ -116,7 +116,7 @@ def detect_seals_with_CSV(model, encoder, device, image_files):
 
 def create_heatmap(points):
     """Create heatmap video given a list of points (x, y, time in ms)."""
-    print("Status: Creating heatmap timelapse")
+    print(f"Status: Creating heatmap timelapse with {len(points)} points")
     img_heatmapper = Heatmapper(
         point_diameter=HEATMAP_POINT_DIAM, point_strength=HEATMAP_POINT_STRENGTH, opacity=HEATMAP_POINT_OPACITY)
     video_heatmapper = VideoHeatmapper(img_heatmapper)
@@ -131,7 +131,7 @@ def create_heatmap(points):
 
 
 if __name__ == "__main__":
-    model, encoder, device = load_CNN_model()
+    # model, encoder, device = load_CNN_model()
     print("Status: Filtering images")
     image_files = [os.path.join(TIMELAPSE_INPUT, img)
                    for img in tqdm(TIMELAPSE_IMAGES[::TIMELAPSE_USE_EVERY])
@@ -141,16 +141,16 @@ if __name__ == "__main__":
     else:
         create_timelapse(image_files)
 
-    if DETECTION_CREATE_CSV and not os.path.exists(DETECTION_CSV_NAME):
-        points = detect_seals_with_CSV(model, encoder, device, image_files)
-    elif os.path.exists(DETECTION_CSV_NAME):
-        print("Status: Reading points from csv")
-        with open(DETECTION_CSV_NAME, newline='') as f:
-            reader = csv.reader(f)
-            next(reader)  # Skip header
-            points = [(int(x), int(y), int(t))
-                      for x, y, t in tqdm(list(reader))]
-    else:
-        points = detect_seals(model, encoder, device, image_files)
+    # if DETECTION_CREATE_CSV and not os.path.exists(DETECTION_CSV_NAME):
+    #     points = detect_seals_with_CSV(model, encoder, device, image_files)
+    # elif os.path.exists(DETECTION_CSV_NAME):
+    #     print("Status: Reading points from csv")
+    #     with open(DETECTION_CSV_NAME, newline='') as f:
+    #         reader = csv.reader(f)
+    #         next(reader)  # Skip header
+    #         points = [(int(x), int(y), int(t))
+    #                   for x, y, t in tqdm(list(reader)) if int(t) < ((len(image_files)//1.1) * (1/TIMELAPSE_FPS) * 1000)]
+    # else:
+    #     points = detect_seals(model, encoder, device, image_files)
 
-    create_heatmap(points)
+    # create_heatmap(points)
