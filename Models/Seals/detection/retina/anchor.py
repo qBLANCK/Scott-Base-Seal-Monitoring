@@ -78,7 +78,7 @@ def encode_classes(label, max_ious, max_ids, match_thresholds=(0.4, 0.5)):
     class_target[max_ious <= match_neg] = 0  # negative label is 0
 
     ignore = (max_ious > match_neg) & (
-            max_ious <= match_pos)  # ignore ious between [0.4,0.5]
+        max_ious <= match_pos)  # ignore ious between [0.4,0.5]
     class_target[ignore] = -1  # mark ignored to -1
 
     return class_target

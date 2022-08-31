@@ -130,15 +130,23 @@ debug_parameters = struct(
 
 input_choices = struct(
     json=struct(
-        path=param(type="str", help="path to exported json annotation file", required=True)),
+        path=param(
+            type="str",
+            help="path to exported json annotation file",
+            required=True)),
     coco=struct(
         path=param(
-            type="str", help="path to exported json annotation file", required=True),
+            type="str",
+            help="path to exported json annotation file",
+            required=True),
         image_root=param(
-            type="str", help="path to root of training images", required=True),
-        split_ratio=param(type="str", help="slash separated list of dataset ratio (train/validate/test) e.g. 70/15/15",
-                          default="70/15/15"))
-)
+            type="str",
+            help="path to root of training images",
+            required=True),
+        split_ratio=param(
+            type="str",
+            help="slash separated list of dataset ratio (train/validate/test) e.g. 70/15/15",
+            default="70/15/15")))
 
 input_parameters = struct(
     input=choice(default="json", options=input_choices, help='input method'),

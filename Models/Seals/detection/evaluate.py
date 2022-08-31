@@ -29,7 +29,7 @@ def compute_mAP(matches, confidence, num_target, weight=1, eps=1e-7):
 
     recall = true_positives / (num_target if num_target > 0 else 1)
     precision = true_positives / \
-                (true_positives + false_positives).clamp(min=eps)
+        (true_positives + false_positives).clamp(min=eps)
 
     recall = bookend(0.0, recall, 1.0)
     precision = rev_cummax(bookend(1.0, precision, 0.0))
@@ -80,7 +80,8 @@ def match_positives(detections, target):
         return const(torch.FloatTensor(n).zero_())
 
     ious = box.iou_matrix(detections.bbox, target.bbox)
-    return lambda threshold: _match_positives(detections.label, target.label, ious, threshold=threshold)
+    return lambda threshold: _match_positives(
+        detections.label, target.label, ious, threshold=threshold)
 
 
 def mAP_classes(image_pairs, num_classes):
@@ -101,7 +102,8 @@ def mAP_classes(image_pairs, num_classes):
 
         def compute_class(i):
             inds = [(predicted_label == i).nonzero(as_tuple=False).squeeze(1)]
-            return compute_mAP(matches[inds], confidence[inds].cpu(), num_targets[i].item())
+            return compute_mAP(
+                matches[inds], confidence[inds].cpu(), num_targets[i].item())
 
         return struct(
             total=compute_mAP(matches, confidence.cpu(),

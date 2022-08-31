@@ -19,10 +19,10 @@ def collate_batch(batch):
     r"""Puts each data field into a tensor with outer dimension batch size"""
 
     elem = batch[0]
-    if type(elem) is Table:
+    if isinstance(elem, Table):
         return cat_tables(batch)
 
-    if type(elem) is Struct:
+    if isinstance(elem, Struct):
         d = {key: collate_batch([d[key] for d in batch])
              for key in elem.keys()}
         return Struct(d)
@@ -44,7 +44,8 @@ empty_target = table(
 
 def load_image(image):
     img = cv.imread_color(image.file)
-    return image._extend(image=img, image_size=torch.LongTensor([img.size(1), img.size(0)]))
+    return image._extend(image=img, image_size=torch.LongTensor(
+        [img.size(1), img.size(0)]))
 
 
 def scale(scale):
@@ -114,7 +115,8 @@ def as_tuple(bbox):
     return (b[0], b[1]), (b[2], b[3])
 
 
-def random_crop_padded(dest_size, scale_range=(1, 1), aspect_range=(1, 1), border_bias=0, select_instance=0.5):
+def random_crop_padded(dest_size, scale_range=(
+        1, 1), aspect_range=(1, 1), border_bias=0, select_instance=0.5):
     cw, ch = dest_size
 
     def apply(d):
@@ -135,7 +137,8 @@ def random_crop_padded(dest_size, scale_range=(1, 1), aspect_range=(1, 1), borde
         if (random.uniform(0, 1) < select_instance) and num_instances > 0:
             instance = random.randint(0, num_instances - 1)
             x, y = transforms.random_crop_target(
-                input_size, region_size, target_box=as_tuple(d.target.bbox[instance]))
+                input_size, region_size, target_box=as_tuple(
+                    d.target.bbox[instance]))
 
         centre = (x + region_size[0] * 0.5, y + region_size[1] * 0.5)
         t = transforms.make_affine(dest_size, centre, scale=(sx, sy))
@@ -163,12 +166,14 @@ def filter_boxes(min_visible=0.4):
 
 def load_training(args, dataset, collate_fn=collate_batch):
     n = round(args.epoch_size / args.image_samples)
-    return DataLoader(dataset,
-                      num_workers=args.num_workers,
-                      batch_size=args.batch_size,
-                      sampler=RepeatSampler(
-                          n, len(dataset)) if args.epoch_size else RandomSampler(dataset),
-                      collate_fn=collate_fn)
+    return DataLoader(
+        dataset,
+        num_workers=args.num_workers,
+        batch_size=args.batch_size,
+        sampler=RepeatSampler(
+            n,
+            len(dataset)) if args.epoch_size else RandomSampler(dataset),
+        collate_fn=collate_fn)
 
 
 def sample_training(args, images, loader, transform, collate_fn=collate_batch):
@@ -176,8 +181,11 @@ def sample_training(args, images, loader, transform, collate_fn=collate_batch):
     assert args.batch_size % args.image_samples == 0, "batch_size should be a multiple of image_samples"
 
     dataset = direct.Loader(loader, transform)
-    sampler = direct.RandomSampler(images, (args.epoch_size // args.image_samples)) if (
-            args.epoch_size is not None) else direct.ListSampler(images)
+    sampler = direct.RandomSampler(
+        images,
+        (args.epoch_size //
+         args.image_samples)) if (
+        args.epoch_size is not None) else direct.ListSampler(images)
 
     return DataLoader(dataset,
                       num_workers=args.num_workers,
@@ -187,7 +195,8 @@ def sample_training(args, images, loader, transform, collate_fn=collate_batch):
 
 
 def load_testing(args, images, collate_fn=collate_batch):
-    return DataLoader(images, num_workers=args.num_workers, batch_size=1, collate_fn=collate_fn)
+    return DataLoader(images, num_workers=args.num_workers,
+                      batch_size=1, collate_fn=collate_fn)
 
 
 def encode_target(encoder):
@@ -229,17 +238,26 @@ def transform_training(args, encoder=None):
     if args.augment == "crop":
         min_scale = args.min_scale or (1 / args.max_scale)
 
-        crop = random_crop_padded(dest_size, scale_range=(s * min_scale, s * args.max_scale),
-                                  aspect_range=(1 / args.max_aspect, args.max_aspect), border_bias=args.border_bias,
-                                  select_instance=args.select_instance)
+        crop = random_crop_padded(
+            dest_size,
+            scale_range=(
+                s * min_scale,
+                s * args.max_scale),
+            aspect_range=(
+                1 / args.max_aspect,
+                args.max_aspect),
+            border_bias=args.border_bias,
+            select_instance=args.select_instance)
     elif args.augment == "resize":
         crop = resize_to(dest_size)
     else:
         assert False, "unknown augmentation method " + args.augment
 
     filter = filter_boxes(min_visible=args.min_visible)
-    flip = random_flips(horizontal=args.flips,
-                        vertical=args.vertical_flips, transposes=args.transposes)
+    flip = random_flips(
+        horizontal=args.flips,
+        vertical=args.vertical_flips,
+        transposes=args.transposes)
 
     adjust_light = over_struct('image', transforms.compose(
         transforms.adjust_gamma(args.gamma, args.channel_gamma),
@@ -248,7 +266,8 @@ def transform_training(args, encoder=None):
     ))
 
     encode = encode_with(args, deepcopy(encoder).to('cpu'))
-    return multiple(args.image_samples, transforms.compose(crop, adjust_light, filter, flip, encode))
+    return multiple(args.image_samples, transforms.compose(
+        crop, adjust_light, filter, flip, encode))
 
 
 def flatten(collate_fn):
@@ -282,8 +301,8 @@ class DetectionDataset:
 
     def __init__(self, images={}, classes=[]):
 
-        assert type(images) is dict, "expected images as a dict"
-        assert type(classes) is list, "expected classes as a list"
+        assert isinstance(images, dict), "expected images as a dict"
+        assert isinstance(classes, list), "expected classes as a list"
 
         self.images = images
         self.classes = classes
@@ -292,7 +311,8 @@ class DetectionDataset:
         self.images[image.id] = image
 
     def get_images(self, k=None):
-        return [image for image in self.images.values() if k is None or (image.category == k)]
+        return [image for image in self.images.values(
+        ) if k is None or (image.category == k)]
 
     def mark_evalated(self, files, net_id):
         for k in files:
@@ -338,11 +358,18 @@ class DetectionDataset:
         return load_training(args, images, collate_fn=flatten(collate))
 
     def sample_train(self, args, encoder, collate=collate_batch):
-        return self.sample_train_on(self.train_images, args, encoder, collate=collate)
+        return self.sample_train_on(
+            self.train_images, args, encoder, collate=collate)
 
     def sample_train_on(self, images, args, encoder, collate=collate_batch):
-        return sample_training(args, images, load_image,
-                               transform=transform_training(args, encoder=encoder), collate_fn=flatten(collate))
+        return sample_training(
+            args,
+            images,
+            load_image,
+            transform=transform_training(
+                args,
+                encoder=encoder),
+            collate_fn=flatten(collate))
 
     def load_inference(self, id, file, args):
         transform = transform_testing(args)
@@ -359,7 +386,8 @@ class DetectionDataset:
         return self.test_on(self.test_images, args, encoder, collate=collate)
 
     def validate(self, args, encoder, collate=collate_batch):
-        return self.test_on(self.validate_images, args, encoder, collate=collate)
+        return self.test_on(self.validate_images, args,
+                            encoder, collate=collate)
 
     def add_noise(self, noise=0, offset=0):
         totals = struct(iou=0, n=0)

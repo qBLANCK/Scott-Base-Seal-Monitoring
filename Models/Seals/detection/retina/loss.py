@@ -9,7 +9,8 @@ def one_hot(label, num_classes):
     return t.scatter_(1, label.unsqueeze(1), 1)
 
 
-# makes a one_hot vector from class labels with an 'ignored' case as 0 (which is trimmed)
+# makes a one_hot vector from class labels with an 'ignored' case as 0
+# (which is trimmed)
 def one_hot_with_ignored(label, num_classes):
     return one_hot(label, num_classes + 1)[:, 1:]
 
@@ -59,4 +60,4 @@ def class_loss(target, prediction, class_weights, gamma=2, eps=1e-6):
     loss = focal_loss_label(target.clamp(min=0).view(-1),
                             prediction.view(-1, num_classes), class_weights=class_weights, gamma=gamma) \
  \
-            return loss.masked_fill_(invalid_mask.view_as(loss), 0).sum()
+        return loss.masked_fill_(invalid_mask.view_as(loss), 0).sum()

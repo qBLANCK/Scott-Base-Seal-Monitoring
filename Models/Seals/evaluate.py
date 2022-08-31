@@ -28,7 +28,8 @@ def make_statistics(data, loss):
     return stats
 
 
-def eval_train(model, encoder, debug=struct(), device=torch.cuda.current_device()):
+def eval_train(model, encoder, debug=struct(),
+               device=torch.cuda.current_device()):
     def f(data):
         image = data.image.to(device)
         norm_data = normalize_batch(image)
@@ -43,7 +44,8 @@ def eval_train(model, encoder, debug=struct(), device=torch.cuda.current_device(
         loss = encoder.loss(input_size, targets, encoding, prediction)
 
         statistics = make_statistics(data, loss)
-        return struct(error=sum(loss.values()) / image.data.size(0), statistics=statistics, size=data.image.size(0))
+        return struct(error=sum(loss.values()) / image.data.size(0),
+                      statistics=statistics, size=data.image.size(0))
 
     return f
 
@@ -56,7 +58,8 @@ def summarize_train_stats(name, results, classes, log):
 
     loss_str = " + ".join(["{} : {:.3f}".format(k, v)
                            for k, v in sorted(avg.loss.items())])
-    return ('n: {}, instances : {:.2f}, loss: {} = {:.3f}'.format(totals.size, avg.instances, loss_str, avg.error))
+    return ('n: {}, instances : {:.2f}, loss: {} = {:.3f}'.format(
+        totals.size, avg.instances, loss_str, avg.error))
 
 
 def summarize_train(name, results, classes, epoch, log):
@@ -64,8 +67,15 @@ def summarize_train(name, results, classes, epoch, log):
     print('{} epoch: {} {}'.format(name, epoch, summary))
 
 
-def evaluate_image(model, image, encoder, nms_params=detection_table.nms_defaults, device=torch.cuda.current_device(),
-                   offset=(0, 0)):
+def evaluate_image(
+    model,
+    image,
+    encoder,
+    nms_params=detection_table.nms_defaults,
+    device=torch.cuda.current_device(),
+    offset=(
+        0,
+        0)):
     model.eval()
     with torch.no_grad():
         batch = image.unsqueeze(0) if image.dim() == 3 else image
@@ -140,7 +150,12 @@ def evaluate_split(model, data, encoder, params=eval_defaults):
         results = []
         for offset, image in splits:
             output = evaluate_image(
-                model, image, encoder, device=params.device, nms_params=params.nms_params, offset=offset)
+                model,
+                image,
+                encoder,
+                device=params.device,
+                nms_params=params.nms_params,
+                offset=offset)
             output.prediction = map_tensors(
                 output.prediction, lambda p: p.unsqueeze(0))
             input_size = (image.shape[1], image.shape[0])
@@ -150,19 +165,22 @@ def evaluate_split(model, data, encoder, params=eval_defaults):
             results.append(
                 struct(loss=loss, detections=output.detections))
 
-        classification_loss, location_loss = (
-            Tensor.item(sum(i) / len(splits)) for i in zip(*[r.loss.values() for r in results]))
+        classification_loss, location_loss = (Tensor.item(
+            sum(i) / len(splits)) for i in zip(*[r.loss.values() for r in results]))
 
         bbox, confidence, label, index = (torch.cat(thing, dim=0) for thing in zip(
             *[r.detections.values() for r in results]))
         detections = table(bbox=bbox, confidence=confidence,
                            label=label, index=index)
-        statistics = struct(error=classification_loss + location_loss,
-                            loss=struct(
-                                classification=classification_loss, location=location_loss),
-                            size=data.image.size(0),
-                            instances=data.lengths.sum().item(),
-                            )
+        statistics = struct(
+            error=classification_loss +
+            location_loss,
+            loss=struct(
+                classification=classification_loss,
+                location=location_loss),
+            size=data.image.size(0),
+            instances=data.lengths.sum().item(),
+        )
 
         return struct(detections=detections, statistics=statistics)
 
@@ -172,7 +190,11 @@ def evaluate_full(model, data, encoder, params=eval_defaults):
     with torch.no_grad():
         with torch.cuda.amp.autocast():
             result = evaluate_image(
-                model, data.image, encoder, device=params.device, nms_params=params.nms_params)
+                model,
+                data.image,
+                encoder,
+                device=params.device,
+                nms_params=params.nms_params)
 
             prediction = map_tensors(
                 result.prediction, lambda p: p.unsqueeze(0))
@@ -288,8 +310,9 @@ def compute_AP(results, classes, conf_thresholds=None):
         class_counts = None
 
         if None not in [conf_thresholds, class_id]:
-            class_counts = threshold_count(prs[50].confidence, conf_thresholds[class_id]
-                                           )._extend(truth=target_counts.get(class_id))
+            class_counts = threshold_count(
+                prs[50].confidence, conf_thresholds[class_id])._extend(
+                truth=target_counts.get(class_id))
 
         return struct(
             mAP=mAP,
@@ -326,8 +349,17 @@ def summarize_test(name, results, classes, epoch, log, thresholds=None):
     print(name + ' epoch: {} AP: {:.2f} mAP@[0.3-0.95]: [{}] {}'.format(
         epoch, total.AP * 100, mAP_strs, train_summary))
 
-    log.scalars(name, struct(AP=total.AP * 100.0,
-                             mAP30=total.mAP[30] * 100.0, mAP50=total.mAP[50] * 100.0, mAP75=total.mAP[75] * 100.0))
+    log.scalars(
+        name,
+        struct(
+            AP=total.AP *
+            100.0,
+            mAP30=total.mAP[30] *
+            100.0,
+            mAP50=total.mAP[50] *
+            100.0,
+            mAP75=total.mAP[75] *
+            100.0))
 
     for k, ap in class_aps.items():
         if ap.class_counts is not None:

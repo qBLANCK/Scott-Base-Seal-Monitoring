@@ -61,7 +61,8 @@ def filter_hidden(target, lower, upper, min_visible=0.0):
     bounds = torch.Tensor([[*lower, *upper]])
     overlaps = (intersect_matrix(bounds, target.bbox) /
                 area(target.bbox)).squeeze(0)
-    return target._index_select(overlaps.gt(min_visible).nonzero(as_tuple=False).squeeze(1))
+    return target._index_select(overlaps.gt(
+        min_visible).nonzero(as_tuple=False).squeeze(1))
 
 
 def area(boxes):
@@ -108,13 +109,13 @@ def union_matrix(box_a, box_b):
     """
     inter = intersect_matrix(box_a, box_b)
     unions = -inter
-    area_a = ((box_a[:, 2] - box_a[:, 0]) *
-              (box_a[:, 3] - box_a[:, 1])).unsqueeze(1).expand_as(inter)  # [n,m]
+    area_a = ((box_a[:, 2] - box_a[:, 0]) * (box_a[:, 3] -
+              box_a[:, 1])).unsqueeze(1).expand_as(inter)  # [n,m]
     unions += area_a
     del area_a
     torch.cuda.empty_cache()
-    area_b = ((box_b[:, 2] - box_b[:, 0]) *
-              (box_b[:, 3] - box_b[:, 1])).unsqueeze(0).expand_as(inter)  # [n,m]
+    area_b = ((box_b[:, 2] - box_b[:, 0]) * (box_b[:, 3] -
+              box_b[:, 1])).unsqueeze(0).expand_as(inter)  # [n,m]
     unions += area_b
     del area_b
     torch.cuda.empty_cache()

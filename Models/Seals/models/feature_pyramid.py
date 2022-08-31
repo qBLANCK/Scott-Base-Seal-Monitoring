@@ -36,7 +36,8 @@ def residual_decoder(num_blocks=2, upscale='nearest'):
 def residual_subnet(features, n, num_blocks=2):
     blocks = [Residual(basic_block(features, features))
               for i in range(num_blocks)]
-    return nn.Sequential(*blocks, Conv(features, features, 3), Conv(features, n, 1, bias=True))
+    return nn.Sequential(*blocks, Conv(features, features, 3),
+                         Conv(features, n, 1, bias=True))
 
 
 def join_output(layers, n):
@@ -48,13 +49,14 @@ def join_output(layers, n):
 
 
 class FeaturePyramid(nn.Module):
-    """ 
+    """
         backbone_layers: The backbone network split into a list of layers acting at one resolution level (downsampling + processing layers)
         first:    Highest level resolution
         features: Number of features in the outputs and decoder side of the network
     """
 
-    def __init__(self, backbone_layers, first=3, features=32, make_decoder=residual_decoder(2, 'nearest')):
+    def __init__(self, backbone_layers, first=3, features=32,
+                 make_decoder=residual_decoder(2, 'nearest')):
         super().__init__()
 
         backbone_names = list(backbone_layers.keys())
@@ -91,14 +93,24 @@ base_options = '|'.join(pretrained.models.keys())
 
 pyramid_parameters = struct(
     backbone=param(
-        "resnet18", help="name of pretrained model to use as backbone: " + base_options),
-    features=param(64, help="fixed size features in new conv layers"),
-    first=param(3, help="first layer of feature maps, scale = 1 / 2^first"),
-    depth=param(8, help="depth in scale levels"),
+        "resnet18",
+        help="name of pretrained model to use as backbone: " +
+        base_options),
+    features=param(
+        64,
+        help="fixed size features in new conv layers"),
+    first=param(
+        3,
+        help="first layer of feature maps, scale = 1 / 2^first"),
+    depth=param(
+        8,
+        help="depth in scale levels"),
     decode_blocks=param(
-        2, help="number of residual blocks per layer in decoder"),
-    upscale=param('nearest', help="upscaling method used (nearest | shuffle)")
-)
+        2,
+        help="number of residual blocks per layer in decoder"),
+    upscale=param(
+        'nearest',
+        help="upscaling method used (nearest | shuffle)"))
 
 
 def extra_layer(inp, features):
@@ -129,7 +141,8 @@ def label_layers(layers):
     return OrderedDict(layers)
 
 
-def feature_pyramid(backbone_name, first=3, depth=8, features=64, decode_blocks=2, upscale='nearest'):
+def feature_pyramid(backbone_name, first=3, depth=8,
+                    features=64, decode_blocks=2, upscale='nearest'):
     assert first < depth
     assert backbone_name in pretrained.models, "base model not found: " + \
                                                backbone_name + ", options: " + base_options
@@ -138,5 +151,10 @@ def feature_pyramid(backbone_name, first=3, depth=8, features=64, decode_blocks=
     backbone_layers = label_layers(extend_layers(
         base_layers, depth, features=features * 2))
 
-    return FeaturePyramid(backbone_layers, first=first, features=features,
-                          make_decoder=residual_decoder(decode_blocks, upscale))
+    return FeaturePyramid(
+        backbone_layers,
+        first=first,
+        features=features,
+        make_decoder=residual_decoder(
+            decode_blocks,
+            upscale))

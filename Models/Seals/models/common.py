@@ -62,7 +62,8 @@ class UpCascade(nn.Module):
         input = None
         outputs = []
 
-        for module, skip in zip(reverse(self.decoders._modules.values()), reverse(inputs)):
+        for module, skip in zip(
+                reverse(self.decoders._modules.values()), reverse(inputs)):
             input = module(input, skip)
             outputs.append(input)
 
@@ -76,7 +77,8 @@ class Parallel(nn.Module):
 
     def forward(self, inputs):
         assert len(inputs) == len(self.parallel)
-        assert type(inputs) is list, "type of inputs is: " + str(type(inputs))
+        assert isinstance(
+            inputs, list), "type of inputs is: " + str(type(inputs))
 
         return [m(i) for m, i in zip(self.parallel, inputs)]
 
@@ -113,15 +115,30 @@ class Lookup(nn.Module):
 
 
 class Conv(nn.Module):
-    def __init__(self, in_size, out_size, kernel=3, stride=1, padding=None, bias=False,
-                 activation=nn.ReLU(inplace=True), groups=1):
+    def __init__(
+            self,
+            in_size,
+            out_size,
+            kernel=3,
+            stride=1,
+            padding=None,
+            bias=False,
+            activation=nn.ReLU(
+                inplace=True),
+            groups=1):
         super().__init__()
 
         padding = kernel // 2 if padding is None else padding
 
         self.norm = nn.BatchNorm2d(in_size)
-        self.conv = nn.Conv2d(in_size, out_size, kernel,
-                              stride=stride, padding=padding, bias=bias, groups=1)
+        self.conv = nn.Conv2d(
+            in_size,
+            out_size,
+            kernel,
+            stride=stride,
+            padding=padding,
+            bias=bias,
+            groups=1)
         self.activation = activation
 
     def forward(self, inputs):
@@ -129,15 +146,30 @@ class Conv(nn.Module):
 
 
 class Deconv(nn.Module):
-    def __init__(self, in_size, out_size, kernel=3, stride=1, padding=None, bias=False,
-                 activation=nn.ReLU(inplace=True), groups=1):
+    def __init__(
+            self,
+            in_size,
+            out_size,
+            kernel=3,
+            stride=1,
+            padding=None,
+            bias=False,
+            activation=nn.ReLU(
+                inplace=True),
+            groups=1):
         super().__init__()
 
         padding = kernel // 2 if padding is None else padding
 
         self.norm = nn.BatchNorm2d(in_size)
         self.conv = nn.ConvTranspose2d(
-            in_size, out_size, kernel, stride=stride, padding=padding, bias=bias, groups=1)
+            in_size,
+            out_size,
+            kernel,
+            stride=stride,
+            padding=padding,
+            bias=bias,
+            groups=1)
         self.activation = activation
 
     def forward(self, inputs):
@@ -174,7 +206,8 @@ def make_upscale(features, scale_factor, method):
 
 
 class Decode(nn.Module):
-    def __init__(self, features, module=None, scale_factor=2, upscale='nearest'):
+    def __init__(self, features, module=None,
+                 scale_factor=2, upscale='nearest'):
         super().__init__()
         self.scale_factor = scale_factor
         self.reduce = Conv(features * 2, features)

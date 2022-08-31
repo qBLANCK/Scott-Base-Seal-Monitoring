@@ -50,9 +50,8 @@ def decode_object_map(annotations, config):
 
     ids = pluck('id', objs)
 
-    return table(bbox=torch.FloatTensor(boxes) if len(boxes) else torch.FloatTensor(0, 4),
-                 label=torch.LongTensor(labels),
-                 id=torch.LongTensor(ids))
+    return table(bbox=torch.FloatTensor(boxes) if len(boxes) else torch.FloatTensor(
+        0, 4), label=torch.LongTensor(labels), id=torch.LongTensor(ids))
 
 
 def class_mapping(config):

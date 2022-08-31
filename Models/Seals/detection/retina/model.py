@@ -14,7 +14,8 @@ from libs.tools.parameters import param, group
 
 
 class Encoder:
-    def __init__(self, start_layer, box_sizes, class_weights, params, device=torch.device('cpu')):
+    def __init__(self, start_layer, box_sizes, class_weights,
+                 params, device=torch.device('cpu')):
         self.anchor_cache = {}
 
         self.box_sizes = box_sizes
@@ -35,7 +36,8 @@ class Encoder:
 
         def layer_size(i):
             stride = 2 ** i
-            return (stride, max(1, math.ceil(input_size[0] / stride)), max(1, math.ceil(input_size[1] / stride)))
+            return (stride, max(1, math.ceil(
+                input_size[0] / stride)), max(1, math.ceil(input_size[1] / stride)))
 
         input_args = (input_size, self.params.crop_boxes)
 
@@ -54,7 +56,8 @@ class Encoder:
     def encode(self, inputs, target):
         return struct()
 
-    def decode(self, input_size, prediction, nms_params=detection_table.nms_defaults):
+    def decode(self, input_size, prediction,
+               nms_params=detection_table.nms_defaults):
         classification, location = prediction
         location.dim() == 2 and classification.dim() == 2
 
@@ -74,7 +77,9 @@ class Encoder:
             [anchor.encode(t, anchor_boxes, self.params) for t in target])
 
         class_loss = loss.class_loss(
-            encoding.classification, classification, class_weights=self.class_weights)
+            encoding.classification,
+            classification,
+            class_weights=self.class_weights)
         loc_loss = 0
 
         if self.params.location_loss == "l1":
@@ -87,7 +92,8 @@ class Encoder:
             loc_loss = loss.giou(encoding.location, bbox,
                                  encoding.classification)
 
-        return struct(classification=class_loss / self.params.balance, location=loc_loss)
+        return struct(classification=class_loss /
+                      self.params.balance, location=loc_loss)
 
 
 def output(features, n, layers, init=init_weights):
@@ -111,11 +117,19 @@ class RetinaNet(nn.Module):
         self.num_classes = num_classes
 
         self.outputs = Named(
-            location=output(pyramid.features, 4 * num_boxes,
-                            range(pyramid.first, pyramid.depth)),
-            classification=output(pyramid.features, num_classes * num_boxes,
-                                  range(pyramid.first, pyramid.depth), init=init_classifier)
-        )
+            location=output(
+                pyramid.features,
+                4 * num_boxes,
+                range(
+                    pyramid.first,
+                    pyramid.depth)),
+            classification=output(
+                pyramid.features,
+                num_classes * num_boxes,
+                range(
+                    pyramid.first,
+                    pyramid.depth),
+                init=init_classifier))
 
         self.pyramid = pyramid
 
@@ -167,8 +181,8 @@ def anchor_sizes(start, depth, anchor_scale=4, square=False, tall=False):
     scales = [1, pow(2, 1 / 3), pow(2, 2 / 3)]
 
     return len(aspects) * len(scales), \
-           [anchor.anchor_sizes(anchor_scale * (2 ** i), aspects, scales)
-            for i in range(start, depth)]
+        [anchor.anchor_sizes(anchor_scale * (2 ** i), aspects, scales)
+         for i in range(start, depth)]
 
 
 def create(args, dataset_args):
@@ -177,8 +191,12 @@ def create(args, dataset_args):
     num_boxes, box_sizes = anchor_sizes(
         args.first, args.depth, anchor_scale=args.anchor_scale, square=args.square)
 
-    pyramid = feature_pyramid(backbone_name=args.backbone, features=args.features,
-                              first=args.first, depth=args.depth, decode_blocks=args.decode_blocks)
+    pyramid = feature_pyramid(
+        backbone_name=args.backbone,
+        features=args.features,
+        first=args.first,
+        depth=args.depth,
+        decode_blocks=args.decode_blocks)
 
     model = RetinaNet(pyramid, num_boxes=num_boxes,
                       num_classes=num_classes, shared=args.shared)
@@ -193,8 +211,12 @@ def create(args, dataset_args):
     )
 
     class_weights = [c.get('weighting', 0.25) for c in dataset_args.classes]
-    encoder = Encoder(args.first, box_sizes,
-                      class_weights=class_weights, params=params, device=torch.cuda.current_device())
+    encoder = Encoder(
+        args.first,
+        box_sizes,
+        class_weights=class_weights,
+        params=params,
+        device=torch.cuda.current_device())
 
     return model, encoder
 

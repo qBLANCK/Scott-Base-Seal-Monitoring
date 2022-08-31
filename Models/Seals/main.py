@@ -96,8 +96,11 @@ class Trainer():
             model_path, model, model_args, args)
         model, epoch = current.model, current.epoch + 1
 
-        optimizer = optim.SGD(model.parameters(), lr=args.lr,
-                              momentum=args.momentum, weight_decay=args.weight_decay)
+        optimizer = optim.SGD(
+            model.parameters(),
+            lr=args.lr,
+            momentum=args.momentum,
+            weight_decay=args.weight_decay)
 
         device = torch.cuda.current_device()
         tests = args.tests.split(",")
@@ -129,7 +132,7 @@ class Trainer():
         lr = schedule_lr(n / total, self.epoch, self.args)
         for param_group in self.optimizer.param_groups:
             modified = lr * \
-                       param_group['modifier'] if 'modifier' in param_group else lr
+                param_group['modifier'] if 'modifier' in param_group else lr
             param_group['lr'] = modified
 
     def test_images(self, images, split=False, hook=None):
@@ -145,15 +148,18 @@ class Trainer():
 
         eval_test = evaluate.eval_test(
             self.model.eval(), self.encoder, eval_params)
-        return trainer.test(self.dataset.test_on(images, self.args, self.encoder), eval_test, hook=hook)
+        return trainer.test(self.dataset.test_on(
+            images, self.args, self.encoder), eval_test, hook=hook)
 
-    def run_testing(self, name, images, split=False, hook=None, thresholds=None):
+    def run_testing(self, name, images, split=False,
+                    hook=None, thresholds=None):
         if len(images) > 0:
             print("{} {}:".format(name, self.epoch))
             results = self.test_images(images, split=split, hook=hook)
 
-            return evaluate.summarize_test(name, results, self.dataset.classes, self.epoch,
-                                           log=EpochLogger(self.log, self.epoch), thresholds=thresholds)
+            return evaluate.summarize_test(
+                name, results, self.dataset.classes, self.epoch, log=EpochLogger(
+                    self.log, self.epoch), thresholds=thresholds)
 
         return 0, None
 
@@ -176,25 +182,40 @@ class Trainer():
 
         print("Training {} on {} images:".format(
             self.epoch, len(train_images)))
-        train_stats = trainer.train(self.dataset.sample_train_on(train_images, self.args, self.encoder),
-                                    evaluate.eval_train(self.model.train(), self.encoder, self.debug,
-                                                        device=self.device), self.optimizer,
-                                    hook=self.adjust_learning_rate)
+        train_stats = trainer.train(
+            self.dataset.sample_train_on(
+                train_images,
+                self.args,
+                self.encoder),
+            evaluate.eval_train(
+                self.model.train(),
+                self.encoder,
+                self.debug,
+                device=self.device),
+            self.optimizer,
+            hook=self.adjust_learning_rate)
         torch.cuda.empty_cache()
         evaluate.summarize_train("train", train_stats,
                                  self.dataset.classes, self.epoch, log=log)
         score, thresholds = self.run_testing(
-            'validate', self.dataset.validate_images, split=self.args.eval_split == True)
+            'validate', self.dataset.validate_images, split=self.args.eval_split)
 
         is_best = score >= self.best.score
         if is_best:
-            self.best = struct(model=copy.deepcopy(
-                self.model), score=score, thresholds=thresholds, epoch=self.epoch)
+            self.best = struct(
+                model=copy.deepcopy(
+                    self.model),
+                score=score,
+                thresholds=thresholds,
+                epoch=self.epoch)
 
         current = struct(state=self.model.state_dict(),
                          epoch=self.epoch, thresholds=thresholds, score=score)
-        best = struct(state=self.best.model.state_dict(
-        ), epoch=self.best.epoch, thresholds=self.best.thresholds, score=self.best.score)
+        best = struct(
+            state=self.best.model.state_dict(),
+            epoch=self.best.epoch,
+            thresholds=self.best.thresholds,
+            score=self.best.score)
 
         for test_name in self.tests:
             self.run_testing(test_name, self.dataset.get_images(

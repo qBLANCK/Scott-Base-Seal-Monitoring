@@ -16,7 +16,7 @@ def show_differences(d1, d2, prefix=""):
         for k in set(unequal_keys):
             v1 = d1.get(k, '-')
             v2 = d2.get(k, '-')
-            if type(v1) != type(v2):
+            if not isinstance(v1, type(v2)):
                 v1 = type(v1)
                 v2 = type(v2)
 
@@ -84,10 +84,12 @@ def load_model(model_path):
 def load_checkpoint(model_path, model, model_args, args, strict=True):
     loaded = try_load(model_path)
 
-    if not (args.no_load or not (type(loaded) is Struct)):
+    if not (args.no_load or not (isinstance(loaded, Struct))):
 
         current = load_state(
-            model, loaded.best if args.restore_best else loaded.current, strict=strict)
+            model,
+            loaded.best if args.restore_best else loaded.current,
+            strict=strict)
         best = load_state(copy.deepcopy(model), loaded.best, strict=strict)
 
         if loaded.args == model_args:
