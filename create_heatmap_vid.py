@@ -1,7 +1,7 @@
 import csv
 import os
-
-import moviepy.video.io.ImageSequenceClip
+from dateutil import parser
+from moviepy.editor import TextClip, concatenate_videoclips, CompositeVideoClip, ImageSequenceClip
 # Del me
 import numpy as np
 # CNN
@@ -26,15 +26,15 @@ DETECTION_THRESHOLD = 0.4
 TIMELAPSE_INPUT = '/home/fdi19/SENG402/data/images/scott_base/2021-22'
 TIMELAPSE_IMAGES = sorted(os.listdir(TIMELAPSE_INPUT))
 TIMELAPSE_IMAGES = np.array(TIMELAPSE_IMAGES)
-_, _, _, TIMELAPSE_IMAGES = [
-    list(x) for x in np.array_split(TIMELAPSE_IMAGES, CHUNKS)]
-print(len(TIMELAPSE_IMAGES))
+TIMELAPSE_IMAGES = [list(x)
+                    for x in np.array_split(TIMELAPSE_IMAGES, CHUNKS)][0]
+print(TIMELAPSE_IMAGES[-1])
 TIMELAPSE_USE_EVERY = 1  # every nth frame
 # TIMELAPSE_FPS = (len(TIMELAPSE_IMAGES) / TIMELAPSE_USE_EVERY) / VID_LEN_S
 TIMELAPSE_FPS = 24
-TIMELAPSE_NAME = "timelapse_q4.mp4"
+TIMELAPSE_NAME = "timelapse_q1.mp4"
 HEATMAP_FPS = 24
-HEATMAP_NAME = "heatmap_q4.mp4"
+HEATMAP_NAME = "heatmap_q1.mp4"
 HEATMAP_BITRATE = "3000k"
 HEATMAP_KEEP_HEAT = True
 HEATMAP_HEAT_DECAY = 1  # Seconds
@@ -71,8 +71,20 @@ def load_CNN_model():
 def create_timelapse(image_files):
     """Create timelapse video using list of image paths."""
     print("Status: Creating timelapse")
-    clip = moviepy.video.io.ImageSequenceClip.ImageSequenceClip(
-        image_files, fps=TIMELAPSE_FPS)
+    # Local installation of ImageMagick. I ran into permission issues when trying to modify policy.xml
+    os.environ["IMAGEMAGICK_BINARY"] = "/home/fdi19/ImageMagick-7.1.0/utilities/magick"
+    clip_list = []
+    for image_path in image_files:
+        image_name = image_path.split("/")[-1]
+        iso_datetime = image_name.split('.')[0]
+        datetime = parser.parse(iso_datetime.replace("_", ":"))
+        datetime_str = datetime.strftime("%d/%m/%Y %H:%M")
+        txt_clip = TextClip(
+            txt=datetime_str, fontsize=70, color='black').set_duration(1/TIMELAPSE_FPS).set_fps(TIMELAPSE_FPS)
+        clip_list.append(txt_clip)
+    timestamps = concatenate_videoclips(clip_list, method="compose")
+    timelapse = ImageSequenceClip(image_files, fps=TIMELAPSE_FPS)
+    clip = CompositeVideoClip([timelapse, timestamps]).set_fps(TIMELAPSE_FPS)
     clip.write_videofile(TIMELAPSE_NAME, preset='slower', threads=16)
 
 
@@ -88,7 +100,7 @@ def detect_seals(model, encoder, device, image_files):
         results = evaluate_image(model, frame, encoder,
                                  nms_params=nms_params, device=device)
         img_points = [((x1 + x2) / 2, (y1 + y2) / 2, round(1000 * (i * (1 / TIMELAPSE_FPS)))) for x1, y1, x2,
-                                                                                                  y2 in
+                      y2 in
                       results.detections.bbox if is_responsible_bbox([x1, y1, x2, y2], frame)]
         points += img_points
     return points
@@ -134,7 +146,7 @@ def create_heatmap(points):
 
 
 if __name__ == "__main__":
-    # model, encoder, device = load_CNN_model()
+    model, encoder, device = load_CNN_model()
     print("Status: Filtering images")
     image_files = [os.path.join(TIMELAPSE_INPUT, img)
                    for img in tqdm(TIMELAPSE_IMAGES[::TIMELAPSE_USE_EVERY])
@@ -144,16 +156,14 @@ if __name__ == "__main__":
     else:
         create_timelapse(image_files)
 
-    # if DETECTION_CREATE_CSV and not os.path.exists(DETECTION_CSV_NAME):
-    #     points = detect_seals_with_CSV(model, encoder, device, image_files)
-    # elif os.path.exists(DETECTION_CSV_NAME):
-    #     print("Status: Reading points from csv")
-    #     with open(DETECTION_CSV_NAME, newline='') as f:
-    #         reader = csv.reader(f)
-    #         next(reader)  # Skip header
-    #         points = [(int(x), int(y), int(t))
-    #                   for x, y, t in tqdm(list(reader)) if int(t) < ((len(image_files)//1.1) * (1/TIMELAPSE_FPS) * 1000)]
-    # else:
-    #     points = detect_seals(model, encoder, device, image_files)
-
-    # create_heatmap(points)
+    if DETECTION_CREATE_CSV and not os.path.exists(DETECTION_CSV_NAME):
+        points = detect_seals_with_CSV(model, encoder, device, image_files)
+    elif os.path.exists(DETECTION_CSV_NAME):
+        print("Status: Reading points from csv")
+        with open(DETECTION_CSV_NAME, newline='') as f:
+            reader = csv.reader(f)
+            next(reader)  # Skip header
+            timelapse_length = len(image_files) * (1 / TIMELAPSE_FPS)
+            points = [(int(x), int(y), int(t))
+                      for x, y, t in tqdm(list(reader)) if int(t) < (timelapse_length * 1000)]
+    create_heatmap(points)
