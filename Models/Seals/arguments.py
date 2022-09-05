@@ -7,15 +7,6 @@ from libs.tools.parameters import param, parse_args, choice, parse_choice, group
 train_parameters = struct(
     optimizer=group('optimizer settings',
                     lr=param(0.001, help='learning rate'),
-
-                    lr_decay=param(
-                        'log', help='type of LR decay to use (log|cosine|step)'),
-
-                    lr_schedule=param(
-                        30, type='int', help='epochs before dropping LR for step decay'),
-                    lr_step=param(10, type='float',
-                                  help='step factor to drop LR'),
-
                     lr_min=param(
                         0.1, help='minimum learning rate to decay to (factor of initial lr)'),
 

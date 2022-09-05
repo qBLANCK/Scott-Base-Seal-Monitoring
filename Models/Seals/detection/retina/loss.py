@@ -58,6 +58,5 @@ def class_loss(target, prediction, class_weights, gamma=2, eps=1e-6):
     invalid_mask = (target < 0).unsqueeze(2).expand_as(prediction)
 
     loss = focal_loss_label(target.clamp(min=0).view(-1),
-                            prediction.view(-1, num_classes), class_weights=class_weights, gamma=gamma) \
- \
-        return loss.masked_fill_(invalid_mask.view_as(loss), 0).sum()
+                            prediction.view(-1, num_classes), class_weights=class_weights, gamma=gamma)
+    return loss.masked_fill_(invalid_mask.view_as(loss), 0).sum()

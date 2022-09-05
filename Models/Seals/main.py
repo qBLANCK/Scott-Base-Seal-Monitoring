@@ -20,37 +20,22 @@ from libs.tools.logger import EpochLogger
 pp = pprint.PrettyPrinter(indent=2)
 
 
-def log_anneal(range, t):
-    begin, end = range
-    return math.exp(math.log(begin) * (1 - t) + math.log(end) * t)
-
-
-def cosine_anneal(range, t):
-    begin, end = range
-    return end + 0.5 * (begin - end) * (1 + math.cos(t * math.pi))
-
-
-def schedule_lr(t, epoch, args):
+def schedule_lr(t, args):
+    """Return the learning rate for the current time. Using Time-based decay to decay lr during training.
+    Log decay with minimum lr."""
     lr_min = args.lr * args.lr_min
-
-    if args.lr_decay == "log":
-        return log_anneal((args.lr, lr_min), t)
-    elif args.lr_decay == "cosine":
-        return cosine_anneal((args.lr, lr_min), t)
-    elif args.lr_decay == "step":
-        n = math.floor(epoch / args.lr_schedule)
-        return max(lr_min, args.lr * math.pow(args.lr_step, -n))
-    else:
-        assert False, "unknown lr decay method: " + args.lr_decay
+    return math.exp(math.log(args.lr) * (1 - t) + math.log(lr_min) * t)
 
 
 def set_bn_momentum(model, mom):
+    """Set the momentum for all batch normalisation modules in the model."""
     for m in model.modules():
         if isinstance(m, nn.BatchNorm2d):
             m.momentum = mom
 
 
 def get_nms_params(args):
+    """Return the parameters for non-maximum suppression."""
     return struct(
         nms=args.nms_threshold,
         threshold=args.class_threshold,
@@ -58,84 +43,65 @@ def get_nms_params(args):
 
 
 class Trainer():
+    """Train the model."""
+
     def __init__(self) -> None:
+        """Initialize the trainer."""
         args = arguments.get_arguments()
         pp.pprint(args._to_dicts())
         random.seed(args.seed)
         torch.manual_seed(args.seed)
-        config, dataset = load_dataset(args)
+        config, self.dataset = load_dataset(args)
 
         # Initialise
-        data_root = config.root
-        log_root = args.log_dir or data_root
-
-        model_args = struct(
+        self.model_args = struct(
             dataset=struct(
-                classes=dataset.classes,
+                classes=self.dataset.classes,
                 input_channels=3),
             version=2,
             model_params=args.model_params
         )
-
-        run = 0
-
-        debug = struct(
+        self.debug = struct(
             predictions=args.debug_predictions or args.debug_all,
             boxes=args.debug_boxes or args.debug_all
         )
-
-        output_path, log = logger.make_experiment(
+        log_root = args.log_dir or config.root
+        output_path, self.log = logger.make_experiment(
             log_root, args.run_name, load=not args.no_load, dry_run=args.dry_run)
-        model_path = os.path.join(output_path, "model.pth")
-
-        model, encoder = retina.create(args.model_params, model_args.dataset)
-
+        self.model_path = os.path.join(output_path, "model.pth")
+        model, encoder = retina.create(
+            args.model_params, self.model_args.dataset)
         set_bn_momentum(model, args.bn_momentum)
-
-        best, current, _ = checkpoint.load_checkpoint(
-            model_path, model, model_args, args)
-        model, epoch = current.model, current.epoch + 1
-
-        optimizer = optim.SGD(
+        self.best, current, _ = checkpoint.load_checkpoint(
+            self.model_path, model, self.model_args, args)
+        model, self.epoch = current.model, current.epoch + 1
+        self.optimizer = optim.SGD(
             model.parameters(),
             lr=args.lr,
             momentum=args.momentum,
             weight_decay=args.weight_decay)
-
-        device = torch.cuda.current_device()
-        tests = args.tests.split(",")
-
-        # Allocate more GPU memory
-        # fraction = 3 / 4
-        # torch.cuda.set_per_process_memory_fraction(fraction, device)
-
+        self.device = torch.cuda.current_device()
+        self.tests = args.tests.split(",")
         self.args = args
-        self.epoch = epoch
-        self.optimizer = optimizer
-        self.dataset = dataset
-        self.log = log
-        self.model = model.to(device)
-        self.device = device
-        self.encoder = encoder.to(device)
-        self.debug = debug
-        self.best = best
-        self.tests = tests
-        self.run = run
-        self.model_path = model_path
-        self.model_args = model_args
+        self.model = model.to(self.device)
+        self.encoder = encoder.to(self.device)
+        self.run = 0
 
     def wrap_up(self, msg):
+        """Wrap up the training."""
         print(f"Learning completed!\nReason: {msg}")
         exit()
 
     def adjust_learning_rate(self, n, total):
-        lr = schedule_lr(n / total, self.epoch, self.args)
+        """Adjust the learning rate."""
+        lr = schedule_lr(n / total, self.args)
         for param_group in self.optimizer.param_groups:
             modified = lr * \
                 param_group['modifier'] if 'modifier' in param_group else lr
             param_group['lr'] = modified
 
     def test_images(self, images, split=False, hook=None):
+        """Test the model on a set of images."""
         eval_params = struct(
             overlap=self.args.overlap,
             split=split,
@@ -153,6 +119,7 @@ class Trainer():
 
     def run_testing(self, name, images, split=False,
                     hook=None, thresholds=None):
+        """Run the testing."""
         if len(images) > 0:
             print("{} {}:".format(name, self.epoch))
             results = self.test_images(images, split=split, hook=hook)
@@ -164,6 +131,7 @@ class Trainer():
         return 0, None
 
     def training_cycle(self):
+        """Run a training cycle."""
         if len(self.dataset.train_images) == 0:
             raise Exception("Either no environment or training dataset")
 
@@ -237,6 +205,7 @@ class Trainer():
 
 
 def run_main():
+    """Run the trainer."""
     trainer = Trainer()
     try:
         while (True):
