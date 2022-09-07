@@ -1,4 +1,27 @@
-# Setup Steps
+# SENG402 Capstone Project
+## Scott Base Seal Monitoring
+> **Supervisors:** [Oliver Batchelor](https://ucvision.org.nz/oliver-batchelor/) & [Richard Green](https://www.canterbury.ac.nz/engineering/contact-us/people/richard-green.html)
+> **Partner:** [Antarctica NZ](https://www.google.com/search?client=safari&rls=en&q=antarctica%20nz&ie=UTF-8&oe=UTF-8)
+> 
+> The goal of this project was to monitor Weddel seal activity during the Scott Base rebuild at Antartica (starting 2022/2023 summer) to ensure that they are minimally disrupted by building activity. Over the 2021/2022 summer, two 180Mp cameras were successfully installed at Pram Point and Turtle Rock, capturing continuous time-lapse image data of seals from November to February. With support from our deep learning team, this data was analysed for seal count/movemen to ensure this tech is fit-for-purpose for monitoring impact on seals of the Scott Base rebuild that starts late 2022.
+
+## Project Objectives
+ - [x] Recieve and store large RAW images from two time lapse cameras from Nov 2021 — Feb 2022
+ - [x] Design & Train an accurate CNN model to detect Weddel Seals from afar
+ - [x] Use the trained model to generate Seal counts for each image
+	 - [x] Plot Seal counts over the season (including the timestamp)
+	 - [ ] Extract key metrics (movement pattens over season)
+ - [x] Condense images into a short (~5 Minutes) Timelapse
+ - [x] Combine timelapse and Seal detections to create a Heatmap Timelapse showing Movement
+ - [ ] Statistical analysis on the raw data, including an identification and analysis of possible disturbance events.
+ - [ ] Provide a report including a description of the seal population, and summary assessment based on the statistics obtained through analysis. This report is to include tables, maps, and images as appropriate to support the Scott Base Redevelopment environmental monitoring.
+	 - [ ] Provide an advice note containing recommendations for the next summer season based on the previous summer season results (include cost, power, logistics/support) – with the additional goals of:
+		 - Real-time alert for seal disturbance by construction noise
+		 - Accurate 3D seal location
+		 - Identification of individual seals using available biometric data
+
+
+### Setup Steps
 
 `./install_conda.sh`
 
