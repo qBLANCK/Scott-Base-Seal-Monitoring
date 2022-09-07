@@ -5,6 +5,19 @@
 > 
 > The goal of this project was to monitor Weddel seal activity during the Scott Base rebuild at Antartica (starting 2022/2023 summer) to ensure that they are minimally disrupted by building activity. Over the 2021/2022 summer, two 180Mp cameras were successfully installed at Pram Point and Turtle Rock, capturing continuous time-lapse image data of seals from November to February. With support from our deep learning team, this data was analysed for seal count/movemen to ensure this tech is fit-for-purpose for monitoring impact on seals of the Scott Base rebuild that starts late 2022.
 
+<center><img src="data/figures/weddell%20seal.jpeg"></center>
+
+|  |  |
+|--|--|
+| **Seal Counts** | ![Seal Counts](/data/figures/Seal_Counts.png) |
+| **Scott Base** | ![Scott Base](/data/figures/scott_base.jpg) |
+| **Heatmap Example Image** | ![Heatmap](/data/figures/heatmap.png) |
+
+|**Scott Base Original**|**Turtle Rock Original**|
+|--|--|
+|![Scott Base Original](/data/figures/og_scott_base.png)|![Turtle Rock Original](/data/figures/og_turtle_rock.png)|
+
+
 ## Project Objectives
  - [x] Recieve and store large RAW images from two time lapse cameras from Nov 2021 — Feb 2022
  - [x] Design & Train an accurate CNN model to detect Weddel Seals from afar
