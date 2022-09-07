@@ -1,13 +1,11 @@
-import csv
 import os
+import csv
+import numpy as np
 from dateutil import parser
 from moviepy.editor import TextClip, concatenate_videoclips, CompositeVideoClip, ImageSequenceClip
-# Del me
-import numpy as np
 # CNN
 import torch
 from tqdm import tqdm
-
 from Models.Seals.checkpoint import load_model
 from Models.Seals.detection import detection_table
 from Models.Seals.evaluate import evaluate_image
@@ -16,25 +14,22 @@ from libs.heatmappy.heatmappy.heatmap import Heatmapper
 from libs.heatmappy.heatmappy.video import VideoHeatmapper
 from libs.tools.image import cv
 
+# MoviePy and Heatmappy are insanely RAM/CPU hungry. I split creating timelapses into quarters to help.
+# I also had to use Deeplearning01 https://wiki.canterbury.ac.nz/display/RCC/Deeplearning01+the+big+GPU+machine
 CHUNKS = 4
-
-MODEL_DIR = "./Models/Seals/log/Seals_2021-22/model.pth"
-VID_LEN_S = 60 * 6 / CHUNKS  # seconds
+CHUNK_N = 0  # From 0 to CHUNK
+MODEL_DIR = "../Models/Seals/log/Seals_2021-22/model.pth"
 DETECTION_CREATE_CSV = True
-DETECTION_CSV_NAME = "detection.csv"
+DETECTION_CSV_NAME = "2021-22_detection.csv"
 DETECTION_THRESHOLD = 0.4
 TIMELAPSE_INPUT = '/home/fdi19/SENG402/data/images/scott_base/2021-22'
-TIMELAPSE_IMAGES = sorted(os.listdir(TIMELAPSE_INPUT))
-TIMELAPSE_IMAGES = np.array(TIMELAPSE_IMAGES)
-TIMELAPSE_IMAGES = [list(x)
-                    for x in np.array_split(TIMELAPSE_IMAGES, CHUNKS)][0]
-print(TIMELAPSE_IMAGES[-1])
+TIMELAPSE_IMAGES = np.array(sorted(os.listdir(TIMELAPSE_INPUT)))
+TIMELAPSE_IMAGES = [list(x) for x in np.array_split(TIMELAPSE_IMAGES, CHUNKS)][CHUNK_N]
 TIMELAPSE_USE_EVERY = 1  # every nth frame
-# TIMELAPSE_FPS = (len(TIMELAPSE_IMAGES) / TIMELAPSE_USE_EVERY) / VID_LEN_S
 TIMELAPSE_FPS = 24
-TIMELAPSE_NAME = "timelapse_q1.mp4"
+TIMELAPSE_NAME = f"timelapse_q{CHUNK_N+1}.mp4"
 HEATMAP_FPS = 24
-HEATMAP_NAME = "heatmap_q1.mp4"
+HEATMAP_NAME = f"heatmap_q{CHUNK_N+1}.mp4"
 HEATMAP_BITRATE = "3000k"
 HEATMAP_KEEP_HEAT = True
 HEATMAP_HEAT_DECAY = 1  # Seconds
@@ -141,8 +136,9 @@ def create_heatmap(points):
         keep_heat=HEATMAP_KEEP_HEAT,
         heat_decay_s=HEATMAP_HEAT_DECAY,
     )
+    heatmap_video.duration = heatmap_video.end = heatmap_video.duration - HEATMAP_HEAT_DECAY
     heatmap_video.write_videofile(
-        HEATMAP_NAME, bitrate=HEATMAP_BITRATE, fps=HEATMAP_FPS)
+        HEATMAP_NAME, bitrate=HEATMAP_BITRATE, fps=HEATMAP_FPS, threads=32)
 
 
 if __name__ == "__main__":
@@ -163,7 +159,9 @@ if __name__ == "__main__":
         with open(DETECTION_CSV_NAME, newline='') as f:
             reader = csv.reader(f)
             next(reader)  # Skip header
-            timelapse_length = len(image_files) * (1 / TIMELAPSE_FPS)
-            points = [(int(x), int(y), int(t))
-                      for x, y, t in tqdm(list(reader)) if int(t) < (timelapse_length * 1000)]
+            timelapse_length = len(image_files) * (1 / TIMELAPSE_FPS) * 1000
+            points = [(int(x), int(y), round(int(t) - CHUNK_N * timelapse_length))
+                      for x, y, t in tqdm(list(reader))
+                      if (int(t) - CHUNK_N * timelapse_length) < timelapse_length
+                      and (int(t) - CHUNK_N * timelapse_length) > 0]
     create_heatmap(points)
