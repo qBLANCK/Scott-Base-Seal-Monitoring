@@ -1,4 +1,4 @@
-name: venv
+name: seal_env
 channels:
   - defaults
 dependencies:
@@ -101,6 +101,7 @@ dependencies:
       - segments-ai==0.73
       - six
       - stack-data==0.2.0
+      - scikit-learn==1.1.1
       - tensorboard==2.9.0
       - tensorboard-data-server==0.6.1
       - tensorboard-plugin-wit==1.8.1
