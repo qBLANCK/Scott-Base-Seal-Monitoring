@@ -1,0 +1,8 @@
+abstract: |
+  This project aims to conduct research that allows Antarctica New Zealand to monitor the Weddel Seal population surrounding Scott Base. Frequent population counts will allow Antarctica NZ to identify colony disturbance caused by the upcoming Scott Base reconstruction. Surrounding Seal counts can exceed 300, making frequent manual counting laborious and inaccurate due to mental fatigue.
+Such a task lends itself well to a Convolutional Neural Network (CNN). A CNN is a deep learning algorithm that can learn to analyse imagery. The proposed solution uses a CNN for its object detection capabilities. An existing trained CNN was selected for its similarity in purpose and then re-trained using images captured from a high-resolution camera overlooking Scott Base. This Transfer Learning technique resulted in an accurate and robust solution to Seal monitoring.
+name: "Fletcher Dick"
+sponsor: "Antarctica NZ"
+supervisor: "Oliver Batchelor"
+title: "How to count 332 seals in two seconds"
+type: industry
