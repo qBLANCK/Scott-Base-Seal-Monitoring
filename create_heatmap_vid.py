@@ -17,6 +17,7 @@ from libs.heatmappy.heatmappy.video import VideoHeatmapper
 from libs.tools.image import cv
 
 CHUNKS = 4
+q = 3
 
 MODEL_DIR = "./Models/Seals/log/Seals_2021-22/model.pth"
 VID_LEN_S = 60 * 6 / CHUNKS  # seconds
@@ -27,14 +28,13 @@ TIMELAPSE_INPUT = '/home/fdi19/SENG402/data/images/scott_base/2021-22'
 TIMELAPSE_IMAGES = sorted(os.listdir(TIMELAPSE_INPUT))
 TIMELAPSE_IMAGES = np.array(TIMELAPSE_IMAGES)
 TIMELAPSE_IMAGES = [list(x)
-                    for x in np.array_split(TIMELAPSE_IMAGES, CHUNKS)][0]
-print(TIMELAPSE_IMAGES[-1])
+                    for x in np.array_split(TIMELAPSE_IMAGES, CHUNKS)][q]
 TIMELAPSE_USE_EVERY = 1  # every nth frame
 # TIMELAPSE_FPS = (len(TIMELAPSE_IMAGES) / TIMELAPSE_USE_EVERY) / VID_LEN_S
 TIMELAPSE_FPS = 24
-TIMELAPSE_NAME = "timelapse_q1.mp4"
+TIMELAPSE_NAME = f"timelapse_q{q+1}.mp4"
 HEATMAP_FPS = 24
-HEATMAP_NAME = "heatmap_q1.mp4"
+HEATMAP_NAME = f"heatmap_q{q+1}.mp4"
 HEATMAP_BITRATE = "3000k"
 HEATMAP_KEEP_HEAT = True
 HEATMAP_HEAT_DECAY = 1  # Seconds
@@ -85,7 +85,7 @@ def create_timelapse(image_files):
     timestamps = concatenate_videoclips(clip_list, method="compose")
     timelapse = ImageSequenceClip(image_files, fps=TIMELAPSE_FPS)
     clip = CompositeVideoClip([timelapse, timestamps]).set_fps(TIMELAPSE_FPS)
-    clip.write_videofile(TIMELAPSE_NAME, preset='slower', threads=16)
+    clip.write_videofile(TIMELAPSE_NAME, preset='slower', threads=8)
 
 
 def detect_seals(model, encoder, device, image_files):
@@ -139,10 +139,11 @@ def create_heatmap(points):
         video_path=TIMELAPSE_NAME,
         points=points,
         keep_heat=HEATMAP_KEEP_HEAT,
-        heat_decay_s=HEATMAP_HEAT_DECAY,
+        heat_decay_s=HEATMAP_HEAT_DECAY
     )
+    heatmap_video.duration = heatmap_video.end = heatmap_video.duration - HEATMAP_HEAT_DECAY
     heatmap_video.write_videofile(
-        HEATMAP_NAME, bitrate=HEATMAP_BITRATE, fps=HEATMAP_FPS)
+        HEATMAP_NAME, bitrate=HEATMAP_BITRATE, fps=HEATMAP_FPS, threads=16)
 
 
 if __name__ == "__main__":
@@ -164,6 +165,8 @@ if __name__ == "__main__":
             reader = csv.reader(f)
             next(reader)  # Skip header
             timelapse_length = len(image_files) * (1 / TIMELAPSE_FPS)
-            points = [(int(x), int(y), int(t))
-                      for x, y, t in tqdm(list(reader)) if int(t) < (timelapse_length * 1000)]
+            points = [(int(x), int(y), round(int(t) - q * timelapse_length))
+                      for x, y, t in tqdm(list(reader))
+                      if (int(t) - q * timelapse_length) < (timelapse_length * 1000)
+                      and (int(t) - q * timelapse_length) > 0]
     create_heatmap(points)
