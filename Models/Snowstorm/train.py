@@ -3,7 +3,6 @@ import copy
 import torch
 import numpy as np
 from sklearn.metrics import f1_score
-from torchvision import models
 
 from Models.Snowstorm.constants import FEATURE_EXTRACT, NUM_CLASSES
 
@@ -111,20 +110,3 @@ def train_model(model, dataloaders, criterion, optimizer, device, num_epochs=25,
     model.load_state_dict(best_model_wts)
     return model, score_history
 
-
-def set_parameter_requires_grad(model, feature_extracting):
-    if feature_extracting:
-        for param in model.parameters():
-            param.requires_grad = False
-
-
-def initialize_model(use_pretrained=True):
-    # Initialize these variables which will be set in this if statement. Each of these
-    #   variables is model specific.
-
-    model = models.resnet18(pretrained=use_pretrained)
-    set_parameter_requires_grad(model, FEATURE_EXTRACT)
-    num_ftrs = model.fc.in_features
-    model.fc = torch.nn.Linear(num_ftrs, NUM_CLASSES)
-
-    return model

@@ -3,9 +3,12 @@ import cv2
 import random
 import torch
 from torchvision import transforms
+from torchvision import models
+from PIL import Image
 
 from Models.Snowstorm.intervals import all_clears, all_storms
-from Models.Snowstorm.constants import RESEARCH_DIR, CROPS_PER_IMG, OUT_DIR, CROP_SIZE, INPUT_SIZE
+from Models.Snowstorm.constants import RESEARCH_DIR, CROPS_PER_IMG, OUT_DIR, CROP_SIZE, INPUT_SIZE, \
+    FEATURE_EXTRACT, NUM_CLASSES
 
 # Data augmentation and normalization for training
 # Just normalization for validation
@@ -81,9 +84,26 @@ def create_and_save_crops(is_storm):
     print(f'Total augmentation count: {total_count}\n')
 
 
-def classify(model, img, device):
+def set_parameter_requires_grad(model, feature_extracting):
+    if feature_extracting:
+        for param in model.parameters():
+            param.requires_grad = False
+
+
+def load_model(path):
+    model = models.resnet18(pretrained=True)
+    set_parameter_requires_grad(model, FEATURE_EXTRACT)
+    num_ftrs = model.fc.in_features
+    model.fc = torch.nn.Linear(num_ftrs, NUM_CLASSES)
+    model.load_state_dict(torch.load(path))
+
+    return model
+
+
+def classify(model, device, path, random_crop=False):
     classes = ['clear', 'storm']
-    img_t = data_transforms['val'](img)
+    img = Image.open(path)
+    img_t = data_transforms['train' if random_crop else 'val'](img)
     batch_t = torch.unsqueeze(img_t, 0)
     batch_t = batch_t.to(device)
 
@@ -94,3 +114,16 @@ def classify(model, img, device):
     _, index = torch.max(out, 1)
 
     return classes[index], percentage[index].item()
+
+
+def smart_classify(model, device, path, iterations=5):
+    scores = []
+    for _ in range(iterations):
+        output, confidence = classify(model, device, path, random_crop=True)
+        if output == 'storm':
+            scores.append(confidence)
+        else:
+            scores.append(-confidence)
+    avg_score = sum(scores) / len(scores)
+
+    return 'storm' if avg_score > 0 else 'clear', abs(avg_score)
