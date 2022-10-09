@@ -64,6 +64,11 @@ class Encoder:
         anchor_boxes = self.anchors(input_size)
 
         bbox = anchor.decode(location, anchor_boxes)
+        x1, y1, x2, y2 = bbox[:, 0], bbox[:, 1], bbox[:, 2], bbox[:, 3]
+        h, w = abs(y2 - y1), abs(x2 - x1)
+        bbox = bbox[(h*w) < 1000]
+        classification = classification[(h*w) < 1000]
+
         confidence, label = classification.max(1)
 
         decoded = table(bbox=bbox, confidence=confidence, label=label)
