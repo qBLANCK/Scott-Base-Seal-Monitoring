@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 datetimes = []
 counts = []
 
-with open('data/counts/scott_base-21-22.csv', 'r') as csvfile:
+with open('../data/counts/scott_base-21-22.csv', 'r') as csvfile:
     lines = csv.reader(csvfile, delimiter=',')
     next(lines)
     for row in lines:

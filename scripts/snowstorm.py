@@ -8,8 +8,8 @@ device = torch.cuda.current_device()
 model = load_model("Models/Snowstorm/storm_model.pt")
 model.to(device)
 
-with open('data/counts/scott_base-21-22.csv', 'r') as csvinput:
-    with open('output2.csv', 'w') as csvoutput:
+with open('data/counts/scott_base-21-22.csv','r') as csvinput:
+    with open('output.csv', 'w') as csvoutput:
         writer = csv.writer(csvoutput, lineterminator='\n')
         reader = csv.reader(csvinput)
 
@@ -19,7 +19,7 @@ with open('data/counts/scott_base-21-22.csv', 'r') as csvinput:
         row.append('Snowstorm Confidence')
         all.append(row)
 
-        for row in tqdm(list(reader)):
+        for row in reader:
             path = f"/home/fdi19/SENG402/data/images/scott_base/2021-22/{row[0]}.jpg"
             output, confidence = classify(model, device, path)
 
