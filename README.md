@@ -58,7 +58,6 @@ This solution applies a RetinaNet CNN to detect the small and dense seals. The o
 
 ```
 ├── data
-│   ├── annotations               Annotations of Seals in Coco and Oliver's json format.
 │   ├── counts                    Seal counts for seasons ('a','b','c' are camera
 │   │                               viewpoints and 's' includes snowstorm detection data).
 │   └── figures                   Illustrative graphics on project and Seal data.
@@ -96,4 +95,40 @@ Example below:
 
 ```
 python -m Models.Seals.main --first 2 --input coco\ --path annotations/annotation.json --image_root /csse/reserach/.../2021-22 --split_ratio 70/15/15 --log_dir Models/Seals/log --image_size 512 --batch_size 8 --validation_pause 16 --run_name Seals_test
+```
+
+## Large Project Artifacts
+
+Other large artifacts such as models, training logs, annotations, and images that are too large for GitHub are stored on the University of Canterbury's csse drive (`/csse/research/antarctica_seals`).
+
+Below is the tree map for the artifacts folder:
+
+```
+├── annotations
+├── images
+│   ├── scott_base
+│   │   ├── 2018-19               Including the three viewpoints (A, B & C).
+│   │   │   ├── CameraA
+│   │   │   ├── CameraB
+│   │   │   └── CameraC
+│   │   ├── 2019-20               Including the three viewpoints (A, B & C).
+│   │   │   ├── CameraA
+│   │   │   ├── CameraB
+│   │   │   └── CameraC
+│   │   └── 2021-22
+│   ├── training_sets             Training images for 2018-19 and 2019-20 seasons. Used
+│   │   │                           with Oliver's annnnotation format.
+│   │   ├── scott_base
+│   │   └── turtle_rock
+│   └── turtle_rock
+│       └── 2021-22
+├── models
+│   ├── seal_od                   Dir for Seal object detection models.
+│   │   ├── olivers
+│   │   │   ├── 2018-19
+│   │   │   └── 2019-20
+│   │   ├── Seals_2018-19
+│   │   └── Seals_2021-22
+│   └── snowstorm_cl              Dir for Snowstorm classification models.
+└── videos                        Inc. Timelapse and Heatmap of 2021-22 Scott Base.
 ```
