@@ -1,6 +1,6 @@
 # Preproccesing
 # For now, only using 2018 - 2019
-RESEARCH_DIR = '/csse/research/antarctica_seals/scott_base/2018-19/cropped'
+RESEARCH_DIR = '/csse/research/antarctica_seals/scott_base/2018-19'
 CROPS_PER_IMG = 5
 OUT_DIR = 'data/all'
 CROP_SIZE = 500  # px
