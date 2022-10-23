@@ -93,8 +93,8 @@ The main script (used for training) can be run with `python -m Models.Seals.main
 
 Example below:
 
-```
-python -m Models.Seals.main --first 2 --input coco\ --path annotations/annotation.json --image_root /csse/reserach/.../2021-22 --split_ratio 70/15/15 --log_dir Models/Seals/log --image_size 512 --batch_size 8 --validation_pause 16 --run_name Seals_test
+```bash
+python -m Models.Seals.main --first 2 --input "coco --path annotations.json --image_root /img_location --split_ratio 70/15/15" --log_dir Models/Seals/log --image_size 512 --validation_pause 16 --run_name Seals
 ```
 
 ## Large Project Artifacts
