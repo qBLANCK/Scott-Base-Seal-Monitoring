@@ -97,6 +97,12 @@ Example below:
 python -m Models.Seals.main --first 2 --input "coco --path annotations.json --image_root /img_location --split_ratio 70/15/15" --log_dir Models/Seals/log --image_size 512 --validation_pause 16 --run_name Seals
 ```
 
+python -m Models.Seals.main --first 2 --input "coco --path /csse/users/jte52/Documents/Seals/annotations_2021-22/annotations.json --image_root /csse/research/antarctica_seals/images/scott_base/2021-22 --split_ratio 70/15/15" --log_dir Models/Seals/log --image_size 512 --validation_pause 16 --run_name Seals
+
+
+
+
+
 ## Large Project Artifacts
 
 Other large artifacts such as models, training logs, annotations, and images that are too large for GitHub are stored on the University of Canterbury's csse drive (`/csse/research/antarctica_seals`).
