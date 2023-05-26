@@ -20,7 +20,7 @@ with open('data/counts/scott_base-21-22.csv','r') as csvinput:
         all.append(row)
 
         for row in reader:
-            path = f"/home/fdi19/SENG402/data/images/scott_base/2021-22/{row[0]}.jpg"
+            path = f"/home/jte52/SENG402/data/images/scott_base/2021-22/{row[0]}.jpg"
             output, confidence = classify(model, device, path)
 
             row.append("Yes" if output == "storm" else "No")

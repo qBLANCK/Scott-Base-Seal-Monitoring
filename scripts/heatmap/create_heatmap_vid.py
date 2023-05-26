@@ -22,7 +22,7 @@ MODEL_DIR = "../Models/Seals/log/Seals_2021-22/model.pth"
 DETECTION_CREATE_CSV = True
 DETECTION_CSV_NAME = "2021-22_detection.csv"
 DETECTION_THRESHOLD = 0.4
-TIMELAPSE_INPUT = '/home/fdi19/SENG402/data/images/scott_base/2021-22'
+TIMELAPSE_INPUT = '/home/jte52/SENG402/data/images/scott_base/2021-22'
 TIMELAPSE_IMAGES = np.array(sorted(os.listdir(TIMELAPSE_INPUT)))
 TIMELAPSE_IMAGES = [list(x) for x in np.array_split(
     TIMELAPSE_IMAGES, CHUNKS)][CHUNK_N]
@@ -68,7 +68,7 @@ def create_timelapse(image_files):
     """Create timelapse video using list of image paths."""
     print("Status: Creating timelapse")
     # Local installation of ImageMagick. I ran into permission issues when trying to modify policy.xml
-    os.environ["IMAGEMAGICK_BINARY"] = "/home/fdi19/ImageMagick-7.1.0/utilities/magick"
+    os.environ["IMAGEMAGICK_BINARY"] = "/home/jte52/ImageMagick-7.1.0/utilities/magick"
     clip_list = []
     for image_path in image_files:
         image_name = image_path.split("/")[-1]

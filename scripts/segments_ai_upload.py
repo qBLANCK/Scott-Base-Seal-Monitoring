@@ -9,7 +9,7 @@ api_key = environ.get("SegmentsAI_api_key")
 dataset = "segmentsai1/Seal_2022-22"
 
 client = SegmentsClient(api_key)
-path = "/home/fdi19/SENG402/data/images/scott_base/2021-22"
+path = "/home/jte52/SENG402/data/images/scott_base/2021-22"
 
 for filename in tqdm(listdir(path)[8775:]):
     name = filename.split('.')[0]

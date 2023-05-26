@@ -126,4 +126,4 @@ dependencies:
       - wrapt==1.14.1
       - xarray==2022.3.0
       - xmltodict==0.13.0
-prefix: /home/fdi19/miniconda3/envs/venv
+prefix: /home/jte52/miniconda3/envs/venv

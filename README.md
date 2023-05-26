@@ -97,7 +97,9 @@ Example below:
 python -m Models.Seals.main --first 2 --input "coco --path annotations.json --image_root /img_location --split_ratio 70/15/15" --log_dir Models/Seals/log --image_size 512 --validation_pause 16 --run_name Seals
 ```
 
-python -m Models.Seals.main --first 2 --input "coco --path /csse/users/jte52/Documents/Seals/annotations_2021-22/annotations.json --image_root /csse/research/antarctica_seals/images/scott_base/2021-22 --split_ratio 70/15/15" --log_dir Models/Seals/log --image_size 512 --validation_pause 16 --run_name Seals
+```bash
+CUDA_LAUNCH_BLOCKING=1 TORCH_USE_CUDA_DSA=1 python -m Models.Seals.main --first 2 --input "coco --path /csse/users/jte52/Documents/Seals/annotations/2021-22/annotations_new.json --image_root /csse/research/antarctica_seals/images/scott_base/2021-22" --log_dir Models/Seals/log --image_size 256 --batch_size 4 --validation_pause 16 --eval_split --run_name Seals 
+```
 
 
 
