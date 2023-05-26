@@ -7,13 +7,14 @@ from libs.tools import struct, const
 
 def bookend(*xs, dim=0):
     def to_tensor(xs):
-        return xs if torch.is_tensor(xs) else torch.FloatTensor([xs])
+        tensor = xs if torch.is_tensor(xs) else torch.FloatTensor([xs])
+        return tensor.cpu()
 
     return torch.cat([to_tensor(x) for x in xs], dim)
 
 
 def rev_cummax(v):
-    flipped = v.flip(0).numpy()
+    flipped = v.flip(0).cpu().numpy()
     rev_max = np.maximum.accumulate(flipped)
     return torch.from_numpy(rev_max).flip(0)
 
@@ -98,7 +99,7 @@ def mAP_classes(image_pairs, num_classes):
     num_targets = torch.bincount(target_label, minlength=num_classes)
 
     def f(threshold):
-        matches = torch.cat([match(threshold) for match in matchers])[order]
+        matches = torch.cat([match(threshold) for match in matchers]).cuda()[order]
 
         def compute_class(i):
             inds = [(predicted_label == i).nonzero(as_tuple=False).squeeze(1)]
