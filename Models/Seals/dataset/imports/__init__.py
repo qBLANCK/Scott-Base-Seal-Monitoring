@@ -49,8 +49,28 @@ def import_dataset(input_args):
     else:
         assert False, "unknown dataset type: " + choice
 
-
 def load_dataset(args):
     dataset = import_dataset(args.input)
-    summarise(dataset['images'], dataset['config']['classes'])
+
+    if 'second_input' in args:
+        second_dataset = import_dataset(args.second_input)
+        dataset = combine_datasets(dataset, second_dataset)
+
+    summarise(dataset['images'], dataset['config']['classes'])      # This seems to be spitting out the wrong information at the moment
     return decode_dataset(dataset)
+
+def combine_datasets(first, second):               #NOTE: Check images marked for validation
+    combined = {}
+
+    # Combine the 'config' information              NOTE: Might not work with 2 json files
+    combined['config'] = {
+        'root': first['config']['root'],
+        'extensions': first['config']['extensions'],
+        'classes': first['config']['classes']
+    }
+
+    # Combine the 'images' information
+    combined['images'] = first['images'] + second['images']
+
+    return combined
+

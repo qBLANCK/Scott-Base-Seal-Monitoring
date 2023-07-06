@@ -137,10 +137,12 @@ input_choices = struct(
         split_ratio=param(
             type="str",
             help="slash separated list of dataset ratio (train/validate/test) e.g. 70/15/15",
-            default="70/15/15")))
+            default="70/15/15"))
+)
 
 input_parameters = struct(
     input=choice(default="json", options=input_choices, help='input method'),
+    second_input=choice(default="json", options=input_choices, help='secondary input method')
 )
 
 parameters = detection_parameters._merge(train_parameters)._merge(
@@ -150,6 +152,7 @@ parameters = detection_parameters._merge(train_parameters)._merge(
 def get_arguments():
     args = parse_args(parameters, "trainer", "object detection parameters")
     args.input = parse_choice("input", parameters.input, args.input)
+    args.second_input = parse_choice("second_input", parameters.second_input, args.second_input)
 
     parser = argparse.ArgumentParser()
     add_arguments(parser, retina.parameters)
