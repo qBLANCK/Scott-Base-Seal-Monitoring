@@ -56,13 +56,13 @@ def load_dataset(args):
         second_dataset = import_dataset(args.second_input)
         dataset = combine_datasets(dataset, second_dataset)
 
-    summarise(dataset['images'], dataset['config']['classes'])      # This seems to be spitting out the wrong information at the moment
+    summarise(dataset['images'], dataset['config']['classes'])
     return decode_dataset(dataset)
 
 def combine_datasets(first, second):               #NOTE: Check images marked for validation
     combined = {}
 
-    # Combine the 'config' information              NOTE: Might not work with 2 json files
+    # Combine the 'config' information              NOTE: Might not work with 2 coco files
     combined['config'] = {
         'root': first['config']['root'],
         'extensions': first['config']['extensions'],

@@ -14,9 +14,9 @@ def bookend(*xs, dim=0):
 
 
 def rev_cummax(v):
-    flipped = v.flip(0).cpu().numpy()
-    rev_max = np.maximum.accumulate(flipped)
-    return torch.from_numpy(rev_max).flip(0)
+    flipped = v.flip(0)
+    rev_max, _ = torch.cummax(flipped, dim=0)
+    return rev_max
 
 
 def area_under_curve(xs, ys):

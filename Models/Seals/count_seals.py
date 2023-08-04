@@ -16,10 +16,10 @@ from Models.Seals.evaluate import evaluate_image
 
 
 # CONSTANTS
-MODEL_PATH = Path('log/Seals_2021-22/model.pth')
-SEAL_IMG_DIR = Path("../../data/images/scott_base/2021-22")
-OUTPUT_DIR = Path("../../data/counts")
-OUTPUT_NAME = "scott_base-21-22.csv"
+MODEL_PATH = Path('Models/Seals/log/Dual_b4/model.pth')
+SEAL_IMG_DIR = Path("/csse/research/antarctica_seals/images/scott_base/2021-22/")
+OUTPUT_DIR = Path("./data/counts")
+OUTPUT_NAME = "seal_counts.csv"
 THRESHOLDS = [0.3, 0.4, 0.5]
 
 # MODEL SETUP
@@ -28,7 +28,6 @@ device = torch.cuda.current_device()
 model.to(device)
 encoder.to(device)
 classes = args.dataset.classes
-
 
 def is_responsible_bbox(bbox, frame):
     x1, y1, x2, y2 = bbox
@@ -44,7 +43,6 @@ def is_responsible_bbox(bbox, frame):
     if (w / h) > ratio or (h / w) > ratio:
         return False
     return True
-
 
 with open(OUTPUT_DIR / OUTPUT_NAME, "w") as count_file:
     try:
