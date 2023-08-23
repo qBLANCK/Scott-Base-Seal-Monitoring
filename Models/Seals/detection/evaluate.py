@@ -1,4 +1,3 @@
-import numpy as np
 import torch
 
 from Models.Seals.detection import box
@@ -16,7 +15,7 @@ def bookend(*xs, dim=0):
 def rev_cummax(v):
     flipped = v.flip(0)
     rev_max, _ = torch.cummax(flipped, dim=0)
-    return rev_max
+    return rev_max.flip(0)
 
 
 def area_under_curve(xs, ys):

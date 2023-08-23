@@ -59,6 +59,7 @@ def load_dataset(args):
     summarise(dataset['images'], dataset['config']['classes'])
     return decode_dataset(dataset)
 
+# Pretty sure this requires a normal json then a coco, otherwise config from second json will be ignored (?)
 def combine_datasets(first, second):               #NOTE: Check images marked for validation
     combined = {}
 

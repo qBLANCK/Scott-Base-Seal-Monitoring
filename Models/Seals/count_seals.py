@@ -9,6 +9,7 @@ import libs.tools.image.cv as cv
 from Models.Seals.checkpoint import load_model
 from Models.Seals.detection import detection_table
 from Models.Seals.evaluate import evaluate_image
+import mask
 
 # TODO: Take out dependence on library
 # TODO: Add more confidence levels
@@ -44,6 +45,8 @@ def is_responsible_bbox(bbox, frame):
         return False
     return True
 
+mask_matrix = mask.load_mask()
+
 with open(OUTPUT_DIR / OUTPUT_NAME, "w") as count_file:
     try:
         count_writer = csv.writer(count_file, delimiter=',')
@@ -55,6 +58,9 @@ with open(OUTPUT_DIR / OUTPUT_NAME, "w") as count_file:
             if seal_img_name.endswith(".jpg"):
                 img_path = SEAL_IMG_DIR / seal_img_name
                 frame = cv.imread_color(str(img_path))
+
+                frame = frame * mask.unsqueeze(2)
+
                 counts = []
                 for t in THRESHOLDS:
                     nms_params = detection_table.nms_defaults._extend(
