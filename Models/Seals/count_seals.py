@@ -18,6 +18,7 @@ import mask
 
 # CONSTANTS
 MODEL_PATH = Path('Models/Seals/log/Dual_b4/model.pth')
+MASK_PATH = 'Models/Seals/mask.jpg'
 SEAL_IMG_DIR = Path("/csse/research/antarctica_seals/images/scott_base/2021-22/")
 OUTPUT_DIR = Path("./data/counts")
 OUTPUT_NAME = "seal_counts.csv"
@@ -45,7 +46,7 @@ def is_responsible_bbox(bbox, frame):
         return False
     return True
 
-mask_matrix = mask.load_mask()
+mask_matrix = mask.load_mask(MASK_PATH)
 
 with open(OUTPUT_DIR / OUTPUT_NAME, "w") as count_file:
     try:
@@ -59,8 +60,6 @@ with open(OUTPUT_DIR / OUTPUT_NAME, "w") as count_file:
                 img_path = SEAL_IMG_DIR / seal_img_name
                 frame = cv.imread_color(str(img_path))
 
-                frame = frame * mask.unsqueeze(2)
-
                 counts = []
                 for t in THRESHOLDS:
                     nms_params = detection_table.nms_defaults._extend(
@@ -73,9 +72,15 @@ with open(OUTPUT_DIR / OUTPUT_NAME, "w") as count_file:
 
                     seal_count = 0
                     for label, bbox in detections:
+                        
                         if is_responsible_bbox(bbox, frame):
-                            label_class = classes[label]
-                            seal_count += 1 if label_class.name == "seal" else 2
+                            # Convert bbox coordinates to integers and create a mask for the bounding box
+                            x_min, y_min, x_max, y_max = map(int, bbox)
+                            bbox_mask = mask_matrix[y_min:y_max, x_min:x_max]
+
+                            if not torch.any(bbox_mask):
+                                        label_class = classes[label]
+                                        seal_count += 1 if label_class.name == "seal" else 2
 
                     counts.append(seal_count)
 
