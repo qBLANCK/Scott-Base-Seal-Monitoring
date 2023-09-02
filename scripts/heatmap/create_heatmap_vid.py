@@ -18,11 +18,12 @@ from libs.tools.image import cv
 # I also had to use Deeplearning01 https://wiki.canterbury.ac.nz/display/RCC/Deeplearning01+the+big+GPU+machine
 CHUNKS = 4
 CHUNK_N = 0  # From 0 to CHUNK
-MODEL_DIR = "../Models/Seals/log/Seals_2021-22/model.pth"
-DETECTION_CREATE_CSV = True
-DETECTION_CSV_NAME = "2021-22_detection.csv"
-DETECTION_THRESHOLD = 0.4
-TIMELAPSE_INPUT = '/home/jte52/SENG402/data/images/scott_base/2021-22'
+MODEL_DIR = "../Models/Seals/log/Dual_b4/model.pth"
+MASK_PATH = "../Models/Seals/mask.jpg"
+DETECTION_CREATE_CSV = False # True if CSV needs to be created, False is CSV already exists
+DETECTION_CSV_NAME = "seal_locations.csv"
+DETECTION_THRESHOLD = 0.5
+TIMELAPSE_INPUT = "/csse/research/antarctica_seals/images/scott_base/2021-22/"
 TIMELAPSE_IMAGES = np.array(sorted(os.listdir(TIMELAPSE_INPUT)))
 TIMELAPSE_IMAGES = [list(x) for x in np.array_split(
     TIMELAPSE_IMAGES, CHUNKS)][CHUNK_N]
