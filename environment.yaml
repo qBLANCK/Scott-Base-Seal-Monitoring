@@ -43,6 +43,7 @@ dependencies:
       - google-pasta==0.2.0
       - grpcio==1.46.3
       - h5py==3.7.0
+      - heatmappy==1.0
       - idna==3.3
       - imageio==2.9.0
       - imageio-ffmpeg==0.4.7
