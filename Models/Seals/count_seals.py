@@ -19,11 +19,11 @@ import mask
 
 # CONSTANTS
 MODEL_PATH = Path('Models/Seals/log/Dual_b4/model.pth')
-MASK_PATH = 'Models/Seals/mask.jpg'
+MASK_PATH = 'Models/Seals/mask_extended.jpg'
 SEAL_IMG_DIR = Path("/csse/research/antarctica_seals/images/scott_base/2021-22/")
 OUTPUT_DIR = Path("./data/counts")
 OUTPUT_NAME = "seal_counts.csv"
-THRESHOLDS = [0.3, 0.4, 0.5]
+THRESHOLDS = [0.3, 0.4, 0.5, 0.6, 0.7]
 WANT_LOCATIONS = False # Set this to True if you want to generate a CSV with the location/timestamp of each detection
 
 # MODEL SETUP
