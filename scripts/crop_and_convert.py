@@ -16,7 +16,7 @@ OUTPUT_DIR = '/csse/research/antarctica_seals/images/scott_base/2022-23'
 
 # Crop dimensions for 2022-23 dataset (left, upper, right, lower)
 CROP_BOX = (6000, 6900, 15750, 7800)        # Crop dimensions (left, upper, right, lower)
-#CROP_BOX = (x, y, x+3914, x+375)   # 2021-22 dataset
+#CROP_BOX = (4600, 7250, 8514, 7625)   # 2021-22 dataset
 
 
 # Create the output directory if it doesn't exist
