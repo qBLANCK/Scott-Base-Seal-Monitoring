@@ -1,3 +1,19 @@
+'''
+This script generates heatmaps from seal detection data and overlays them on a timelapse video.
+
+        WARNING: THIS THING REQUIRES QUITE A LOT OF JUICE
+        If you do not have access to a monstrously powerful PC such as DeepLearning01, 
+        https://wiki.canterbury.ac.nz/display/RCC/Deeplearning01+the+big+GPU+machine
+        consider looking into alternative heatmap generation methods.
+
+        If you're getting really desperate, you can adjust NUM_CHUNKS until you get it to 
+        generate one chunk then manually increment the loop everytime it crashes. 
+
+- This script requires a CSV containing seal detections and a timelapse of the dataset. 
+- These can be generated using count_seals.py and create_timelapse.py
+- Place these files in the same directory and specify the paths in DETECTIONS_CSV and TIMELAPSE.
+'''
+
 import csv
 import os
 from tqdm import tqdm
@@ -8,29 +24,22 @@ from libs.heatmappy.heatmappy.heatmap import Heatmapper
 from libs.heatmappy.heatmappy.video import VideoHeatmapper
 from moviepy.editor import VideoFileClip
 
-"""     
-        WARNING: THIS THING REQUIRES QUITE A LOT OF JUICE
-        If you do not have access to a monstrously powerful PC such as DeepLearning01, 
-        https://wiki.canterbury.ac.nz/display/RCC/Deeplearning01+the+big+GPU+machine
-        consider looking into alternative heatmap generation methods.
-
-        If you're getting really desperate, you can adjust NUM_CHUNKS until you get it to 
-        generate one chunk then manually increment the loop everytime it crashes. 
-"""
-
 IMAGE_FOLDER = "/csse/research/antarctica_seals/images/scott_base/2021-22/"
-NUM_CHUNKS = 32  # Adjust this to change the number of output chunks. Recommend making this as low as possible.
-DETECTIONS_CSV = "seal_locations.csv"   # Path to CSV file containing seal detections. Generate this file using count_seals.py
+# Adjust this to change the number of output chunks. Recommend making this as low as possible.
+NUM_CHUNKS = 32  
+# Path to CSV file containing seal detections. Generate this file using count_seals.py
+DETECTIONS_CSV = "seal_locations.csv"   
 FPS = 24
-TIMELAPSE_NAME = "2021-22_timelapse.mp4"    # Path to mp4 file containing timelapse of dataset. Generate this file using create_timelapse.py
+# Path to mp4 file containing timelapse of dataset. Generate this file using create_timelapse.py
+TIMELAPSE = "2021-22_timelapse.mp4"   
 
 # Heatmap parameters
 HEATMAP_BITRATE = "3000k"
 HEATMAP_KEEP_HEAT = True
-HEATMAP_HEAT_DECAY = 0.5  # Seconds
+HEATMAP_HEAT_DECAY = 1  # Seconds
 HEATMAP_POINT_DIAM = 40
 HEATMAP_POINT_STRENGTH = 0.5
-HEATMAP_POINT_OPACITY = 0.6
+HEATMAP_POINT_OPACITY = 0.35
 
 # Get the list of image files in the folder
 image_files = [os.path.join(IMAGE_FOLDER, f) for f in sorted(os.listdir(IMAGE_FOLDER)) if f.endswith(".jpg")]
@@ -38,12 +47,10 @@ total_frames = len(image_files)
 frames_per_chunk = total_frames // NUM_CHUNKS
 
 print("Status: Loading timelapse video")
-timelapse_video = VideoFileClip(TIMELAPSE_NAME)
+timelapse_video = VideoFileClip(TIMELAPSE)
 
 # Loop through each chunk
-#for i in range(int(NUM_CHUNKS)):
-for i in range(1):
-    #i += 1
+for i in range(int(NUM_CHUNKS)):
     print(f"Processing Chunk {i + 1}/{int(NUM_CHUNKS)}")
 
     # Calculate the time range for the current chunk
