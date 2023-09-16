@@ -7,7 +7,7 @@ from libs.tools import struct, const
 def bookend(*xs, dim=0):
     def to_tensor(xs):
         tensor = xs if torch.is_tensor(xs) else torch.FloatTensor([xs])
-        return tensor#.cpu()
+        return tensor
 
     return torch.cat([to_tensor(x) for x in xs], dim)
 
@@ -85,29 +85,42 @@ def match_positives(detections, target):
 
 
 def mAP_classes(image_pairs, num_classes):
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")  # Get the current device
+    #device = torch.device("cuda" if torch.cuda.is_available() else "cpu")  # Get the current device
 
-    confidence = torch.cat([i.detections.confidence.to(device) for i in image_pairs]).float()
+    confidence = torch.cat(
+        [i.detections.confidence for i in image_pairs]).float()
     confidence, order = confidence.sort(0, descending=True)
 
-    matchers = [match_positives(i.detections.to(device), i.target.to(device)) for i in image_pairs]
+    matchers = [match_positives(i.detections, i.target) for i in image_pairs]
 
-    predicted_label = torch.cat([i.detections.label.to(device) for i in image_pairs])[order]
-    target_label = torch.cat([i.target.label.to(device) for i in image_pairs])
+    predicted_label = torch.cat(
+        [i.detections.label for i in image_pairs])[order]
+    target_label = torch.cat([i.target.label for i in image_pairs])
 
-    num_targets = torch.bincount(target_label.to(device), minlength=num_classes)
+    num_targets = torch.bincount(target_label, minlength=num_classes)
+
+    print("=========================================================")
+    print("Image Pairs: " + str(image_pairs.device))
+    print("Num Classes: " + str(num_classes.device))
+    print("Confidence: " + str(confidence.device))
+    print("Order: " + str(order.device))
+    print("Predicted Label: " + str(predicted_label.device))
+    print("Target Label: " + str(target_label.device))
+    print("Num Targets: " + str(num_targets.device))
+    print("=========================================================")
 
     def f(threshold):
-        matches = torch.cat([match(threshold).cpu() for match in matchers])[order.cpu()]
+        matches = torch.cat([match(threshold) for match in matchers])[order]
 
         def compute_class(i):
             inds = [(predicted_label == i).nonzero(as_tuple=False).squeeze(1)]
-            return compute_mAP(matches[inds], confidence[inds], num_targets[i].item())
+            return compute_mAP(
+                matches[inds], confidence[inds], num_targets[i].item())
 
         return struct(
-            total=compute_mAP(matches, confidence.cpu(), target_label.size(0)),
+            total=compute_mAP(matches, confidence,
+                              target_label.size(0)),
             classes=[compute_class(i) for i in range(0, num_classes)]
         )
 
     return f
-
