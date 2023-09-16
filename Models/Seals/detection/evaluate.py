@@ -7,7 +7,7 @@ from libs.tools import struct, const
 def bookend(*xs, dim=0):
     def to_tensor(xs):
         tensor = xs if torch.is_tensor(xs) else torch.FloatTensor([xs])
-        return tensor.cpu()
+        return tensor#.cpu()
 
     return torch.cat([to_tensor(x) for x in xs], dim)
 
