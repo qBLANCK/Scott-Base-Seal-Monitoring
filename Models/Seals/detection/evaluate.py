@@ -98,7 +98,7 @@ def mAP_classes(image_pairs, num_classes):
     num_targets = torch.bincount(target_label, minlength=num_classes)
 
     def f(threshold):
-        matches = torch.cat([match(threshold) for match in matchers]).cuda()[order]
+        matches = torch.cat([match(threshold) for match in matchers])[order]
 
         def compute_class(i):
             inds = [(predicted_label == i).nonzero(as_tuple=False).squeeze(1)]
