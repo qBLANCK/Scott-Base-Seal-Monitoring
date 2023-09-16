@@ -100,7 +100,7 @@ def mAP_classes(image_pairs, num_classes):
     num_targets = torch.bincount(target_label, minlength=num_classes)
 
     print("=========================================================")
-    print("Image Pairs: " + str(image_pairs.device))
+    #print("Image Pairs: " + str(image_pairs.device))
     print("Num Classes: " + str(num_classes.device))
     print("Confidence: " + str(confidence.device))
     print("Order: " + str(order.device))
