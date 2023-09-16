@@ -85,30 +85,29 @@ def match_positives(detections, target):
 
 
 def mAP_classes(image_pairs, num_classes):
-    confidence = torch.cat(
-        [i.detections.confidence for i in image_pairs]).float()
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")  # Get the current device
+
+    confidence = torch.cat([i.detections.confidence.to(device) for i in image_pairs]).float()
     confidence, order = confidence.sort(0, descending=True)
 
-    matchers = [match_positives(i.detections, i.target) for i in image_pairs]
+    matchers = [match_positives(i.detections.to(device), i.target.to(device)) for i in image_pairs]
 
-    predicted_label = torch.cat(
-        [i.detections.label for i in image_pairs])[order]
-    target_label = torch.cat([i.target.label for i in image_pairs])
+    predicted_label = torch.cat([i.detections.label.to(device) for i in image_pairs])[order]
+    target_label = torch.cat([i.target.label.to(device) for i in image_pairs])
 
-    num_targets = torch.bincount(target_label, minlength=num_classes)
+    num_targets = torch.bincount(target_label.to(device), minlength=num_classes)
 
     def f(threshold):
         matches = torch.cat([match(threshold).cpu() for match in matchers])[order.cpu()]
 
         def compute_class(i):
             inds = [(predicted_label == i).nonzero(as_tuple=False).squeeze(1)]
-            return compute_mAP(
-                matches[inds], confidence[inds].cpu(), num_targets[i].item())
+            return compute_mAP(matches[inds], confidence[inds], num_targets[i].item())
 
         return struct(
-            total=compute_mAP(matches, confidence.cpu(),
-                              target_label.size(0)),
+            total=compute_mAP(matches, confidence.cpu(), target_label.size(0)),
             classes=[compute_class(i) for i in range(0, num_classes)]
         )
 
     return f
+
