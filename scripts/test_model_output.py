@@ -8,7 +8,7 @@ from Models.Seals.checkpoint import load_model
 from Models.Seals.mask.mask import load_mask, apply_mask_to_image
 
 # Load the model and other necessary components
-out_dir = "Models/Seals/log/Seals01"
+out_dir = "Models/Seals/log/Seals02"
 model, encoder, args = load_model(f"{out_dir}/model.pth")
 device = torch.cuda.current_device()
 model = model.to(device)
