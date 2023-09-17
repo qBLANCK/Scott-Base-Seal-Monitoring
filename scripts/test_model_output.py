@@ -93,4 +93,4 @@ output_directory = 'data/processed_images/'
 os.makedirs(output_directory, exist_ok=True)
 
 for image_path in image_paths:
-    process_and_save_image(image_path, output_directory, mask=mask_t, mask_visible=True)
+    process_and_save_image(image_path, output_directory, threshold=0.3, mask=mask_t, mask_visible=True)
