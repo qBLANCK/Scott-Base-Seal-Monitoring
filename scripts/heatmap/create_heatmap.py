@@ -1,4 +1,4 @@
-'''
+"""
 This script generates heatmaps from seal detection data and overlays them on a timelapse video.
 
         WARNING: THIS THING REQUIRES QUITE A LOT OF JUICE
@@ -10,9 +10,9 @@ This script generates heatmaps from seal detection data and overlays them on a t
         generate one chunk then manually increment the loop everytime it crashes. 
 
 - This script requires a CSV containing seal detections and a timelapse of the dataset. 
-- These can be generated using count_seals.py and create_timelapse.py
+- These can be generated using generate_seal_locations.py and create_timelapse.py
 - Place these files in the same directory and specify the paths in DETECTIONS_CSV and TIMELAPSE.
-'''
+"""
 
 import csv
 import os
@@ -27,7 +27,7 @@ from moviepy.editor import VideoFileClip
 IMAGE_FOLDER = "/csse/research/antarctica_seals/images/scott_base/2021-22/"
 # Adjust this to change the number of output chunks. Recommend making this as low as possible.
 NUM_CHUNKS = 32  
-# Path to CSV file containing seal detections. Generate this file using count_seals.py
+# Path to CSV file containing seal detections. Generate this file using generate_seal_locations.py
 DETECTIONS_CSV = "seal_locations.csv"   
 FPS = 24
 # Path to mp4 file containing timelapse of dataset. Generate this file using create_timelapse.py

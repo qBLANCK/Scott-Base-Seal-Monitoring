@@ -1,10 +1,10 @@
-'''
+"""
 This script generates a timelapse video from a folder of image frames with timestamps.
 
 - The script assumes that image frames are named in a specific format with timestamps (e.g., '2021-11-20T10_02_26.jpg').
 - It extracts timestamps from the image filenames to display on the frames.
 - The output video will be saved in the same directory as the script.
-'''
+"""
 
 import cv2
 import os

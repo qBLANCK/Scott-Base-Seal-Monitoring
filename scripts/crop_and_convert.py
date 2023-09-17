@@ -1,6 +1,6 @@
-'''
+"""
 This script converts .RW2 files to .JPG format, crops them to a specified region, and renames them based on their timestamp.
-'''
+"""
 
 import os
 import rawpy
