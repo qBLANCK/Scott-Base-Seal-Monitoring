@@ -1,6 +1,5 @@
 import torch
 import os
-from matplotlib import pyplot as plt
 
 from libs.tools.image import cv
 from Models.Seals.detection import display, detection_table
@@ -89,7 +88,7 @@ def process_and_save_image(image_path, output_dir, threshold=0.5, mask=None, mas
     cv.imwrite(output_path, frame)
 
 # Images to process and save
-image_paths = ['/csse/research/antarctica_seals/images/scott_base/2021-22/2022-01-23T13_33_48.jpg']
+image_paths = ['/home/jte52/images/2021-22/2022-01-23T13_33_48.jpg']
 output_directory = 'data/processed_images/'
 os.makedirs(output_directory, exist_ok=True)
 
