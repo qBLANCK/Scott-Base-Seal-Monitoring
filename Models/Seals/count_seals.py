@@ -27,10 +27,10 @@ from Models.Seals.mask.mask import load_mask
 
 # CONSTANTS
 MODEL_PATH = Path('Models/Seals/log/Dual_b4/model.pth')
-MASK_PATH = 'Models/Seals/mask/mask_2022-23.jpg'
-SEAL_IMG_DIR = Path("/csse/research/antarctica_seals/images/scott_base/2022-23/")
+MASK_PATH = 'Models/Seals/mask/mask_2021-22_ext.jpg'
+SEAL_IMG_DIR = Path("/csse/research/antarctica_seals/images/scott_base/2021-22/")
 OUTPUT_DIR = Path("./data/counts")
-OUTPUT_NAME = "seal_counts_2022-23.csv"
+OUTPUT_NAME = "seal_counts_2021-22_test.csv"
 THRESHOLDS = [0.3, 0.4, 0.5, 0.6, 0.7]
 
 # MODEL SETUP

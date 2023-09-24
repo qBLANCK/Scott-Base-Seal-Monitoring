@@ -7,14 +7,11 @@ Script Variables:
 - SEAL_IMG_DIR: Directory containing the input images.
 - OUTPUT_DIR: Directory where the output files will be saved.
 - OUTPUT_NAME: Name of the CSV file containing seal locations.
-- THRESHOLDS: List of detection confidence thresholds to apply.
 """
 
 import csv
-from os import listdir
 import os
 from pathlib import Path
-
 import torch
 from tqdm import tqdm
 
@@ -28,9 +25,8 @@ from Models.Seals.mask.mask import load_mask
 MODEL_PATH = Path('Models/Seals/log/Dual_b4/model.pth')
 MASK_PATH = 'Models/Seals/mask/mask_2021-22_ext.jpg'
 SEAL_IMG_DIR = Path("/csse/research/antarctica_seals/images/scott_base/2021-22/")
-OUTPUT_DIR = Path("./scripts/heatmap")
+OUTPUT_DIR = Path("data/locations")
 OUTPUT_NAME = "seal_locations_test.csv"
-THRESHOLDS = [0.3, 0.4, 0.5, 0.6, 0.7]
 
 # MODEL SETUP
 model, encoder, args = load_model(MODEL_PATH)
@@ -69,14 +65,13 @@ def detect_seal_locations(model, encoder, device, image_files):
     with open(OUTPUT_DIR / OUTPUT_NAME, "w") as f:
         writer = csv.writer(f, delimiter=',')
         writer.writerow(["X pos", "Y pos", "Time (ms)"])
-        for i, img in tqdm(enumerate(image_files)):
+        for i, img in enumerate(tqdm(image_files)):
             frame = cv.imread_color(img)
             results = evaluate_image(model, frame, encoder,
                                      nms_params=nms_params, device=device)
-            img_points = [(int((x1 + x2) / 2), int((y1 + y2) / 2), round(1000 * (i * (1 / TIMELAPSE_FPS)))) for
-                          x1, y1, x2,
-                          y2 in results.detections.bbox if is_responsible_bbox([x1, y1, x2, y2], frame)]
-            
+            img_points = [(int((x1 + x2) / 2), int((y1 + y2) / 2), 1000 * (i * (1 / TIMELAPSE_FPS))) for
+                          x1, y1, x2, y2 in results.detections.bbox if is_responsible_bbox([x1, y1, x2, y2], frame)]
+
             for x, y, time_ms in img_points:
                 if mask_matrix[y, x] == 0:  # Exclude points that are in the mask
                     writer.writerow([x, y, time_ms])
@@ -89,4 +84,5 @@ image_files = [
     for img in os.listdir(SEAL_IMG_DIR)
     if img.endswith(".jpg")
 ]
+image_files.sort()
 points = detect_seal_locations(model, encoder, device, image_files)

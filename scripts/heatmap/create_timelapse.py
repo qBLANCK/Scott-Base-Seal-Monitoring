@@ -13,7 +13,7 @@ from tqdm import tqdm
 
 frame_folder = "/csse/research/antarctica_seals/images/scott_base/2021-22/" # Image sources
 output_video = "2021-22_timelapse.mp4"
-fps = 24
+FPS = 24
 
 # Get the list of image files in the folder
 image_files = [os.path.join(frame_folder, f) for f in sorted(os.listdir(frame_folder)) if f.endswith(".jpg")]
@@ -27,7 +27,7 @@ height, width, layers = frame.shape
 
 # Initialize the video writer
 fourcc = cv2.VideoWriter_fourcc(*'mp4v')    # <-- Try H264 if having problems
-out = cv2.VideoWriter(output_video, fourcc, fps, (width, height))
+out = cv2.VideoWriter(output_video, fourcc, FPS, (width, height))
 
 for image_file in tqdm(image_files, desc="Processing frames", unit="frame"):
     frame = cv2.imread(image_file)
