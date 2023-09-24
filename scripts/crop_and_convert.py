@@ -7,6 +7,7 @@ import rawpy
 from PIL import Image
 from tqdm import tqdm
 import exifread
+import datetime
 
 # Directory containing .RW2 files
 INPUT_DIR = '/media/jte52/Longterm_TL/2021-22_ANZ/Crater Hill 2022-2023/118_PANA'   # 2022-23 Dataset
@@ -41,14 +42,16 @@ for rw2_file in rw2_files:
 
     if timestamp_tag:
         # Rename file to timestamp
-        new_filename = str(timestamp_tag).replace(":", "_").replace(" ", "T") + ".jpg"
+        timestamp = datetime.strptime(str(timestamp_tag), "%Y:%m:%d %H:%M:%S")
+        new_filename = timestamp.strftime("%Y-%m-%dT%H_%M_%S") + '.jpg'
+
         output_path = os.path.join(OUTPUT_DIR, new_filename)
 
         # Process image
         image = Image.fromarray(rgb)
         image = image.crop(CROP_BOX)
         
-        # Scale the cropped image by a factor of 2 --- Uncomment if needed, e.g. for 2021-22 dataset.
+        # Scale the cropped image by a factor of 2 --- Uncomment if needed.
         #image = image.resize((image.width * 2, image.height * 2))
 
         image.save(output_path)
