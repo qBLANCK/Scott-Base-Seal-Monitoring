@@ -7,7 +7,7 @@ IMPORTANT NOTE: The start_time variable should be set according to the timestamp
 import pandas as pd
 from datetime import datetime, timedelta
 
-locations_csv = "data/locations/2021-22_.csv"
+locations_csv = "data/locations/2021-22_locations_filtered_test.csv"
 df = pd.read_csv(locations_csv)
 
 # Calculate the timestamps for 15-minute intervals

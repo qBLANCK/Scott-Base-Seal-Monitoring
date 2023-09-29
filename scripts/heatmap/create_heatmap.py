@@ -38,8 +38,8 @@ HEATMAP_BITRATE = "3000k"
 HEATMAP_KEEP_HEAT = True
 HEATMAP_HEAT_DECAY = 1  # Seconds
 HEATMAP_POINT_DIAM = 40
-HEATMAP_POINT_STRENGTH = 0.5
-HEATMAP_POINT_OPACITY = 0.35
+HEATMAP_POINT_STRENGTH = 0.2
+HEATMAP_POINT_OPACITY = 0.65
 
 # Get the list of image files in the folder
 image_files = [os.path.join(IMAGE_FOLDER, f) for f in sorted(os.listdir(IMAGE_FOLDER)) if f.endswith(".jpg")]

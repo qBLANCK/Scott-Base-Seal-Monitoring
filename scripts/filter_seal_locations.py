@@ -1,52 +1,84 @@
 import csv
+import math
 from tqdm import tqdm
+from time import sleep
 
-INPUT_CSV = 'data/locations/2021-22_detection.csv'
+# Define the path to your input CSV file
+INPUT_CSV = 'data/locations/2021-22_locations.csv'
+OUTPUT_CSV = 'data/locations/2021-22_locations_filtered_test.csv'
 
-OUTPUT_CSV = 'data/locations/2021-22_detection_filtered.csv'
+# Create a dictionary to store detections grouped by timestamp
+detections_by_timestamp = {}
 
-# Function to calculate the Euclidean distance between two points
-def calculate_distance(x1, y1, x2, y2):
-    return ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** 0.5
-
-# Read the CSV file
+# Read the CSV file and group detections by timestamp
+print("Status: Reading detections into dictionary")
 with open(INPUT_CSV, 'r') as csv_file:
-    csv_reader = csv.reader(csv_file)
-    header = next(csv_reader)  # Read and ignore the header row
-    rows = list(csv_reader)
+    csv_reader = csv.DictReader(csv_file)
+    for row in csv_reader:
+        x_pos = float(row['X pos'])
+        y_pos = float(row['Y pos'])
+        timestamp = float(row['Time (ms)'])
+        
+        # Check if the timestamp exists in the dictionary, if not, create a new list
+        if timestamp not in detections_by_timestamp:
+            detections_by_timestamp[timestamp] = []
+        
+        # Append the detection to the corresponding timestamp
+        detections_by_timestamp[timestamp].append((x_pos, y_pos))
 
-# Create a new list to store filtered rows
-filtered_rows = []
+# Define the distance threshold for matching
+distance_threshold = 25
+print(len(detections_by_timestamp))
+
+# Create a dictionary to store filtered detections by timestamp
+filtered_detections_by_timestamp = {}
 
 # Create a tqdm progress bar
-progress_bar = tqdm(total=len(rows), desc="Filtering seal locations")
+progress_bar = tqdm(total=len(detections_by_timestamp), desc="Filtering detections")
 
-# Loop through the rows to filter based on nearby detections
-for i in range(len(rows)):
-    x1, y1, time1 = map(int, rows[i])
-    nearby_detection = False
+# Iterate through the sorted dictionary of detections by timestamp
+timestamps = sorted(detections_by_timestamp.keys())
+
+for i, timestamp in enumerate(timestamps):
+    filtered_detections = []
     
-    # Check adjacent timestamps (previous and next)
-    for j in range(i - 1, i + 2):
-        if j >= 0 and j < len(rows) and j != i:
-            x2, y2, time2 = map(int, rows[j])
-            distance = calculate_distance(x1, y1, x2, y2)
+    for (x1, y1) in detections_by_timestamp[timestamp]:
+        matched = False
+        
+        # Check for matching detections in adjacent timestamps
+        for j in range(max(0, i - 1), min(i + 2, len(timestamps))):
+            other_timestamp = timestamps[j]
             
-            # Check if the distance criteria is met
-            if distance <= 50:
-                nearby_detection = True
-                break
-    
-    if nearby_detection:
-        filtered_rows.append(rows[i])
+            if other_timestamp == timestamp:
+                continue  # Skip the same timestamp
+            
+            # Iterate through detections in the other timestamp
+            for (x2, y2) in detections_by_timestamp[other_timestamp]:
+                distance = math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
+                
+                if distance <= distance_threshold:
+                    matched = True
+                    break  # No need to check other detections in this timestamp
+            
+            if matched:
+                break  # No need to check other timestamps if a match is found
+        
+        if matched:
+            filtered_detections.append((x1, y1))
 
+    filtered_detections_by_timestamp[timestamp] = filtered_detections
     progress_bar.update(1)
-
 progress_bar.close()
 
-# Write the filtered rows to a new CSV file
-print("Writing to CSV...")
-with open(OUTPUT_CSV, 'w', newline='') as output_file:
-    csv_writer = csv.writer(output_file)
-    csv_writer.writerow(header)  # Write the header row
-    csv_writer.writerows(filtered_rows)
+# Write the filtered detections to a new CSV file
+print("Status: Writing output to CSV")
+with open(OUTPUT_CSV, 'w', newline='') as csv_file:
+    csv_writer = csv.writer(csv_file)
+    
+    # Write the header row
+    csv_writer.writerow(["X pos", "Y pos", "Time (ms)"])
+    
+    # Iterate through the filtered detections and write them to the CSV
+    for timestamp, filtered_detections in sorted(filtered_detections_by_timestamp.items()):
+        for (x, y) in filtered_detections:
+            csv_writer.writerow([x, y, timestamp])
