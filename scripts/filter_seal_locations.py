@@ -1,7 +1,19 @@
+"""
+Filters out detections that don't have a nearby detection in neighbouring timestamps.
+Intended to work on files CSV created using generate_seal_locations.py
+
+This script reads detections from a CSV file, filters out detections based on a distance threshold
+to remove outliers, and writes the filtered detections to a new CSV file in the same format as the input.
+
+distance_threshold can be modified to suit the dataset. 
+This number should try to fit in the sweet spot between detecting everything as nearby and filtering out actually valid detections.
+You may also consider modifying the number
+of timestamps either side of the timestamp you want to check, especially for sparser detections.
+"""
+
 import csv
 import math
 from tqdm import tqdm
-from time import sleep
 
 # Define the path to your input CSV file
 INPUT_CSV = 'data/locations/2021-22_locations.csv'
@@ -28,7 +40,6 @@ with open(INPUT_CSV, 'r') as csv_file:
 
 # Define the distance threshold for matching
 distance_threshold = 25
-print(len(detections_by_timestamp))
 
 # Create a dictionary to store filtered detections by timestamp
 filtered_detections_by_timestamp = {}
