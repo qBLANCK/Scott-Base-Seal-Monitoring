@@ -7,8 +7,7 @@ to remove outliers, and writes the filtered detections to a new CSV file in the 
 
 distance_threshold can be modified to suit the dataset. 
 This number should try to fit in the sweet spot between detecting everything as nearby and filtering out actually valid detections.
-You may also consider modifying the number
-of timestamps either side of the timestamp you want to check, especially for sparser detections.
+You may also consider modifying the number of timestamps either side of the timestamp you want to check, especially for sparser detections.
 """
 
 import csv

@@ -26,7 +26,7 @@ MODEL_PATH = Path('Models/Seals/log/Dual_b4/model.pth')
 MASK_PATH = 'Models/Seals/mask/mask_2021-22_ext.jpg'
 SEAL_IMG_DIR = Path("/csse/research/antarctica_seals/images/scott_base/2021-22/")
 OUTPUT_DIR = Path("data/locations")
-OUTPUT_NAME = "2021-22_locations_c40.csv"
+OUTPUT_NAME = "2021-22_locations_c70.csv"
 
 # MODEL SETUP
 print("Status: Loading seal detection model")
@@ -61,7 +61,7 @@ def detect_seal_locations(model, encoder, device, image_files):
        Also save results to CSV for subsequent script runs."""
     print(f"Status: Detecting seal locations, saving results to {OUTPUT_NAME}")
     nms_params = detection_table.nms_defaults._extend(
-        threshold=0.4)
+        threshold=0.7)
     points = []
     with open(OUTPUT_DIR / OUTPUT_NAME, "w") as f:
         writer = csv.writer(f, delimiter=',')

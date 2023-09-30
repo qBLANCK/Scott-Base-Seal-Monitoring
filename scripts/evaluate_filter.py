@@ -1,6 +1,6 @@
 import csv
 
-INPUT_CSV = 'data/locations/2021-22_locations_c40.csv'
+INPUT_CSV = 'data/locations/2021-22_locations_c60.csv'
 # Read the filtered CSV file
 with open(INPUT_CSV, 'r') as csv_file:
     csv_reader = csv.reader(csv_file)
