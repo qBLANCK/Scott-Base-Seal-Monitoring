@@ -7,7 +7,7 @@ IMPORTANT NOTE: The start_time variable should be set according to the timestamp
 import pandas as pd
 from datetime import datetime, timedelta
 
-locations_csv = "data/locations/2021-22_locations_filtered_test.csv"
+locations_csv = "data/locations/2021-22_locations_c55_filtered.csv"
 df = pd.read_csv(locations_csv)
 
 # Calculate the timestamps for 15-minute intervals
@@ -21,8 +21,8 @@ df["Timestamp"] = df["Timestamp"].dt.strftime("%Y-%m-%dT%H_%M_%S")      # Reform
 
 # Group the data by the "Time (ms)" column and count the occurrences
 counts = df["Timestamp"].value_counts().reset_index()
-counts.columns = ["Timestamp", "Counts (50)"]             # '50' refers to the confidence interval used to generate the locations CSV
+counts.columns = ["Timestamp", "Counts (55)"]             # '50' refers to the confidence interval used to generate the locations CSV
 counts = counts.sort_values(by="Timestamp", ascending=True)
 
-output_csv = "data/counts/counts_from_locations_test.csv"
+output_csv = "data/counts/2021-22_filtered_c55.csv"
 counts.to_csv(output_csv, index=False)

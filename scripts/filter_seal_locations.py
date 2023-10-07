@@ -15,8 +15,8 @@ import math
 from tqdm import tqdm
 
 # Define the path to your input CSV file
-INPUT_CSV = 'data/locations/2021-22_locations.csv'
-OUTPUT_CSV = 'data/locations/2021-22_locations_filtered_test.csv'
+INPUT_CSV = 'data/locations/2021-22_locations_c55.csv'
+OUTPUT_CSV = 'data/locations/2021-22_locations_c55_filtered.csv'
 
 # Create a dictionary to store detections grouped by timestamp
 detections_by_timestamp = {}

@@ -45,11 +45,11 @@ output_dir = "/media/jte52/BLANCK/Seals/Evaluation"
 
 i = 0
 for image_name, image_index in zip(images, image_indexes):
-    # Your code to process each image with its corresponding index
     i += 1
     timestamp = 1000 * image_index * (1/24)
-    
-    detections = df[df["Time (ms)"] == timestamp]
+
+    df["Time (ms)"] = df["Time (ms)"].round(0)
+    detections = df[df["Time (ms)"] == round(timestamp, 0)]
 
     count = 0
     for _, row in detections.iterrows():
