@@ -1,5 +1,9 @@
 """
 This script converts .RW2 files to .JPG format, crops them to a specified region, and renames them based on their timestamp.
+
+Some values from previous datasets that may be useful:
+    Crop box for 2021-22 dataset: (4600, 7250, 8514, 7625)
+    Crop box for 2021-22 dataset: (6000, 6900, 15750, 7800) - Images scaled by 2 after cropping
 """
 
 import os
@@ -8,16 +12,29 @@ from PIL import Image
 from tqdm import tqdm
 import exifread
 import datetime
+import argparse
 
-# Directory containing .RW2 files
-INPUT_DIR = '/media/jte52/Longterm_TL/2021-22_ANZ/Crater Hill 2022-2023/118_PANA'   # 2022-23 Dataset
+# Argument Parser
+parser = argparse.ArgumentParser(description="Convert .RW2 files to .JPG format, crop, and rename based on timestamp.")
+parser.add_argument("--input_dir", type=str, required=True, help="Directory containing .RW2 files.")
+parser.add_argument("--output_dir", type=str, required=True, help="Directory to save the cropped .JPG files.")
+parser.add_argument("--crop_box", type=int, nargs=4, required=True, help="Crop dimensions (left, upper, right, lower).")
+args = parser.parse_args()
 
-# Directory to save the cropped .JPG files
-OUTPUT_DIR = '/csse/research/antarctica_seals/images/scott_base/2022-23'
+# Assign arguments to variables
+INPUT_DIR = args.input_dir
+OUTPUT_DIR = args.output_dir
+CROP_BOX = tuple(args.crop_box)
 
-# Crop dimensions for 2022-23 dataset (left, upper, right, lower)
-CROP_BOX = (6000, 6900, 15750, 7800)        # Crop dimensions (left, upper, right, lower)
-#CROP_BOX = (4600, 7250, 8514, 7625)   # 2021-22 dataset
+# # Directory containing .RW2 files
+# INPUT_DIR = '/media/jte52/Longterm_TL/2021-22_ANZ/Crater Hill 2022-2023/118_PANA'   # 2022-23 Dataset
+
+# # Directory to save the cropped .JPG files
+# OUTPUT_DIR = '/csse/research/antarctica_seals/images/scott_base/2022-23'
+
+# # Crop dimensions for 2022-23 dataset (left, upper, right, lower)
+# CROP_BOX = (6000, 6900, 15750, 7800)        # Crop dimensions (left, upper, right, lower)
+# #CROP_BOX = (4600, 7250, 8514, 7625)   # 2021-22 dataset
 
 
 # Create the output directory if it doesn't exist

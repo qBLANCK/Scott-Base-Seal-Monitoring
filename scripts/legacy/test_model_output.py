@@ -17,7 +17,7 @@ classes = args.dataset.classes
 
 # Load the mask and mask_extended (you can choose one)
 MASK_PATH = "Models/Seals/mask/mask_2021-22_ext.jpg"
-mask_t = load_mask(MASK_PATH)
+mask_ = load_mask(MASK_PATH)
 
 def is_responsible_bbox(bbox, frame=None):
     x1, y1, x2, y2 = bbox

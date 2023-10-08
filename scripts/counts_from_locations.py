@@ -3,21 +3,32 @@ Generates a CSV file of seal counts from a CSV of seal locations with timestamps
 """
 
 import pandas as pd
+import argparse
 
-locations_csv = "data/locations/Locations_2021-22.csv"
-df = pd.read_csv(locations_csv)
-THRESHOLDS = [30, 40, 45, 50, 55, 60, 70]
+# Argument Parser
+parser = argparse.ArgumentParser(description="Generate a CSV file of seal counts from seal locations with timestamps.")
+parser.add_argument("--input_csv", type=str, required=True, help="Input CSV file containing seal locations.")
+parser.add_argument("--output_csv", type=str, required=True, help="Output CSV file name and path.")
+parser.add_argument("--thresholds", type=int, nargs='+', default=[30, 40, 45, 50, 55, 60, 70], help="List of confidence thresholds as percentages.")
+args = parser.parse_args()
+
+INPUT_CSV = args.input_csv
+OUTPUT_CSV = args.output_csv
+THRESHOLDS_PERCENTAGES = args.thresholds
+
+# Convert threshold percentages to decimal values
+THRESHOLDS = [t / 100.0 for t in THRESHOLDS_PERCENTAGES]
+
+df = pd.read_csv(INPUT_CSV)
 
 # Initialize a dictionary to store counts for each threshold
-counts_dict = {"Timestamp": df["Timestamp"].unique()}  # Initialize with unique timestamps
+counts_dict = {"Timestamp": df["Timestamp"].unique()}
 
-# Iterate over each confidence threshold
 for threshold in THRESHOLDS:
-    # Filter detections above the threshold
-    filtered_df = df[df["Confidence"] >= threshold]
+    filtered_df = df[df["Confidence"] >= threshold] # Filter detections above the threshold
     
     # Group the data by the "Timestamp" column and count the occurrences
-    counts = filtered_df.groupby("Timestamp").size().reset_index(name=f"Counts ({threshold})")
+    counts = filtered_df.groupby("Timestamp").size().reset_index(name=f"Counts ({int(threshold*100)}%)")
     
     # Merge the counts with the existing dictionary
     counts_dict = pd.merge(counts_dict, counts, on="Timestamp", how="left")
@@ -25,5 +36,8 @@ for threshold in THRESHOLDS:
 # Fill NaN values with 0 for timestamps with no detections above the thresholds
 counts_dict = counts_dict.fillna(0)
 
-output_csv = "data/counts/2021-22_filtered_counts.csv"
+
+output_csv = f"{OUTPUT_CSV}"
 counts_dict.to_csv(output_csv, index=False)
+
+print(f"Counts saved to {output_csv}")

@@ -4,29 +4,34 @@ Intended to work on files CSV created using locate_seals.py
 
 This script reads detections from a CSV file, filters out detections based on a distance threshold
 to remove outliers, and writes the filtered detections to a new CSV file in the same format as the input.
-
-DISTANCE_THRESHOLD and CONFIDENCE_THRESHOLD can be modified to suit the dataset.
-This number should try to fit in the sweet spot between detecting everything as nearby and filtering out actually valid detections.
-You may also consider modifying the number of timestamps either side of the timestamp you want to check, especially for sparser detections.
 """
 
 import csv
 import math
 from tqdm import tqdm
+import argparse
 
-# Define the path to your input CSV file
-INPUT_CSV = 'data/locations/2021-22_locations_c55.csv'
-OUTPUT_CSV = 'data/locations/2021-22_locations_c55_filtered.csv'
+# Argument Parser
+parser = argparse.ArgumentParser(description="Filter seal detections based on distance and confidence.")
+parser.add_argument("--input", type=str, required=True, help="Path to the input CSV file with seal detections.")
+parser.add_argument("--output", type=str, required=True, help="Path to the output filtered CSV file.")
+parser.add_argument("--distance", type=float, default=25, help="Distance threshold for filtering detections.")
+parser.add_argument("--confidence", type=float, default=0.3, help="Confidence threshold for filtering detections.")
+parser.add_argument("--num_timestamps", type=int, default=1, help="Number of timestamps to check on either side.")
+args = parser.parse_args()
 
-DISTANCE_THRESHOLD = 25
-CONFIDENCE_THRESHOLD = 0.5
+input_csv = args.input
+output_csv = args.output
+distance_threshold = args.distance
+confidence_threshold = args.confidence
+num_timestamps = args.num_timestamps
 
 timestamps = []  # List of timestamps
 detections_by_timestamp = {}  # Dictionary to store detections by timestamp
 
 # Read the CSV file and group detections by timestamp
 print("Status: Reading detections into dictionary")
-with open(INPUT_CSV, 'r') as csv_file:
+with open(input_csv, 'r') as csv_file:
     csv_reader = csv.DictReader(csv_file)
     for row in csv_reader:
         timestamp = row['Timestamp']
@@ -36,7 +41,7 @@ with open(INPUT_CSV, 'r') as csv_file:
         y_max = int(row['Y_max'])
         confidence = float(row['Confidence'])
 
-        if confidence < CONFIDENCE_THRESHOLD:
+        if confidence < confidence_threshold:
             continue
         
         # Store detections by timestamp
@@ -64,7 +69,7 @@ for i, timestamp in enumerate(timestamps):
         matched = False
         
         # Check for matching detections in adjacent timestamps
-        for j in range(max(0, i - 1), min(i + 2, len(timestamps))):
+        for j in range(max(0, i - num_timestamps), min(i + num_timestamps + 1, len(timestamps))):
             other_timestamp = timestamps[j]
             
             if other_timestamp == timestamp:
@@ -80,7 +85,7 @@ for i, timestamp in enumerate(timestamps):
                 distance = math.sqrt((center_x - center_x2) ** 2 + (center_y - center_y2) ** 2)
 
                 
-                if distance <= DISTANCE_THRESHOLD:
+                if distance <= distance_threshold:
                     matched = True
                     break  # No need to check other detections in this timestamp
             
@@ -96,7 +101,7 @@ progress_bar.close()
 
 # Write the filtered detections to a new CSV file
 print("Status: Writing output to CSV")
-with open(OUTPUT_CSV, 'w', newline='') as csv_file:
+with open(output_csv, 'w', newline='') as csv_file:
     csv_writer = csv.writer(csv_file)
     
     # Write the header row
