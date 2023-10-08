@@ -105,9 +105,9 @@ with open(output_csv, 'w', newline='') as csv_file:
     csv_writer = csv.writer(csv_file)
     
     # Write the header row
-    csv_writer.writerow(["X pos", "Y pos", "Time (ms)"])
+    csv_writer.writerow(["Timestamp", "X_min", "Y_min", "X_max", "Y_max", "Confidence"])
     
     # Iterate through the filtered detections and write them to the CSV
     for timestamp, filtered_detections in sorted(filtered_detections_by_timestamp.items()):
-        for (x, y) in filtered_detections:
-            csv_writer.writerow([x, y, timestamp])
+        for d in filtered_detections:
+            csv_writer.writerow([timestamp, d[0], d[1], d[2], d[3], d[4]])
