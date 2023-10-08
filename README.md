@@ -83,7 +83,7 @@ This solution applies a RetinaNet CNN to detect the small and dense seals. The o
 
 This project has been deleveloped with a Conda environment for ease of reproduction. If you do not have conda installed, run `./install_conda.sh`.
 
-To install the conda environment with all required dependencies run `conda env create -f environment.yaml python=3.8`.
+To install the conda environment with all required dependencies run `conda env create -f environment.yaml`.
 
 To activate the environment run `conda activate seal_env`.
 
@@ -100,12 +100,13 @@ python -m Models.Seals.main --first 2 --input "coco --path annotations.json --im
 ## Analysing a dataset
 
 ```bash
-python -m scripts.crop_and_convert.py --input_dir /path/to/input_dir --output_dir /path/to/output_dir --crop_box left upper right lower
-python -m scripts.locate_seals.py --model_path "path/to/your/model.pth" --mask_path "path/to/your/mask.jpg" --input_dir "path/to/your/images" --output_dir "path/to/your/output" --output_name "output_filename.csv"
-python -m scripts.filter_seal_locations.py --input_csv "path/to/your/input.csv" --output_csv "path/to/your/output.csv"
-python -m scripts.counts_from_locations.py --input_csv "path/to/your/input.csv" --output_csv "path/to/your/output.csv"
-python -m scripts.heatmap.create_timelapse.py
-python -m scripts.heatmap.create_heatmap.py
+conda activate seal_env
+python -m scripts.crop_and_convert --input_dir /path/to/input_dir --output_dir /path/to/output_dir --crop_box left upper right lower
+python -m scripts.locate_seals --model_path "path/to/your/model.pth" --mask_path "path/to/your/mask.jpg" --input_dir "path/to/your/images" --output_dir "path/to/your/output" --output_name "output_filename.csv"
+python -m scripts.filter_seal_locations --input_csv "path/to/your/input.csv" --output_csv "path/to/your/output.csv"
+python -m scripts.counts_from_locations --input_csv "path/to/your/input.csv" --output_csv "path/to/your/output.csv"
+python -m scripts.heatmap.create_timelapse
+python -m scripts.heatmap.create_heatmap
 ```
 
 ## Large Project Artifacts

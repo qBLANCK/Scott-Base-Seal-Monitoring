@@ -21,8 +21,8 @@ THRESHOLDS = [t / 100.0 for t in THRESHOLDS_PERCENTAGES]
 
 df = pd.read_csv(INPUT_CSV)
 
-# Initialize a dictionary to store counts for each threshold
-counts_dict = {"Timestamp": df["Timestamp"].unique()}
+# Initialize a DataFrame to store counts for each threshold
+counts_df = pd.DataFrame({"Timestamp": df["Timestamp"].unique()})
 
 for threshold in THRESHOLDS:
     filtered_df = df[df["Confidence"] >= threshold] # Filter detections above the threshold
@@ -30,14 +30,13 @@ for threshold in THRESHOLDS:
     # Group the data by the "Timestamp" column and count the occurrences
     counts = filtered_df.groupby("Timestamp").size().reset_index(name=f"Counts ({int(threshold*100)}%)")
     
-    # Merge the counts with the existing dictionary
-    counts_dict = pd.merge(counts_dict, counts, on="Timestamp", how="left")
+    # Merge the counts with the existing DataFrame
+    counts_df = pd.merge(counts_df, counts, on="Timestamp", how="left")
 
 # Fill NaN values with 0 for timestamps with no detections above the thresholds
-counts_dict = counts_dict.fillna(0)
+counts_df = counts_df.fillna(0)
 
-
-output_csv = f"{OUTPUT_CSV}"
-counts_dict.to_csv(output_csv, index=False)
+output_csv = OUTPUT_CSV
+counts_df.to_csv(output_csv, index=False)
 
 print(f"Counts saved to {output_csv}")
