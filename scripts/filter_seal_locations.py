@@ -1,11 +1,11 @@
 """
 Filters out detections that don't have a nearby detection in neighbouring timestamps.
-Intended to work on files CSV created using generate_seal_locations.py
+Intended to work on files CSV created using locate_seals.py
 
 This script reads detections from a CSV file, filters out detections based on a distance threshold
 to remove outliers, and writes the filtered detections to a new CSV file in the same format as the input.
 
-distance_threshold can be modified to suit the dataset. 
+DISTANCE_THRESHOLD and CONFIDENCE_THRESHOLD can be modified to suit the dataset.
 This number should try to fit in the sweet spot between detecting everything as nearby and filtering out actually valid detections.
 You may also consider modifying the number of timestamps either side of the timestamp you want to check, especially for sparser detections.
 """
@@ -18,32 +18,36 @@ from tqdm import tqdm
 INPUT_CSV = 'data/locations/2021-22_locations_c55.csv'
 OUTPUT_CSV = 'data/locations/2021-22_locations_c55_filtered.csv'
 
-# Create a dictionary to store detections grouped by timestamp
-detections_by_timestamp = {}
+DISTANCE_THRESHOLD = 25
+CONFIDENCE_THRESHOLD = 0.5
+
+timestamps = []  # List of timestamps
+detections_by_timestamp = {}  # Dictionary to store detections by timestamp
 
 # Read the CSV file and group detections by timestamp
 print("Status: Reading detections into dictionary")
 with open(INPUT_CSV, 'r') as csv_file:
     csv_reader = csv.DictReader(csv_file)
     for row in csv_reader:
-        x_pos = float(row['X pos'])
-        y_pos = float(row['Y pos'])
-        timestamp = float(row['Time (ms)'])
+        timestamp = row['Timestamp']
+        x_min = int(row['X_min'])
+        y_min = int(row['Y_min'])
+        x_max = int(row['X_max'])
+        y_max = int(row['Y_max'])
+        confidence = float(row['Confidence'])
+
+        if confidence < CONFIDENCE_THRESHOLD:
+            continue
         
-        # Check if the timestamp exists in the dictionary, if not, create a new list
+        # Store detections by timestamp
         if timestamp not in detections_by_timestamp:
             detections_by_timestamp[timestamp] = []
-        
-        # Append the detection to the corresponding timestamp
-        detections_by_timestamp[timestamp].append((x_pos, y_pos))
+        detections_by_timestamp[timestamp].append((x_min, y_min, x_max, y_max, confidence))
+        if timestamp not in timestamps:
+            timestamps.append(timestamp)
 
-# Define the distance threshold for matching
-distance_threshold = 25
-
-# Create a dictionary to store filtered detections by timestamp
 filtered_detections_by_timestamp = {}
 
-# Create a tqdm progress bar
 progress_bar = tqdm(total=len(detections_by_timestamp), desc="Filtering detections")
 
 # Iterate through the sorted dictionary of detections by timestamp
@@ -52,7 +56,11 @@ timestamps = sorted(detections_by_timestamp.keys())
 for i, timestamp in enumerate(timestamps):
     filtered_detections = []
     
-    for (x1, y1) in detections_by_timestamp[timestamp]:
+    for (x_min, y_min, x_max, y_max, confidence) in detections_by_timestamp[timestamp]:
+        # Calculate the center of the bounding box
+        center_x = (x_min + x_max) / 2
+        center_y = (y_min + y_max) / 2
+
         matched = False
         
         # Check for matching detections in adjacent timestamps
@@ -63,10 +71,16 @@ for i, timestamp in enumerate(timestamps):
                 continue  # Skip the same timestamp
             
             # Iterate through detections in the other timestamp
-            for (x2, y2) in detections_by_timestamp[other_timestamp]:
-                distance = math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
+            for (x_min2, y_min2, x_max2, y_max2, _) in detections_by_timestamp[other_timestamp]:
+                # Calculate the center of the other bounding box
+                center_x2 = (x_min2 + x_max2) / 2
+                center_y2 = (y_min2 + y_max2) / 2
+
+                # Calculate the Euclidean distance between centers
+                distance = math.sqrt((center_x - center_x2) ** 2 + (center_y - center_y2) ** 2)
+
                 
-                if distance <= distance_threshold:
+                if distance <= DISTANCE_THRESHOLD:
                     matched = True
                     break  # No need to check other detections in this timestamp
             
@@ -74,7 +88,7 @@ for i, timestamp in enumerate(timestamps):
                 break  # No need to check other timestamps if a match is found
         
         if matched:
-            filtered_detections.append((x1, y1))
+            filtered_detections.append((x_min, y_min, x_max, y_max, confidence))
 
     filtered_detections_by_timestamp[timestamp] = filtered_detections
     progress_bar.update(1)

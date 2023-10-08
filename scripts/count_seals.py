@@ -79,6 +79,7 @@ with open(OUTPUT_DIR / OUTPUT_NAME, "w") as count_file:
 
                     d, p = results.detections, results.prediction
                     detections = list(zip(d.label, d.bbox))
+                    print(detections)
 
                     seal_count = 0
                     for label, bbox in detections:
