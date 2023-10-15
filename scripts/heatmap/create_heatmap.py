@@ -82,7 +82,7 @@ for i in range(int(NUM_CHUNKS)):
         keep_heat=HEATMAP_KEEP_HEAT,
         heat_decay_s=HEATMAP_HEAT_DECAY,
     )
-    heatmap_name = f"home/jte52/SENG402/scripts/heatmap/heatmap_chunks/heatmap_{i+1}.mp4"
+    heatmap_name = f"heatmap_chunks/heatmap_{i+1}.mp4"
     heatmap_video.duration = heatmap_video.end = heatmap_video.duration - HEATMAP_HEAT_DECAY
     heatmap_video.write_videofile(
         heatmap_name, bitrate=HEATMAP_BITRATE, fps=FPS, threads=32)
