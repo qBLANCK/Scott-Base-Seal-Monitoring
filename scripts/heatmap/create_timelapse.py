@@ -14,16 +14,16 @@ import argparse
 
 # Argument Parser
 parser = argparse.ArgumentParser(description="Filter seal detections based on distance and confidence.")
-parser.add_argument("--input", type=str, required=True, help="Path to the input folder with timelapse images.")
-parser.add_argument("--output", type=str, required=True, help="Path to the output MP4 file.")
+#parser.add_argument("--input", type=str, required=True, help="Path to the input folder with timelapse images.")
+#parser.add_argument("--output", type=str, required=True, help="Path to the output MP4 file.")
 parser.add_argument("--scale", type=float, default=1.0, help="Scale factor to upsize or downsize images (e.g., 0.5 for half size, 2.0 for double size)")
 args = parser.parse_args()
 
-#frame_folder = "/csse/research/antarctica_seals/images/scott_base/2022-23/" # Image sources
-#output_video = "/media/jte52/BLANCK/Seals/2022-23_timelapse.mp4"
+frame_folder = "/csse/research/antarctica_seals/images/scott_base/2022-23/" # Image sources
+output_video = "/media/jte52/BLANCK/Seals/2022-23_timelapse.mp4"
 
-frame_folder = args.input
-output_video = args.output
+#frame_folder = args.input
+#output_video = args.output
 scale_factor = args.scale
 
 FPS = 24
