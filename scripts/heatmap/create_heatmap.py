@@ -69,7 +69,7 @@ for i in range(int(NUM_CHUNKS)):
 
             x_mid = (int(x_min) + int(x_max)) // 2
             y_mid = (int(y_min) + int(y_max)) // 2
-            points.append((x_mid, y_mid, time_ms))
+            points.append((x_mid, y_mid, int(time_ms)))
 
     # Create heatmap video given a list of points (x, y, time in ms).
     # Don't touch this part if you don't need to
@@ -86,6 +86,6 @@ for i in range(int(NUM_CHUNKS)):
     heatmap_name = f"heatmap_chunks/heatmap_{i+1}.mp4"
     heatmap_video.duration = heatmap_video.end = heatmap_video.duration - HEATMAP_HEAT_DECAY
     heatmap_video.write_videofile(
-        heatmap_name, bitrate=HEATMAP_BITRATE, fps=FPS, threads=32)
+        heatmap_name, bitrate=HEATMAP_BITRATE, fps=FPS, threads=64)
 
 print("All chunks processed.")
