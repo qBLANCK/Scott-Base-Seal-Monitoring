@@ -15,7 +15,8 @@ This script generates heatmaps from seal detection data and overlays them on a t
 """
 
 import csv
-
+import sys
+sys.path.append('../../')  # Adjust path to access libs
 from libs.heatmappy.heatmappy.heatmap import Heatmapper
 from libs.heatmappy.heatmappy.video import VideoHeatmapper
 from moviepy.editor import VideoFileClip
