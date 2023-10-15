@@ -16,8 +16,6 @@ This script generates heatmaps from seal detection data and overlays them on a t
 
 import csv
 
-#import sys
-#sys.path.append('../../')  # Adjust path to access libs
 from libs.heatmappy.heatmappy.heatmap import Heatmapper
 from libs.heatmappy.heatmappy.video import VideoHeatmapper
 from moviepy.editor import VideoFileClip
@@ -29,7 +27,7 @@ NUM_CHUNKS = 1
 DETECTIONS_CSV = "home/jte52/SENG402/data/locations/Locations_2021-22_gen-Oct15.csv"   
 FPS = 24
 # Path to mp4 file containing timelapse of dataset. Generate this file using create_timelapse.py
-TIMELAPSE = "home/jte52/SENG402/scripts/heatmap/2021-22_timelapse.mp4"   
+TIMELAPSE = "2021-22_timelapse.mp4"   
 
 # Heatmap parameters
 HEATMAP_BITRATE = "3000k"
