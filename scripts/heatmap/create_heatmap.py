@@ -49,10 +49,6 @@ frames_per_chunk = total_frames // NUM_CHUNKS
 print("Status: Loading timelapse video")
 timelapse_video = VideoFileClip(TIMELAPSE)
 
-def convert_timestamp_to_ms(timestamp):
-    1000 * (i * (1 / FPS))
-    return 0
-
 # Loop through each chunk
 for i in range(int(NUM_CHUNKS)):
     print(f"Processing Chunk {i + 1}/{int(NUM_CHUNKS)}")
@@ -70,16 +66,11 @@ for i in range(int(NUM_CHUNKS)):
         reader = csv.reader(f)
         next(reader)  # Skip header
         points = []  # Create an empty list to store (X_mid, Y_mid, time in ms)
-        first_timestamp = None
         for row in reader:                
-            timestamp, x_min, y_min, x_max, y_max, _ = row
-
-            if first_timestamp is None:
-                first_timestamp = timestamp
+            _, x_min, y_min, x_max, y_max, _, time_ms = row
 
             x_mid = (int(x_min) + int(x_max)) // 2
             y_mid = (int(y_min) + int(y_max)) // 2
-            time_ms = convert_timestamp_to_ms(first_timestamp, timestamp)  # Implement this function
             points.append((x_mid, y_mid, time_ms))
 
     # Create heatmap video given a list of points (x, y, time in ms).
