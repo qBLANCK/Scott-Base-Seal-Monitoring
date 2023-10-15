@@ -37,7 +37,7 @@ frame = cv2.imread(image_files[0])
 height, width, layers = frame.shape
 
 # Initialize the video writer
-fourcc = cv2.VideoWriter_fourcc(*'H264')    # <-- Try H264 if having problems
+fourcc = cv2.VideoWriter_fourcc(*'XVID')    # <-- Try H264 if having problems
 out = cv2.VideoWriter(output_video, fourcc, FPS, (width, height))
 
 for image_file in tqdm(image_files, desc="Processing frames", unit="frame"):
