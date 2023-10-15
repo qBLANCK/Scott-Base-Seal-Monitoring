@@ -80,7 +80,7 @@ for i in range(int(num_chunks)):
                 y_mid = (int(y_min) + int(y_max)) // 2
                 # Adjust the time value to be relative to the start of the chunk
                 time_ms -= start_time
-                points.append((int(x_mid), int(y_mid), time_ms))
+                points.append((int(x_mid), int(y_mid), int(time_ms)))
 
     # Create heatmap video given a list of points (x, y, time in ms).
     # Don't touch this part if you don't need to
