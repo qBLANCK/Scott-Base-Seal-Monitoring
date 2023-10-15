@@ -20,10 +20,16 @@ sys.path.append('../../')  # Adjust path to access libs
 from libs.heatmappy.heatmappy.heatmap import Heatmapper
 from libs.heatmappy.heatmappy.video import VideoHeatmapper
 from moviepy.editor import VideoFileClip
+import argparse
+
+# Argument Parser
+parser = argparse.ArgumentParser(description="Filter seal detections based on distance and confidence.")
+parser.add_argument("--chunks", type=str, default=1, help="Number of chunks to split the heatmap into")
+args = parser.parse_args()
 
 IMAGE_FOLDER = "/csse/research/antarctica_seals/images/scott_base/2021-22/"
 # Adjust this to change the number of output chunks. Recommend making this as low as possible.
-NUM_CHUNKS = 1
+num_chunks = args.chunks
 # Path to CSV file containing seal detections. Generate this file using generate_seal_locations.py
 DETECTIONS_CSV = "seal_locations.csv"   
 FPS = 24
@@ -42,14 +48,14 @@ HEATMAP_POINT_OPACITY = 0.35
 #image_files = [os.path.join(IMAGE_FOLDER, f) for f in sorted(os.listdir(IMAGE_FOLDER)) if f.endswith(".jpg")]
 #total_frames = len(image_files)
 total_frames = 8926         # Hardcoded for 2021-22 dataset
-frames_per_chunk = total_frames // NUM_CHUNKS
+frames_per_chunk = total_frames // num_chunks
 
 print("Status: Loading timelapse video")
 timelapse_video = VideoFileClip(TIMELAPSE)
 
 # Loop through each chunk
-for i in range(int(NUM_CHUNKS)):
-    print(f"Processing Chunk {i + 1}/{int(NUM_CHUNKS)}")
+for i in range(int(num_chunks)):
+    print(f"Processing Chunk {i + 1}/{int(num_chunks)}")
 
     # Calculate the time range for the current chunk
     start_frame = i * frames_per_chunk
@@ -66,10 +72,15 @@ for i in range(int(NUM_CHUNKS)):
         points = []  # Create an empty list to store (X_mid, Y_mid, time in ms)
         for row in reader:                
             _, x_min, y_min, x_max, y_max, _, time_ms = row
+            time_ms = int(time_ms)  # Convert to integer
 
-            x_mid = (int(x_min) + int(x_max)) // 2
-            y_mid = (int(y_min) + int(y_max)) // 2
-            points.append((x_mid, y_mid, int(time_ms)))
+            # Check if the time_ms value falls within the current chunk's time frame
+            if start_time <= time_ms <= end_time:
+                x_mid = (int(x_min) + int(x_max)) // 2
+                y_mid = (int(y_min) + int(y_max)) // 2
+                # Adjust the time value to be relative to the start of the chunk
+                time_ms -= start_time
+                points.append((x_mid, y_mid, time_ms))
 
     # Create heatmap video given a list of points (x, y, time in ms).
     # Don't touch this part if you don't need to

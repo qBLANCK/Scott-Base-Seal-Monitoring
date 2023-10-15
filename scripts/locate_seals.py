@@ -14,8 +14,8 @@ import argparse
 # CONSTANTS
 DEFAULT_MODEL_PATH = 'Models/Seals/log/Dual_b4/model.pth'
 DEFAULT_MASK_PATH = 'Models/Seals/mask/mask_2021-22_ext.jpg'
-DEFAULT_SEAL_IMG_DIR = "/csse/research/antarctica_seals/images/scott_base/2021-22/"
-DEFAULT_OUTPUT_NAME = "data/locations/Locations_2021-22_gen-Oct15.csv"
+DEFAULT_SEAL_IMG_DIR = "/csse/research/antarctica_seals/images/scott_base/2022-23/"
+DEFAULT_OUTPUT_NAME = "data/locations/Locations_2022-23_gen-Oct15.csv"
 DEFAULT_CONFIDENCE_THRESHOLD = 0.3
 DEFAULT_BRIGHTNESS_THRESHOLD = 0.6
 
@@ -103,7 +103,7 @@ with open(output, "w") as count_file:
         csv_writer.writerow(["Timestamp", "X_min", "Y_min", "X_max", "Y_max", "Confidence", "Timelapse_pos"])
 
         for i, image_name in enumerate(tqdm(image_files)):
-            time_ms = 1000 * (i * (1 / FPS))        # Image position in timelapse in milliseconds
+            time_ms = int(1000 * (i * (1 / FPS)))        # Image position in timelapse in milliseconds
 
             frame = cv.imread_color(image_name)
             frame, brightness = brighten_image_to_threshold(frame)
