@@ -15,11 +15,9 @@ This script generates heatmaps from seal detection data and overlays them on a t
 """
 
 import csv
-import os
-from tqdm import tqdm
 
-import sys
-sys.path.append('../../')  # Adjust path to access libs
+#import sys
+#sys.path.append('../../')  # Adjust path to access libs
 from libs.heatmappy.heatmappy.heatmap import Heatmapper
 from libs.heatmappy.heatmappy.video import VideoHeatmapper
 from moviepy.editor import VideoFileClip
@@ -28,10 +26,10 @@ IMAGE_FOLDER = "/csse/research/antarctica_seals/images/scott_base/2021-22/"
 # Adjust this to change the number of output chunks. Recommend making this as low as possible.
 NUM_CHUNKS = 1
 # Path to CSV file containing seal detections. Generate this file using generate_seal_locations.py
-DETECTIONS_CSV = "seal_locations.csv"   
+DETECTIONS_CSV = "home/jte52/SENG402/data/locations/Locations_2021-22_gen-Oct15.csv"   
 FPS = 24
 # Path to mp4 file containing timelapse of dataset. Generate this file using create_timelapse.py
-TIMELAPSE = "2021-22_timelapse.mp4"   
+TIMELAPSE = "home/jte52/SENG402/scripts/heatmap/2021-22_timelapse.mp4"   
 
 # Heatmap parameters
 HEATMAP_BITRATE = "3000k"
@@ -42,8 +40,9 @@ HEATMAP_POINT_STRENGTH = 0.2
 HEATMAP_POINT_OPACITY = 0.35
 
 # Get the list of image files in the folder
-image_files = [os.path.join(IMAGE_FOLDER, f) for f in sorted(os.listdir(IMAGE_FOLDER)) if f.endswith(".jpg")]
-total_frames = len(image_files)
+#image_files = [os.path.join(IMAGE_FOLDER, f) for f in sorted(os.listdir(IMAGE_FOLDER)) if f.endswith(".jpg")]
+#total_frames = len(image_files)
+total_frames = 8926         # Hardcoded for 2021-22 dataset
 frames_per_chunk = total_frames // NUM_CHUNKS
 
 print("Status: Loading timelapse video")
@@ -85,7 +84,7 @@ for i in range(int(NUM_CHUNKS)):
         keep_heat=HEATMAP_KEEP_HEAT,
         heat_decay_s=HEATMAP_HEAT_DECAY,
     )
-    heatmap_name = f"heatmap_chunks/heatmap_{i+1}.mp4"
+    heatmap_name = f"home/jte52/SENG402/scripts/heatmap/heatmap_chunks/heatmap_{i+1}.mp4"
     heatmap_video.duration = heatmap_video.end = heatmap_video.duration - HEATMAP_HEAT_DECAY
     heatmap_video.write_videofile(
         heatmap_name, bitrate=HEATMAP_BITRATE, fps=FPS, threads=32)
