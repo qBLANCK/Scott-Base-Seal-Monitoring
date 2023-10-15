@@ -50,6 +50,7 @@ with open(input_csv, 'r') as csv_file:
         x_max = int(row['X_max'])
         y_max = int(row['Y_max'])
         confidence = float(row['Confidence'])
+        time_ms = float(row['Timelapse_pos'])
 
         if confidence < confidence_threshold:
             continue
@@ -57,7 +58,7 @@ with open(input_csv, 'r') as csv_file:
         # Store detections by timestamp
         if timestamp not in detections_by_timestamp:
             detections_by_timestamp[timestamp] = []
-        detections_by_timestamp[timestamp].append((x_min, y_min, x_max, y_max, confidence))
+        detections_by_timestamp[timestamp].append((x_min, y_min, x_max, y_max, confidence, time_ms))
         if timestamp not in timestamps:
             timestamps.append(timestamp)
 
@@ -71,7 +72,7 @@ timestamps = sorted(detections_by_timestamp.keys())
 for i, timestamp in enumerate(timestamps):
     filtered_detections = []
     
-    for (x_min, y_min, x_max, y_max, confidence) in detections_by_timestamp[timestamp]:
+    for (x_min, y_min, x_max, y_max, confidence, time_ms) in detections_by_timestamp[timestamp]:
         # Calculate the center of the bounding box
         center_x = (x_min + x_max) / 2
         center_y = (y_min + y_max) / 2
@@ -86,7 +87,7 @@ for i, timestamp in enumerate(timestamps):
                 continue  # Skip the same timestamp
             
             # Iterate through detections in the other timestamp
-            for (x_min2, y_min2, x_max2, y_max2, _) in detections_by_timestamp[other_timestamp]:
+            for (x_min2, y_min2, x_max2, y_max2, _, _) in detections_by_timestamp[other_timestamp]:
                 # Calculate the center of the other bounding box
                 center_x2 = (x_min2 + x_max2) / 2
                 center_y2 = (y_min2 + y_max2) / 2
@@ -106,7 +107,7 @@ for i, timestamp in enumerate(timestamps):
                 break
         
         if matched_count >= num_to_verify:
-            filtered_detections.append((x_min, y_min, x_max, y_max, confidence))
+            filtered_detections.append((x_min, y_min, x_max, y_max, confidence, time_ms))
 
     filtered_detections_by_timestamp[timestamp] = filtered_detections
     progress_bar.update(1)
@@ -118,9 +119,9 @@ with open(output_csv, 'w', newline='') as csv_file:
     csv_writer = csv.writer(csv_file)
     
     # Write the header row
-    csv_writer.writerow(["Timestamp", "X_min", "Y_min", "X_max", "Y_max", "Confidence"])
+    csv_writer.writerow(["Timestamp", "X_min", "Y_min", "X_max", "Y_max", "Confidence", "Timelapse_pos"])
     
     # Iterate through the filtered detections and write them to the CSV
     for timestamp, filtered_detections in sorted(filtered_detections_by_timestamp.items()):
         for d in filtered_detections:
-            csv_writer.writerow([timestamp, d[0], d[1], d[2], d[3], d[4]])
+            csv_writer.writerow([timestamp, d[0], d[1], d[2], d[3], d[4], int(d[5])])

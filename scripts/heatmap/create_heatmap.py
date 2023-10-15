@@ -25,7 +25,7 @@ IMAGE_FOLDER = "/csse/research/antarctica_seals/images/scott_base/2021-22/"
 # Adjust this to change the number of output chunks. Recommend making this as low as possible.
 NUM_CHUNKS = 1
 # Path to CSV file containing seal detections. Generate this file using generate_seal_locations.py
-DETECTIONS_CSV = "home/jte52/SENG402/data/locations/Locations_2021-22_gen-Oct15.csv"   
+DETECTIONS_CSV = "seal_locations.csv"   
 FPS = 24
 # Path to mp4 file containing timelapse of dataset. Generate this file using create_timelapse.py
 TIMELAPSE = "2021-22_timelapse.mp4"   
