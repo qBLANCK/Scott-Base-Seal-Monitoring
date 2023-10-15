@@ -24,7 +24,7 @@ import argparse
 
 # Argument Parser
 parser = argparse.ArgumentParser(description="Filter seal detections based on distance and confidence.")
-parser.add_argument("--chunks", type=str, default=1, help="Number of chunks to split the heatmap into")
+parser.add_argument("--chunks", type=int, default=1, help="Number of chunks to split the heatmap into")
 args = parser.parse_args()
 
 IMAGE_FOLDER = "/csse/research/antarctica_seals/images/scott_base/2021-22/"
