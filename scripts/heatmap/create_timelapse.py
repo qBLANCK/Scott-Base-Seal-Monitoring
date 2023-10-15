@@ -10,9 +10,20 @@ import cv2
 import os
 from datetime import datetime
 from tqdm import tqdm
+import argparse
 
-frame_folder = "/csse/research/antarctica_seals/images/scott_base/2021-22/" # Image sources
-output_video = "2021-22_timelapse.mp4"
+# Argument Parser
+parser = argparse.ArgumentParser(description="Filter seal detections based on distance and confidence.")
+parser.add_argument("--input", type=str, required=True, help="Path to the input folder with timelapse images.")
+parser.add_argument("--output", type=str, required=True, help="Path to the output MP4 file.")
+args = parser.parse_args()
+
+frame_folder = "/csse/research/antarctica_seals/images/scott_base/2022-23/" # Image sources
+output_video = "/media/jte52/BLANCK/Seals/2022-23_timelapse.mp4"
+
+frame_folder = args.input
+output_video = args.output
+
 FPS = 24
 
 # Get the list of image files in the folder

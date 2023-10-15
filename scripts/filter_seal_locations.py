@@ -18,13 +18,23 @@ parser.add_argument("--output", type=str, required=True, help="Path to the outpu
 parser.add_argument("--distance", type=float, default=25, help="Distance threshold for filtering detections.")
 parser.add_argument("--confidence", type=float, default=0.3, help="Confidence threshold for filtering detections.")
 parser.add_argument("--num_timestamps", type=int, default=1, help="Number of timestamps to check on either side.")
+parser.add_argument("--num_to_verify", type=int, default=1, help="Number of adjacent detections required to verify an image")
 args = parser.parse_args()
+
+# Check if num_timestamps is not 0
+if args.num_timestamps <= 0:
+    raise argparse.ArgumentTypeError("num_timestamps cannot be less than 1")
+
+# Check if num_to_verify is less than num_timestamps * 2
+if args.num_to_verify >= args.num_timestamps * 2:
+    raise argparse.ArgumentTypeError("num_to_verify must be less than num_timestamps * 2")
 
 input_csv = args.input
 output_csv = args.output
 distance_threshold = args.distance
 confidence_threshold = args.confidence
 num_timestamps = args.num_timestamps
+num_to_verify = args.num_to_verify
 
 timestamps = []  # List of timestamps
 detections_by_timestamp = {}  # Dictionary to store detections by timestamp
@@ -66,7 +76,7 @@ for i, timestamp in enumerate(timestamps):
         center_x = (x_min + x_max) / 2
         center_y = (y_min + y_max) / 2
 
-        matched = False
+        matched_count = 0
         
         # Check for matching detections in adjacent timestamps
         for j in range(max(0, i - num_timestamps), min(i + num_timestamps + 1, len(timestamps))):
@@ -86,13 +96,16 @@ for i, timestamp in enumerate(timestamps):
 
                 
                 if distance <= distance_threshold:
-                    matched = True
-                    break  # No need to check other detections in this timestamp
+                    matched_count += 1
+                    # If enough matches are found, break the loop
+                    if matched_count >= num_to_verify:
+                        break
             
-            if matched:
-                break  # No need to check other timestamps if a match is found
+            # If enough matches are found, break the loop
+            if matched_count >= num_to_verify:
+                break
         
-        if matched:
+        if matched_count >= num_to_verify:
             filtered_detections.append((x_min, y_min, x_max, y_max, confidence))
 
     filtered_detections_by_timestamp[timestamp] = filtered_detections

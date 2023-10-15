@@ -26,7 +26,7 @@ from moviepy.editor import VideoFileClip
 
 IMAGE_FOLDER = "/csse/research/antarctica_seals/images/scott_base/2021-22/"
 # Adjust this to change the number of output chunks. Recommend making this as low as possible.
-NUM_CHUNKS = 32  
+NUM_CHUNKS = 1
 # Path to CSV file containing seal detections. Generate this file using generate_seal_locations.py
 DETECTIONS_CSV = "seal_locations.csv"   
 FPS = 24
@@ -39,7 +39,7 @@ HEATMAP_KEEP_HEAT = True
 HEATMAP_HEAT_DECAY = 1  # Seconds
 HEATMAP_POINT_DIAM = 40
 HEATMAP_POINT_STRENGTH = 0.2
-HEATMAP_POINT_OPACITY = 0.65
+HEATMAP_POINT_OPACITY = 0.35
 
 # Get the list of image files in the folder
 image_files = [os.path.join(IMAGE_FOLDER, f) for f in sorted(os.listdir(IMAGE_FOLDER)) if f.endswith(".jpg")]
@@ -48,6 +48,10 @@ frames_per_chunk = total_frames // NUM_CHUNKS
 
 print("Status: Loading timelapse video")
 timelapse_video = VideoFileClip(TIMELAPSE)
+
+def convert_timestamp_to_ms(timestamp):
+    1000 * (i * (1 / FPS))
+    return 0
 
 # Loop through each chunk
 for i in range(int(NUM_CHUNKS)):
@@ -65,9 +69,18 @@ for i in range(int(NUM_CHUNKS)):
     with open(DETECTIONS_CSV, newline='') as f:
         reader = csv.reader(f)
         next(reader)  # Skip header
-        points = [(int(x), int(y), round(int(t) - start_time))
-                    for x, y, t in tqdm(list(reader))
-                    if start_time <= int(t) <= end_time]
+        points = []  # Create an empty list to store (X_mid, Y_mid, time in ms)
+        first_timestamp = None
+        for row in reader:                
+            timestamp, x_min, y_min, x_max, y_max, _ = row
+
+            if first_timestamp is None:
+                first_timestamp = timestamp
+
+            x_mid = (int(x_min) + int(x_max)) // 2
+            y_mid = (int(y_min) + int(y_max)) // 2
+            time_ms = convert_timestamp_to_ms(first_timestamp, timestamp)  # Implement this function
+            points.append((x_mid, y_mid, time_ms))
 
     # Create heatmap video given a list of points (x, y, time in ms).
     # Don't touch this part if you don't need to
