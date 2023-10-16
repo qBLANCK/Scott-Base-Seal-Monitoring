@@ -12,19 +12,19 @@ parser.add_argument("--output", type=str, required=True, help="Output CSV file n
 parser.add_argument("--thresholds", type=int, nargs='+', default=[30, 40, 50, 60, 70], help="List of confidence thresholds as percentages.")
 args = parser.parse_args()
 
-INPUT_CSV = args.input
-OUTPUT_CSV = args.output
-THRESHOLDS_PERCENTAGES = args.thresholds
+input_csv = args.input
+output_csv = args.output
+thresholds_percentages = args.thresholds
 
 # Convert threshold percentages to decimal values
-THRESHOLDS = [t / 100.0 for t in THRESHOLDS_PERCENTAGES]
+thresholds = [t / 100.0 for t in thresholds_percentages]
 
-df = pd.read_csv(INPUT_CSV)
+df = pd.read_csv(input_csv)
 
 # Initialize a DataFrame to store counts for each threshold
 counts_df = pd.DataFrame({"Timestamp": df["Timestamp"].unique()})
 
-for threshold in THRESHOLDS:
+for threshold in thresholds:
     filtered_df = df[df["Confidence"] >= threshold] # Filter detections above the threshold
     
     # Group the data by the "Timestamp" column and count the occurrences
@@ -36,7 +36,7 @@ for threshold in THRESHOLDS:
 # Fill NaN values with 0 for timestamps with no detections above the thresholds
 counts_df = counts_df.fillna(0)
 
-output_csv = OUTPUT_CSV
+output_csv = output_csv
 counts_df.to_csv(output_csv, index=False)
 
 print(f"Counts saved to {output_csv}")
