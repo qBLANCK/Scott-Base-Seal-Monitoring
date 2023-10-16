@@ -8,11 +8,12 @@
 
 >
 
-> The goal of this project was to monitor Weddel seal activity during the Scott Base rebuild at Antartica (starting 2022/2023 summer) to ensure that they are minimally disrupted by building activity. Over the 2021/2022 summer, two 180Mp cameras were successfully installed at Pram Point and Turtle Rock, capturing continuous time-lapse image data of seals from November to February. With support from our deep learning team, this data was analysed for seal count/positioning to ensure this tech is fit-for-purpose for monitoring impact on seals of the Scott Base rebuild that starts late 2022.
+> The goal of this project was to monitor Weddell seal activity during the Scott Base rebuild at Antartica (starting 2022/2023 summer) to ensure that they are minimally disrupted by building activity. Over the 2021/2022 summer, two 180Mp cameras were successfully installed at Pram Point and Turtle Rock, capturing continuous time-lapse image data of seals from November to February. With support from our deep learning team, this data was analysed for seal count/positioning to ensure this tech is fit-for-purpose for monitoring impact on seals of the Scott Base rebuild that starts late 2022.
 
 ## Method
 
-This solution applies a RetinaNet CNN to detect the small and dense seals. The object detector can detect individual seals and a pairing of seals. Additionally, a second CNN was developed to detect low-visability inducing Antractic Snowstorms. These snowstorms greatly affect the validity of the seal detection CNN as they objstuct the view of the seals. Detection of Snowstorms allows for detection of false low-counts.
+This solution applies a RetinaNet CNN to detect the small and dense seals. The object detector can detect individual seals and a pairing of seals. 
+Additionally, a second CNN was developed to detect low-visability inducing Antractic Snowstorms. This was later replaced with a simpler algorithm based on detecting images with higher than usual brightness and cross referenced with low seal counts. These snowstorms greatly affect the validity of the seal detection CNN as they objstuct the view of the seals. Detection of Snowstorms allows for detection of false low-counts.
 
 ## Artifacts & Examples
 
@@ -30,7 +31,7 @@ This solution applies a RetinaNet CNN to detect the small and dense seals. The o
 
 - [x] Recieve and store large RAW images from two time lapse cameras from Nov 2021 — Feb 2022
 
-- [x] Design & Train an accurate CNN model to detect Weddel Seals from afar
+- [x] Design & Train an accurate CNN model to detect Weddell Seals from afar
 
 - [x] Use the trained model to generate Seal counts for each image
 
@@ -99,14 +100,18 @@ python -m Models.Seals.main --first 2 --input "coco --path annotations.json --im
 
 ## Analysing a dataset
 
+These are the scripts used to process a dataset from start to finish. Detailed instructions on usage is supplied in the user manual pdf.
+
 ```bash
 conda activate seal_env
-python -m scripts.crop_and_convert --input_dir /path/to/input_dir --output_dir /path/to/output_dir --crop_box left upper right lower
-python -m scripts.locate_seals --model_path "path/to/your/model.pth" --mask_path "path/to/your/mask.jpg" --input_dir "path/to/your/images" --output_dir "path/to/your/output" --output_name "output_filename.csv"
-python -m scripts.filter_seal_locations --input_csv "path/to/your/input.csv" --output_csv "path/to/your/output.csv"
-python -m scripts.counts_from_locations --input_csv "path/to/your/input.csv" --output_csv "path/to/your/output.csv"
-python -m scripts.heatmap.create_timelapse
-python -m scripts.heatmap.create_heatmap
+python -m scripts.crop_and_convert --input "/path/to/your/rw2/files" --output "/path/to/your/processed/images" --crop_box 1 2 3 4
+python -m scripts.locate_seals --input "/path/to/your/processed/images" --mask "/path/to/your/mask/image.jpg" --output "/path/to/your/output/file.csv"
+python -m scripts.filter_seal_locations --input "/path/to/your/locations/file.csv" --output "/path/to/your/filtered/locations/file.csv"
+python -m scripts.counts_from_locations --input "/path/to/your/locations/file.csv" --output "/path/to/your/counts/file.csv"
+python -m scripts.detect_snowstorms --input_dir "/path/to/your/processed/images" --input_csv "/path/to/your/counts/file.csv" --mask "/path/to/your/mask/image.jpg" --output "/path/to/your/output/file.csv"
+python -m scripts.heatmap.create_timelapse --input "/path/to/your/processed/images" --output "/path/to/your/timelapse.mp4"
+cd scripts/heatmap
+python -m create_heatmap --chunks 4 --timelapse "timelapse.mp4" --seals "locations.csv" --frames 1000
 ```
 
 ## Large Project Artifacts
