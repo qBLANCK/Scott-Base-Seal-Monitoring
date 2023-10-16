@@ -23,7 +23,7 @@ args = parser.parse_args()
 brightness_threshold = args.brightness
 confidence_threshold = args.confidence
 
-counts_csv = "data/counts/Counts_2021-22_gen-Oct15.csv"
+counts_csv = "data/counts/Counts_2021-22.csv"
 seal_img_dir = Path("/csse/research/antarctica_seals/images/scott_base/2021-22/")
 mask_path = 'Models/Seals/mask/mask_2021-22.jpg'
 
@@ -64,7 +64,31 @@ merged_df = merged_df.fillna(0)
 print("Checking for snowstorms...")
 
 merged_df['Snowstorm'] = False
-merged_df.loc[(merged_df['Brightness'] > brightness_threshold) & (merged_df['Counts ({}%)'.format(int(confidence_threshold * 100))] == 0), 'Snowstorm'] = True
+merged_df['Snowstorm'] = 'no'  # Initialize all entries to 'no'
+
+# Check for "yes" and "maybe" cases
+# If brightness is above the threshold and count is 0, set to "yes"
+merged_df.loc[
+    (merged_df['Brightness'] > brightness_threshold) &
+    (merged_df['Counts ({}%)'.format(int(confidence_threshold * 100))] == 0),
+    'Snowstorm'
+] = 'yes'
+
+# If brightness threshold is low but count is 0, set to "maybe"
+merged_df.loc[
+    (merged_df['Brightness'] <= brightness_threshold) &
+    (merged_df['Counts ({}%)'.format(int(confidence_threshold * 100))] == 0),
+    'Snowstorm'
+] = 'maybe'
+
+# If brightness threshold is high but count is below 10, set to "maybe"
+merged_df.loc[
+    (merged_df['Brightness'] > brightness_threshold) &
+    (merged_df['Counts ({}%)'.format(int(confidence_threshold * 100))] < 10),
+    'Snowstorm'
+] = 'maybe'
+
+merged_df = merged_df.sort_values(by='timestamp')
 
 print("Writing to CSV...")
 merged_df.to_csv(args.output, index=False)

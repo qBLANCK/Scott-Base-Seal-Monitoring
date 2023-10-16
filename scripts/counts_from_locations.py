@@ -9,7 +9,7 @@ import argparse
 parser = argparse.ArgumentParser(description="Generate a CSV file of seal counts from seal locations with timestamps.")
 parser.add_argument("--input", type=str, required=True, help="Input CSV file containing seal locations.")
 parser.add_argument("--output", type=str, required=True, help="Output CSV file name and path.")
-parser.add_argument("--thresholds", type=int, nargs='+', default=[30, 40, 50, 60, 70], help="List of confidence thresholds as percentages.")
+parser.add_argument("--thresholds", type=int, nargs='+', default=[50], help="List of confidence thresholds as percentages.")
 args = parser.parse_args()
 
 input_csv = args.input
