@@ -28,6 +28,7 @@ parser.add_argument("--chunks", type=int, default=1, help="Number of chunks to s
 parser.add_argument("--frames", type=int, required=True, help="Number of images in the dataset being processed.")
 parser.add_argument("--timelapse", type=str, required=True, help="Path to timelapse video to process.")
 parser.add_argument("--seals", required=True, help="Path to a CSV file containing seal detections")
+parser.add_argument("--scale", type=float, default=1.0 , help="Scale factor to upsize or downsize images (e.g., 0.5 for half size, 2.0 for double size)")
 args = parser.parse_args()
 
 num_chunks = args.chunks
@@ -35,6 +36,7 @@ detections_csv = args.seals
 timelapse = args.timelapse 
 total_frames = args.frames
 frames_per_chunk = total_frames // num_chunks
+scale_factor = args.scale
 
 # Heatmap parameters
 FPS = 24
@@ -75,7 +77,7 @@ for i in range(int(num_chunks)):
                 y_mid = (int(y_min) + int(y_max)) // 2
                 # Adjust the time value to be relative to the start of the chunk
                 time_ms -= start_time
-                points.append((int(x_mid), int(y_mid), int(time_ms)))
+                points.append((int(x_mid * scale_factor), int(y_mid * scale_factor), int(time_ms)))
 
     # Create heatmap video given a list of points (x, y, time in ms).
     # Don't touch this part if you don't need to

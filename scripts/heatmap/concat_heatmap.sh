@@ -3,11 +3,11 @@
 # Note: The number of chunks generated and the length of the heatmap decay can be checked in create_heatmap.py
 
 # Specify the number of video clips (must match the number of chunks in the heatmap_chunks folder)
-num_clips=32
+num_clips=4
 
 # Specify the durations for each clip (should match the length of each chunk minus HEATMAP_HEAT_DECAY)
 # The first chunk is one second shorter than the rest
-length=11.6
+length=94
 durations=($(echo "$length - 1" | bc) $(for ((i=1; i<num_clips; i++)); do echo $length; done))
 
 prefix="heatmap"
