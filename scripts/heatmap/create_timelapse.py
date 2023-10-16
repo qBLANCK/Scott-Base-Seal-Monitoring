@@ -13,14 +13,11 @@ from tqdm import tqdm
 import argparse
 
 # Argument Parser
-parser = argparse.ArgumentParser(description="Filter seal detections based on distance and confidence.")
+parser = argparse.ArgumentParser(description="Create an mp4 timelapse from a folder of images.")
 parser.add_argument("--input", type=str, required=True, help="Path to the input folder with timelapse images.")
 parser.add_argument("--output", type=str, required=True, help="Path to the output MP4 file.")
 parser.add_argument("--scale", type=float, default=1.0, help="Scale factor to upsize or downsize images (e.g., 0.5 for half size, 2.0 for double size)")
 args = parser.parse_args()
-
-#frame_folder = "/csse/research/antarctica_seals/images/scott_base/2022-23/" # Image sources
-#output_video = "/media/jte52/BLANCK/Seals/2022-23_timelapse.mp4"
 
 frame_folder = args.input
 output_video = args.output
@@ -30,7 +27,6 @@ FPS = 24
 
 # Get the list of image files in the folder
 image_files = [os.path.join(frame_folder, f) for f in sorted(os.listdir(frame_folder)) if f.endswith(".jpg")]
-#image_files = image_files[:100]        # Uncomment this if you want to just generate a quick test portion instead of the whole video
 total_frames = len(image_files)
 
 # Get the dimensions of the first image (assuming all images have the same dimensions)

@@ -1,3 +1,7 @@
+"""
+Detects seal locations in a set of images, saving the results to a CSV file.
+"""
+
 import csv
 import os
 from pathlib import Path
@@ -23,21 +27,21 @@ FPS = 24
 
 # Argument Parser
 parser = argparse.ArgumentParser(description="Generate seal locations from images.")
-parser.add_argument("--model_path", type=str, default=DEFAULT_MODEL_PATH, help="Path to the seal detection model.")
-parser.add_argument("--mask_path", type=str, default=DEFAULT_MASK_PATH, help="Path to the mask image.")
-parser.add_argument("--input_dir", type=str, default=DEFAULT_SEAL_IMG_DIR, help="Directory containing seal images.")
+parser.add_argument("--model", type=str, default=DEFAULT_MODEL_PATH, help="Path to the seal detection model.")
+parser.add_argument("--mask", type=str, default=DEFAULT_MASK_PATH, help="Path to the mask image.")
+parser.add_argument("--input", type=str, default=DEFAULT_SEAL_IMG_DIR, help="Directory containing seal images.")
 parser.add_argument("--output", type=str, default=DEFAULT_OUTPUT_NAME, help="Where to save the output CSV file.")
-parser.add_argument("--confidence_threshold", type=float, default=DEFAULT_CONFIDENCE_THRESHOLD, help="Confidence threshold for detections.")
-parser.add_argument("--brightness_threshold", type=float, default=DEFAULT_BRIGHTNESS_THRESHOLD, help="Brightness threshold for images.")
+parser.add_argument("--confidence", type=float, default=DEFAULT_CONFIDENCE_THRESHOLD, help="Confidence threshold for detections.")
+parser.add_argument("--brightness", type=float, default=DEFAULT_BRIGHTNESS_THRESHOLD, help="Brightness threshold for images.")
 args = parser.parse_args()
 
 # MODEL SETUP
-model_path = args.model_path
-mask_path = args.mask_path
-seal_img_dir = args.input_dir
+model_path = args.model
+mask_path = args.mask
+seal_img_dir = args.input
 output = args.output
-confidence_threshold = args.confidence_threshold
-brightness_threshold = args.brightness_threshold
+confidence_threshold = args.confidence
+brightness_threshold = args.brightness
 
 print("Status: Loading seal detection model")
 model, encoder, _ = load_model(model_path)
