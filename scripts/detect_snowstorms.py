@@ -88,7 +88,7 @@ merged_df.loc[
     'Snowstorm'
 ] = 'maybe'
 
-merged_df = merged_df.sort_values(by='timestamp')
+merged_df = merged_df.sort_values(by='Timestamp')
 
 print("Writing to CSV...")
 merged_df.to_csv(args.output, index=False)
