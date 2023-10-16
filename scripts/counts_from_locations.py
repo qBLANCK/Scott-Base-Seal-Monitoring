@@ -7,13 +7,13 @@ import argparse
 
 # Argument Parser
 parser = argparse.ArgumentParser(description="Generate a CSV file of seal counts from seal locations with timestamps.")
-parser.add_argument("--input_csv", type=str, required=True, help="Input CSV file containing seal locations.")
-parser.add_argument("--output_csv", type=str, required=True, help="Output CSV file name and path.")
-parser.add_argument("--thresholds", type=int, nargs='+', default=[30, 40, 45, 50, 55, 60, 70], help="List of confidence thresholds as percentages.")
+parser.add_argument("--input", type=str, required=True, help="Input CSV file containing seal locations.")
+parser.add_argument("--output", type=str, required=True, help="Output CSV file name and path.")
+parser.add_argument("--thresholds", type=int, nargs='+', default=[30, 40, 50, 60, 70], help="List of confidence thresholds as percentages.")
 args = parser.parse_args()
 
-INPUT_CSV = args.input_csv
-OUTPUT_CSV = args.output_csv
+INPUT_CSV = args.input
+OUTPUT_CSV = args.output
 THRESHOLDS_PERCENTAGES = args.thresholds
 
 # Convert threshold percentages to decimal values

@@ -7,7 +7,8 @@ num_clips=32
 
 # Specify the durations for each clip (should match the length of each chunk minus HEATMAP_HEAT_DECAY)
 # The first chunk is one second shorter than the rest
-durations=(10.6 $(for ((i=1; i<num_clips; i++)); do echo 11.6; done))
+length=11.6
+durations=($(echo "$length - 1" | bc) $(for ((i=1; i<num_clips; i++)); do echo $length; done))
 
 prefix="heatmap"
 
